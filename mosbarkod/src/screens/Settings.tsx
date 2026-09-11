@@ -1795,7 +1795,7 @@ export default function SettingsScreen({
 
       {open === 'hardware' && (
         <SettingsModal title="Donanım Entegrasyonu" icon="barcode" color="text-mint" onClose={() => setOpen(null)}>
-          <HardwareCard toast={toast} />
+          <HardwareCard settings={s} onPatch={onPatch} toast={toast} />
         </SettingsModal>
       )}
 

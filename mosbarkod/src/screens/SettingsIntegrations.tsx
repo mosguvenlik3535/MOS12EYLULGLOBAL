@@ -5,6 +5,13 @@ import { Btn, Field, Inp, Sel } from '../components/ui';
 import ReportModal from '../components/ReportModal';
 import { buildReport, waLink } from '../lib/report';
 import { sendEmail } from '../lib/email';
+import { useLocale } from '../locales/i18n';
+import {
+  DEFAULT_ENABLED_DEVICES,
+  HARDWARE_DEVICES,
+  hardwareCountryName,
+  hardwareRegionModels,
+} from '../lib/hardware';
 import {
   ALL_REPORT_IDS,
   REPORT_ITEMS,
@@ -660,37 +667,109 @@ export function EmailCard({
 
 /* ---------------- DONANIM ---------------- */
 
-export function HardwareCard({ toast }: { toast: Toast }) {
-  const devices = [
-    { name: 'Barkod Okuyucu', sub: 'Klavye Emülasyonu (USB/HID)' },
-    { name: 'Terminal Yazıcı', sub: 'ESC/POS Protokolü (58/80mm)' },
-    { name: 'Elektronik Terazi', sub: 'CAS/TEM Seri Port' },
-  ];
+export function HardwareCard({
+  settings,
+  onPatch,
+  toast,
+}: {
+  settings: Settings;
+  onPatch: (p: Partial<Settings>) => void;
+  toast: Toast;
+}) {
+  const { locale } = useLocale();
+  const enabled = settings.hardware?.enabledDevices ?? DEFAULT_ENABLED_DEVICES;
+  const country = hardwareCountryName(locale);
+
+  const toggle = (id: string) => {
+    const next = enabled.includes(id) ? enabled.filter((x) => x !== id) : [...enabled, id];
+    onPatch({ hardware: { enabledDevices: next } });
+    const d = HARDWARE_DEVICES.find((x) => x.id === id);
+    toast(next.includes(id) ? `${d?.name} eklendi` : `${d?.name} çıkarıldı`);
+  };
+
   return (
     <Card
       icon="barcode"
       title="Donanım Bağlantı & Entegrasyon Paneli"
       color="text-mint"
-      desc="Yazılımımız tüm standart 1D/2D barkod okuyucular, 58mm/80mm terminal fiş yazıcılar ve elektronik terazilerle (CAS, TEM vb.) %100 uyumlu olarak çalışır."
+      desc="Barkod okuyucu, fiş yazıcı, barkod etiket yazıcısı, terazi, para çekmecesi ve müşteri ekranı gibi tüm standart ekipmanlarla uyumludur. İhtiyacınız olan ekipmanları ekleyip çıkarabilirsiniz."
     >
-      <div className="grid gap-2 sm:grid-cols-3">
-        {devices.map((d) => (
-          <div key={d.name} className="rounded-lg border border-line bg-panel2/60 p-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[12px] font-bold">{d.name}</span>
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mint opacity-60" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-mint" />
-              </span>
-            </div>
-            <div className="mt-0.5 text-[10px] text-mut2">{d.sub}</div>
-            <div className="mt-2.5 font-mono text-[10px] font-bold tracking-wider text-mint">X100 UYUMLU</div>
-          </div>
-        ))}
+      <div className="mb-3 flex items-center gap-2 rounded-lg border border-mint/25 bg-mint/5 px-3 py-2">
+        <Ic n="globe" c="h-4 w-4 text-mint" />
+        <span className="text-[11px] text-mut">
+          Seçili ülke: <b className="text-mint">{country}</b> — aşağıda bu pazarda yaygın modeller önerilir.
+        </span>
       </div>
-      <Btn v="primary" className="mt-3 w-full" onClick={() => toast('Donanım profili güncellendi ve kaydedildi')}>
-        <Ic n="check" c="h-4 w-4" /> Ayarları Güncelle ve Kaydet
-      </Btn>
+
+      <div className="grid gap-2 sm:grid-cols-2">
+        {HARDWARE_DEVICES.map((d) => {
+          const active = enabled.includes(d.id);
+          return (
+            <div
+              key={d.id}
+              className={cn(
+                'rounded-lg border p-3 transition-colors',
+                active ? 'border-mint/40 bg-panel2/70' : 'border-line bg-panel2/30 opacity-60'
+              )}
+            >
+              <div className="flex items-start gap-2.5">
+                <span
+                  className={cn(
+                    'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border',
+                    active ? 'border-mint/40 bg-mint/10 text-mint' : 'border-line2 bg-panel3 text-mut'
+                  )}
+                >
+                  <Ic n={d.icon} c="h-4.5 w-4.5" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[12.5px] font-bold">{d.name}</span>
+                    <button
+                      onClick={() => toggle(d.id)}
+                      className={cn(
+                        'relative h-5 w-9 shrink-0 rounded-full border transition-colors',
+                        active ? 'border-mint bg-mint/80' : 'border-line2 bg-ink/60'
+                      )}
+                      title={active ? 'Ekipmanı çıkar' : 'Ekipmanı ekle'}
+                    >
+                      <span
+                        className={cn(
+                          'absolute top-0.5 h-3.5 w-3.5 rounded-full bg-[#0a0e13] transition-all',
+                          active ? 'left-[18px]' : 'left-0.5'
+                        )}
+                      />
+                    </button>
+                  </div>
+                  <div className="mt-0.5 font-mono text-[9.5px] text-mut2">{d.protocols}</div>
+                </div>
+              </div>
+
+              <div className="mt-2.5 space-y-1.5">
+                <div className="rounded-md border border-line bg-ink/40 px-2 py-1.5 text-[9.5px] leading-relaxed text-mut">
+                  <b className="text-mut">🌍 {country}:</b> {hardwareRegionModels(d, locale)}
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[9.5px] font-bold tracking-wider text-mint">
+                    {active ? '✓ AKTİF' : 'EKLENMEDİ'}
+                  </span>
+                  {active && (
+                    <span className="relative flex h-2 w-2">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mint opacity-60" />
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-mint" />
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <p className="mt-3 text-[10px] leading-relaxed text-mut2">
+        💡 Barkod okuyucular klavye gibi çalışır (sürücü gerekmez). Fiş yazıcılar ESC/POS, etiket yazıcıları ZPL/TSPL
+        protokolüyle yazdırır. Para çekmecesi fiş yazıcısının RJ11 çıkışından, terazi RS232/USB üzerinden bağlanır.
+        Dil seçimi değiştiğinde ülkeye özel model önerileri otomatik güncellenir.
+      </p>
     </Card>
   );
 }

@@ -479,6 +479,10 @@ export interface Settings {
   mobileSyncCode: string;
   /** Kullanıcı PIN kodları — 4 haneli. Anahtar: kullanıcı id (u1/u2/u3) */
   pins: Record<string, string>;
+  /** Donanım entegrasyonu — aktif ekipmanlar (reader, receipt, label, scale, drawer, display) */
+  hardware: {
+    enabledDevices: string[];
+  };
   ui: {
     productImgH: number;
     productImgScale: number;
@@ -1041,6 +1045,9 @@ export const defaultSettings = (): Settings => ({
   kkartDiscount: 8,
   mobileSyncCode: 'MOSB',
   pins: { u1: '0000', u2: '1111', u3: '2222' },
+  hardware: {
+    enabledDevices: ['reader', 'receipt', 'scale'],
+  },
   ui: defaultUI(),
   pos: {
     enabled: false,
@@ -1110,6 +1117,7 @@ export function loadState(): AppState {
             pins: { ...d.pins, ...(s.settings.pins || {}) },
             currency: { ...d.currency, ...(s.settings.currency || {}) },
             cfd: { ...d.cfd, ...(s.settings.cfd || {}) },
+            hardware: { ...d.hardware, ...(s.settings.hardware || {}) },
           },
         };
         if (merged.settings.currency?.active) {
