@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import JSZip from 'jszip';
 import { QRCodeSVG } from 'qrcode.react';
 import { cn } from '../utils/cn';
@@ -1050,6 +1050,112 @@ async function makeLinuxMintPackage(state: AppState) {
   return zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } });
 }
 
+/**
+ * Korumalı bölümlerin ortak güvenlik şifresi.
+ * Kasa & ciro sıfırlama ve Kurulum & Sürüm Dosyaları gibi kritik bölümler
+ * yalnızca bu 8 haneli şifreyle açılır.
+ */
+const SECURITY_PASS = '12345678';
+
+/**
+ * Ortak 8 haneli güvenlik şifresi penceresi.
+ * Şifre doğru girildiğinde `onAuthorized` çağrılır; yanlış girilirse hata gösterilir.
+ */
+function SecurityGateModal({
+  title,
+  confirmLabel,
+  warning,
+  color = 'text-red',
+  onAuthorized,
+  onError,
+  onClose,
+}: {
+  title: string;
+  confirmLabel: string;
+  warning?: ReactNode;
+  color?: string;
+  onAuthorized: () => void;
+  onError?: () => void;
+  onClose: () => void;
+}) {
+  const [pass, setPass] = useState('');
+  const [err, setErr] = useState(false);
+
+  const clear = () => {
+    setPass('');
+    setErr(false);
+  };
+
+  return (
+    <Modal
+      title={title}
+      icon={<Ic n="lock" c={`h-4.5 w-4.5 ${color}`} />}
+      onClose={() => {
+        clear();
+        onClose();
+      }}
+      w="max-w-md"
+      footer={
+        <>
+          <Btn
+            v="ghost"
+            onClick={() => {
+              clear();
+              onClose();
+            }}
+          >
+            Vazgeç
+          </Btn>
+          <Btn
+            v="danger"
+            disabled={pass.length !== 8}
+            onClick={() => {
+              if (pass === SECURITY_PASS) {
+                clear();
+                onAuthorized();
+              } else {
+                setErr(true);
+                setPass('');
+                onError?.();
+              }
+            }}
+          >
+            <Ic n="alert" c="h-4 w-4" /> {confirmLabel}
+          </Btn>
+        </>
+      }
+    >
+      <div className="space-y-3">
+        {warning}
+        <div>
+          <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-widest text-mut">
+            8 Haneli Güvenlik Şifresi *
+          </label>
+          <input
+            type="password"
+            value={pass}
+            onChange={(e) => {
+              setPass(e.target.value.replace(/\D/g, '').slice(0, 8));
+              setErr(false);
+            }}
+            placeholder="••••••••"
+            inputMode="numeric"
+            autoFocus
+            className={cn(
+              'w-full rounded-lg border bg-ink/80 px-3 py-2.5 text-center font-mono text-xl font-bold tracking-[0.35em] text-red outline-none transition-colors focus:border-red',
+              err ? 'border-red ring-2 ring-red/20' : 'border-line2'
+            )}
+          />
+          <div className="mt-1 flex items-center justify-between font-mono text-[9.5px]">
+            <span className="text-mut2">{pass.length} / 8 hane</span>
+            {err && <span className="font-bold text-red">Hatalı şifre!</span>}
+          </div>
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
 export default function SettingsScreen({
   state,
   onPatch,
@@ -1090,8 +1196,7 @@ export default function SettingsScreen({
   const fileRef = useRef<HTMLInputElement>(null);
   const visibleConnected = sync.connected;
   const [resetOpen, setResetOpen] = useState(false);
-  const [resetPass, setResetPass] = useState('');
-  const [resetErr, setResetErr] = useState(false);
+  const [dlPassOpen, setDlPassOpen] = useState(false);
   const [open, setOpen] = useState<TileId | null>(null);
   const [winBusy, setWinBusy] = useState(false);
   const [linuxBusy, setLinuxBusy] = useState(false);
@@ -1264,7 +1369,14 @@ export default function SettingsScreen({
               desc={t.desc}
               color={t.color}
               badge={t.badge}
-              onOpen={() => setOpen(t.id)}
+              onOpen={() => {
+                // Kurulum & Sürüm Dosyaları yalnızca güvenlik şifresiyle açılır.
+                if (t.id === 'downloads') {
+                  setDlPassOpen(true);
+                } else {
+                  setOpen(t.id);
+                }
+              }}
             />
           ))}
         </div>
@@ -1769,14 +1881,14 @@ export default function SettingsScreen({
       )}
 
       {open === 'reset' && (
-        <SettingsModal title="Kasa & Ciro Sıfırlama" icon="alert" color="text-red" wide={false} onClose={() => { setOpen(null); setResetPass(''); setResetErr(false); }}>
+        <SettingsModal title="Kasa & Ciro Sıfırlama" icon="alert" color="text-red" wide={false} onClose={() => setOpen(null)}>
           <Panel icon="reset" title="Tüm İşletme Değerlerini Sıfırla" color="text-red">
             <p className="mb-3 text-[10.5px] leading-relaxed text-mut2">
               İlk kurulum için satış/ciro, paket sipariş, veresiye, masraf, alış faturası, POS ve kasa hareketleri,
               Ulaşım Kartı, stok miktarları ve personel ödeme geçmişleri sıfırlanır. Ürün/personel kartları ve şirket
               ayarları korunur.
             </p>
-            <Btn v="danger" className="w-full" onClick={() => { setResetOpen(true); setResetPass(''); setResetErr(false); }}><Ic n="alert" c="h-4 w-4" /> Tüm İşletme Değerlerini Sıfırla</Btn>
+            <Btn v="danger" className="w-full" onClick={() => setResetOpen(true)}><Ic n="alert" c="h-4 w-4" /> Tüm İşletme Değerlerini Sıfırla</Btn>
           </Panel>
         </SettingsModal>
       )}
@@ -1799,72 +1911,46 @@ export default function SettingsScreen({
       )}
 
       {resetOpen && (
-        <Modal
+        <SecurityGateModal
           title="Ciro & Kasa Sıfırlama — Güvenlik Şifresi Gerekli"
-          icon={<Ic n="alert" c="h-4.5 w-4.5 text-red" />}
-          onClose={() => { setResetOpen(false); setResetPass(''); setResetErr(false); }}
-          w="max-w-md"
-          footer={
-            <>
-              <Btn v="ghost" onClick={() => { setResetOpen(false); setResetPass(''); setResetErr(false); }}>
-                Vazgeç
-              </Btn>
-              <Btn
-                v="danger"
-                disabled={resetPass.length !== 8}
-                onClick={() => {
-                  if (resetPass === '12345678') {
-                    setResetOpen(false);
-                    setOpen(null);
-                    setResetPass('');
-                    setResetErr(false);
-                    onResetKasa();
-                    toast('Tüm ciro, satış ve işletme verileri başarıyla sıfırlandı');
-                  } else {
-                    setResetErr(true);
-                    setResetPass('');
-                    toast('Hatalı sıfırlama şifresi!', 'err');
-                  }
-                }}
-              >
-                <Ic n="alert" c="h-4 w-4" /> Şifreyi Onayla ve Sıfırla
-              </Btn>
-            </>
-          }
-        >
-          <div className="space-y-3">
+          confirmLabel="Şifreyi Onayla ve Sıfırla"
+          color="text-red"
+          warning={
             <div className="rounded-lg border border-red/30 bg-red/10 p-3 text-[11px] leading-relaxed text-red">
               <b className="font-bold">DİKKAT:</b> Satışlar ({state.sales.length}), paket siparişler ({state.deliveries.length}),
               veresiye bakiyeleri, masraflar ({state.expenses.length}), alış faturaları ({state.invoices.length}),
               kasa hareketleri ve stoklar sıfırlanacaktır. Bu işlem geri alınamaz.
             </div>
+          }
+          onAuthorized={() => {
+            setResetOpen(false);
+            setOpen(null);
+            onResetKasa();
+            toast('Tüm ciro, satış ve işletme verileri başarıyla sıfırlandı');
+          }}
+          onError={() => toast('Hatalı sıfırlama şifresi!', 'err')}
+          onClose={() => setResetOpen(false)}
+        />
+      )}
 
-            <div>
-              <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-widest text-mut">
-                8 Haneli Sıfırlama Güvenlik Şifresi *
-              </label>
-              <input
-                type="password"
-                value={resetPass}
-                onChange={(e) => {
-                  setResetPass(e.target.value.replace(/\D/g, '').slice(0, 8));
-                  setResetErr(false);
-                }}
-                placeholder="••••••••"
-                inputMode="numeric"
-                autoFocus
-                className={cn(
-                  'w-full rounded-lg border bg-ink/80 px-3 py-2.5 text-center font-mono text-xl font-bold tracking-[0.35em] text-red outline-none transition-colors focus:border-red',
-                  resetErr ? 'border-red ring-2 ring-red/20' : 'border-line2'
-                )}
-              />
-              <div className="mt-1 flex items-center justify-between font-mono text-[9.5px]">
-                <span className="text-mut2">{resetPass.length} / 8 hane</span>
-                {resetErr && <span className="font-bold text-red">Hatalı şifre! (12345678)</span>}
-              </div>
+      {dlPassOpen && (
+        <SecurityGateModal
+          title="Kurulum & Sürüm Dosyaları — Güvenlik Şifresi Gerekli"
+          confirmLabel="Şifreyi Onayla ve Aç"
+          color="text-amber2"
+          warning={
+            <div className="rounded-lg border border-amber/30 bg-amber/10 p-3 text-[11px] leading-relaxed text-amber2">
+              Bu bölümde <b className="font-bold">Windows EXE build paketi, Linux Mint kurulumu ve hazır EXE</b> indirme
+              dosyaları bulunur. Yalnızca yetkili yöneticiler açmalıdır.
             </div>
-          </div>
-        </Modal>
+          }
+          onAuthorized={() => {
+            setDlPassOpen(false);
+            setOpen('downloads');
+          }}
+          onError={() => toast('Hatalı güvenlik şifresi!', 'err')}
+          onClose={() => setDlPassOpen(false)}
+        />
       )}
 
       {qrScanOpen && (
