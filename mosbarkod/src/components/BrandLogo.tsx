@@ -1,23 +1,26 @@
 import { useState } from 'react';
 import { cn } from '../utils/cn';
 import { Ic } from '../icons';
+import logoUrl from '../assets/logo.png';
 
 /**
  * Marka logosu — sol üst köşe için ortak bileşen.
  *
- * /icons/logo.png dosyası mevcutsa gerçek logo görseli gösterilir;
- * dosya henüz eklenmemişse (404) mevcut gradient ikon kutusuna düşer.
- * Böylece logo dosyası yüklenene kadar arayüz bozulmaz.
+ * Gerçek logo görseli (`src/assets/logo.png`) gösterilir; görsel bir sebepten
+ * yüklenemezse mevcut gradient ikon kutusuna düşer (arayüz bozulmaz).
+ *
+ * Logo tek dosyalık (single-file) derlemede base64 olarak gömüldüğü için
+ * Electron (file://), PWA ve mobilde sorunsuz çalışır.
  */
 export default function BrandLogo({
-  size = 'h-9 w-9',
+  imgClassName,
+  boxClassName = 'h-9 w-9',
   iconSize = 'h-5 w-5',
-  className,
   fallbackIcon = 'flame',
 }: {
-  size?: string;
+  imgClassName?: string;
+  boxClassName?: string;
   iconSize?: string;
-  className?: string;
   fallbackIcon?: string;
 }) {
   const [imgOk, setImgOk] = useState(true);
@@ -25,11 +28,11 @@ export default function BrandLogo({
   if (imgOk) {
     return (
       <img
-        src="/icons/logo.png"
+        src={logoUrl}
         alt="MOSBARKODYAZILIM"
         draggable={false}
         onError={() => setImgOk(false)}
-        className={cn('shrink-0 select-none rounded-lg object-contain', size, className)}
+        className={cn('shrink-0 select-none object-contain', imgClassName ?? 'h-9 w-auto max-w-[168px]')}
       />
     );
   }
@@ -38,8 +41,7 @@ export default function BrandLogo({
     <div
       className={cn(
         'flex shrink-0 items-center justify-center rounded-lg border border-amber/50 text-[#180c02] shadow-[0_0_18px_rgba(245,158,11,0.2)]',
-        size,
-        className
+        boxClassName
       )}
       style={{ background: 'linear-gradient(135deg, var(--color-amber), var(--color-amber2))' }}
     >

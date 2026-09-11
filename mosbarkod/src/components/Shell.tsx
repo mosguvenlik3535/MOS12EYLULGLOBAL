@@ -31,15 +31,12 @@ export const NAV: { id: ViewId; key: string; icon: string }[] = [
 
 export function Logo({ small, icon = 'flame' }: { small?: boolean; icon?: string }) {
   return (
-    <div className={cn('flex items-center gap-2.5', small ? '' : '')}>
-      <BrandLogo fallbackIcon={icon} />
-      {!small && (
-        <div className="min-w-0">
-          <div className="truncate font-mono text-[12.5px] font-bold tracking-[0.08em] text-txt">MOSBARKODYA…</div>
-          <div className="font-mono text-[9px] tracking-[0.18em] text-mut2">MOSBARKOD V1.5</div>
-        </div>
-      )}
-    </div>
+    <BrandLogo
+      fallbackIcon={icon}
+      imgClassName={small ? 'h-8 w-auto max-w-[42px]' : 'h-9 w-auto max-w-[200px]'}
+      boxClassName={small ? 'h-8 w-8' : 'h-9 w-9'}
+      iconSize={small ? 'h-4 w-4' : 'h-5 w-5'}
+    />
   );
 }
 
@@ -201,7 +198,7 @@ export function TopBar({
   return (
     <header className="flex h-[58px] shrink-0 items-center gap-3 border-b border-line bg-panel px-3">
       <div className="flex items-center gap-2.5">
-        <BrandLogo fallbackIcon={settings.logoIcon || 'flame'} />
+        <BrandLogo fallbackIcon={settings.logoIcon || 'flame'} imgClassName="h-9 w-auto max-w-[168px]" />
         <div className="hidden md:block">
           <div className="font-mono text-[13px] font-bold tracking-[0.14em]">{settings.brandTitle || 'MOSBARKODYAZILIM'}</div>
           <div className="font-mono text-[8.5px] tracking-[0.2em] text-mut2">
