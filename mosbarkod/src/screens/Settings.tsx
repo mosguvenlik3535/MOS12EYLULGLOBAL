@@ -12,6 +12,7 @@ import CameraScanner from '../components/CameraScanner';
 import { CustomerDisplay } from '../components/CustomerDisplay';
 import { useLocale } from '../locales/i18n';
 import { LOCALES } from '../locales/i18n';
+import Flag from '../components/Flag';
 
 type Toast = (msg: string, type?: 'ok' | 'err') => void;
 
@@ -1290,7 +1291,7 @@ export default function SettingsScreen({
                   )}
                   style={locale === l.id ? { boxShadow: `0 0 0 1px rgba(47,214,165,0.4)` } : undefined}
                 >
-                  <span className="text-3xl">{l.flag}</span>
+                  <Flag code={l.id} className="h-6 w-8" />
                   <div className="flex-1">
                     <div className={cn('font-mono text-[13px] font-bold', locale === l.id ? 'text-mint' : 'text-txt')}>{l.label}</div>
                     <div className="text-[10px] text-mut2">{l.native}</div>

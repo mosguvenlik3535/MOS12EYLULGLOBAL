@@ -3,6 +3,7 @@ import { cn } from '../utils/cn';
 import { Ic } from '../icons';
 import { useLocale } from '../locales/i18n';
 import { LOCALES } from '../locales/i18n';
+import Flag from './Flag';
 import {
   USERS,
   VIEWS_LOCKED_FOR_CASHIER,
@@ -394,7 +395,7 @@ function LanguageSwitcher() {
         title={`${current.label} (${current.native})`}
         className="flex items-center gap-1.5 rounded-lg border border-line2 bg-ink/50 px-2.5 py-1.5 text-txt transition-colors hover:border-amber/50 hover:text-amber2"
       >
-        <span className="text-base leading-none">{current.flag}</span>
+        <span className="text-base leading-none"><Flag code={current.id} className="h-3.5 w-[18px]" /></span>
         <span className="font-mono text-[11px] font-bold uppercase text-amber2">{current.id}</span>
       </button>
       {open && (
@@ -411,7 +412,7 @@ function LanguageSwitcher() {
                 locale === l.id ? 'bg-amber/10 text-amber2' : 'text-txt'
               )}
             >
-              <span className="text-lg">{l.flag}</span>
+              <Flag code={l.id} className="h-4 w-[21px]" />
               <span className="flex-1 font-semibold">{l.native}</span>
               {locale === l.id && <Ic n="check" c="h-3.5 w-3.5 text-mint" />}
             </button>
