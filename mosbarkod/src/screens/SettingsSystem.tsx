@@ -19,6 +19,13 @@ import {
   settingsOnlyBackup,
   type BackupMeta,
 } from '../lib/backup';
+import {
+  cloudDownloadText,
+  cloudList,
+  cloudUpload,
+  unpackFromCloud,
+  type CloudFile,
+} from '../lib/cloudBackup';
 
 type Toast = (msg: string, type?: 'ok' | 'err') => void;
 
@@ -531,6 +538,213 @@ export function AutoBackupCard({
           label="Sil"
           onCancel={() => setDeleteId(null)}
           onOk={confirmDelete}
+        />
+      )}
+    </Card>
+  );
+}
+
+/* ---------------- BULUT YEDEKLEME ---------------- */
+
+export function CloudBackupCard({
+  cfg,
+  state,
+  onPatch,
+  onRestore,
+  toast,
+}: {
+  cfg: Settings['cloud'];
+  state: AppState;
+  onPatch: (p: Partial<Settings>) => void;
+  onRestore: (data: AppState) => void;
+  toast: Toast;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [listing, setListing] = useState(false);
+  const [files, setFiles] = useState<CloudFile[]>([]);
+  const [restoreFile, setRestoreFile] = useState<CloudFile | null>(null);
+
+  const patch = (p: Partial<Settings['cloud']>) => onPatch({ cloud: { ...cfg, ...p } });
+  const provider = cfg.provider ?? 'none';
+
+  const doUpload = async () => {
+    setBusy(true);
+    const res = await cloudUpload(cfg, state);
+    setBusy(false);
+    if (res.ok) {
+      patch({ lastUpload: new Date().toISOString(), lastError: '' });
+      toast('Buluta yükleme başarılı');
+    } else {
+      patch({ lastError: res.error || '' });
+      toast(`Buluta yükleme başarısız: ${res.error}`, 'err');
+    }
+  };
+
+  const doList = async () => {
+    setListing(true);
+    const res = await cloudList(cfg);
+    setListing(false);
+    if (res.ok) {
+      setFiles(res.files || []);
+      toast(res.files && res.files.length ? `${res.files.length} yedek bulundu` : 'Bulutta yedek bulunamadı');
+    } else {
+      toast(res.error || 'Listeleme başarısız', 'err');
+    }
+  };
+
+  const doRestore = async () => {
+    if (!restoreFile) return;
+    setBusy(true);
+    try {
+      const text = await cloudDownloadText(cfg, restoreFile);
+      const plain = await unpackFromCloud(text, cfg);
+      const parsed = parseBackupFile(plain, state);
+      if (!parsed.ok) {
+        toast(parsed.error, 'err');
+        return;
+      }
+      onRestore(parsed.data);
+      setRestoreFile(null);
+      setFiles([]);
+    } catch (e) {
+      toast(String(e instanceof Error ? e.message : e), 'err');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Card
+      icon="globe"
+      title="Bulut Yedekleme (Google Drive & Dropbox)"
+      color="text-mint"
+      desc="Yedeklerinizi şifreli olarak buluta da gönderin. İsteğe bağlıdır — kullanmayan bayiye hiçbir yük getirmez."
+      right={<Toggle on={cfg.enabled} onChange={(b) => patch({ enabled: b })} />}
+    >
+      <div className="grid gap-2.5 sm:grid-cols-2">
+        <Field label="Bulut Sağlayıcı">
+          <Sel
+            value={provider}
+            onChange={(e) => patch({ provider: e.target.value as Settings['cloud']['provider'] })}
+          >
+            <option value="none">Kapalı</option>
+            <option value="gdrive">Google Drive</option>
+            <option value="dropbox">Dropbox</option>
+          </Sel>
+        </Field>
+        <Field label="Şifreli Gönder">
+          <Sel value={cfg.encrypt ? '1' : '0'} onChange={(e) => patch({ encrypt: e.target.value === '1' })}>
+            <option value="1">Şifreli (AES-256 + gzip)</option>
+            <option value="0">Düz JSON</option>
+          </Sel>
+        </Field>
+
+        {cfg.encrypt && (
+          <Field label="Şifreleme Parolası" className="sm:col-span-2">
+            <Inp
+              type="password"
+              value={cfg.encryptPass}
+              onChange={(e) => patch({ encryptPass: e.target.value })}
+              className="font-mono"
+              placeholder="Boş bırakılırsa varsayılan parola kullanılır"
+            />
+          </Field>
+        )}
+
+        <Field
+          label={provider === 'dropbox' ? 'Dropbox Yolu (örn /MOSBARKOD)' : 'Drive Klasör Adı'}
+          className="sm:col-span-2"
+        >
+          <Inp
+            value={cfg.folder}
+            onChange={(e) => patch({ folder: e.target.value })}
+            className="font-mono"
+            placeholder={provider === 'dropbox' ? '/MOSBARKOD' : 'MOSBARKOD_Yedekler'}
+          />
+        </Field>
+
+        {provider === 'gdrive' && (
+          <>
+            <Field label="Google Client ID" className="sm:col-span-2">
+              <Inp value={cfg.gdriveClientId} onChange={(e) => patch({ gdriveClientId: e.target.value })} className="font-mono" placeholder="xxxx.apps.googleusercontent.com" />
+            </Field>
+            <Field label="Google Client Secret">
+              <Inp type="password" value={cfg.gdriveClientSecret} onChange={(e) => patch({ gdriveClientSecret: e.target.value })} className="font-mono" />
+            </Field>
+            <Field label="Google Refresh Token">
+              <Inp type="password" value={cfg.gdriveRefreshToken} onChange={(e) => patch({ gdriveRefreshToken: e.target.value })} className="font-mono" placeholder="1//..." />
+            </Field>
+          </>
+        )}
+
+        {provider === 'dropbox' && (
+          <Field label="Dropbox Access Token (uzun ömürlü)" className="sm:col-span-2">
+            <Inp type="password" value={cfg.dropboxToken} onChange={(e) => patch({ dropboxToken: e.target.value })} className="font-mono" placeholder="sl.xxxx..." />
+          </Field>
+        )}
+      </div>
+
+      <div className="mt-3 rounded-lg border border-mint/25 bg-mint/5 px-3 py-2.5 text-[10.5px] leading-relaxed text-mut2">
+        <b className="text-mint">Kurulum:</b>{' '}
+        {provider === 'gdrive' && (
+          <>
+            Google Cloud Console → OAuth Client (Masaüstü) oluşturun; Drive API kapsamı <span className="font-mono">drive.file</span> ile
+            OAuth 2.0 Playground üzerinden Refresh Token alın. Tarayıcıda ve .exe'de çalışır.
+          </>
+        )}
+        {provider === 'dropbox' && (
+          <>
+            Dropbox App Console → App oluşturun, <span className="font-mono">files.content.read/write</span> izinleriyle
+            &quot;Generate access token&quot; deyin. Token tarayıcıda CORS engeline takılabileceğinden <b>masaüstü (.exe)</b> sürümünde çalışır.
+          </>
+        )}
+        {provider === 'none' && <>Önce bir sağlayıcı seçin.</>}
+      </div>
+
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <span className="font-mono text-[10.5px] text-mut2">
+          {cfg.lastUpload ? `Son yükleme: ${dstr(cfg.lastUpload)} ${tstr(cfg.lastUpload)}` : 'Henüz yükleme yapılmadı'}
+        </span>
+        {cfg.lastError && <span className="max-w-[340px] truncate text-[10.5px] text-red" title={cfg.lastError}>Hata: {cfg.lastError}</span>}
+        <div className="ml-auto flex flex-wrap gap-2">
+          <Btn v="ghost" onClick={doList} disabled={listing || provider === 'none'}>
+            <Ic n="folder" c="h-4 w-4" /> {listing ? 'Listeleniyor…' : 'Buluttakileri Listele'}
+          </Btn>
+          <Btn v="mint" onClick={doUpload} disabled={busy || provider === 'none'}>
+            {busy ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" /> : <Ic n="check" c="h-4 w-4" />}
+            Şimdi Yükle (Test)
+          </Btn>
+        </div>
+      </div>
+
+      {files.length > 0 && (
+        <div className="mt-3 space-y-1.5">
+          {files.map((f) => (
+            <div key={f.id} className="flex items-center gap-2.5 rounded-lg border border-line bg-panel2/50 px-3 py-2">
+              <span className="flex h-7 w-8 shrink-0 items-center justify-center rounded-md bg-mint/10 text-mint">
+                <Ic n="file" c="h-3.5 w-3.5" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="truncate font-mono text-[11px] font-bold text-txt">{f.name}</div>
+                <div className="font-mono text-[9.5px] text-mut2">
+                  {humanBytes(f.size)} · {f.modified ? `${dstr(f.modified)} ${tstr(f.modified)}` : ''}
+                </div>
+              </div>
+              <Btn v="subtle" className="px-2 py-1 text-[10px]" onClick={() => setRestoreFile(f)}>
+                <Ic n="reset" c="h-3.5 w-3.5" /> Geri Yükle
+              </Btn>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {restoreFile && (
+        <Confirm
+          title="Buluttan Geri Yükle"
+          msg={`"${restoreFile.name}" dosyası buluttan indirilip mevcut tüm verilerle değiştirilecek. Devam edilsin mi?`}
+          label="Geri Yükle"
+          onCancel={() => setRestoreFile(null)}
+          onOk={doRestore}
         />
       )}
     </Card>

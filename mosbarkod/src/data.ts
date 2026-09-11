@@ -539,6 +539,20 @@ export interface Settings {
     lastTestResult?: 'success' | 'failed';
     lastTestError?: string;
   };
+  /** Bulut yedekleme — Google Drive / Dropbox */
+  cloud: {
+    enabled: boolean;           // otomatik yükleme (her yedeklemede buluta da gönder)
+    provider: 'none' | 'gdrive' | 'dropbox';
+    encrypt: boolean;
+    encryptPass: string;
+    folder: string;             // Drive: klasör adı · Dropbox: yol (örn /MOSBARKOD)
+    gdriveClientId: string;
+    gdriveClientSecret: string;
+    gdriveRefreshToken: string;
+    dropboxToken: string;
+    lastUpload: string | null;
+    lastError: string;
+  };
 }
 
 export interface CashMove {
@@ -1077,6 +1091,19 @@ export const defaultSettings = (): Settings => ({
     beepOnPrint: true,
     openDrawer: false,
   },
+  cloud: {
+    enabled: false,
+    provider: 'none',
+    encrypt: true,
+    encryptPass: '',
+    folder: 'MOSBARKOD_Yedekler',
+    gdriveClientId: '',
+    gdriveClientSecret: '',
+    gdriveRefreshToken: '',
+    dropboxToken: '',
+    lastUpload: null,
+    lastError: '',
+  },
 });
 
 export const defaultState = (): AppState => {
@@ -1124,6 +1151,7 @@ export function loadState(): AppState {
             currency: { ...d.currency, ...(s.settings.currency || {}) },
             cfd: { ...d.cfd, ...(s.settings.cfd || {}) },
             hardware: { ...d.hardware, ...(s.settings.hardware || {}) },
+            cloud: { ...d.cloud, ...(s.settings.cloud || {}) },
           },
         };
         if (merged.settings.currency?.active) {

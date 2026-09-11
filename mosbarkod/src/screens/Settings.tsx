@@ -5,7 +5,7 @@ import { cn } from '../utils/cn';
 import { Ic } from '../icons';
 import { Badge, Btn, Field, Inp, Modal, ScreenHead, Sel } from '../components/ui';
 import { HardwareCard, ReportCard, WhatsAppCard, EmailCard } from './SettingsIntegrations';
-import { AutoBackupCard, HealthCheckCard, SoundCard, ThemesCard } from './SettingsSystem';
+import { AutoBackupCard, CloudBackupCard, HealthCheckCard, SoundCard, ThemesCard } from './SettingsSystem';
 import { applyTheme } from '../lib/themes';
 import { defaultUI, DEFAULT_CURRENCIES, setActiveCurrencyCode, type AppState, type Settings, type CurrencyConfig } from '../data';
 import CameraScanner from '../components/CameraScanner';
@@ -1799,6 +1799,7 @@ export default function SettingsScreen({
       {open === 'backup' && (
         <SettingsModal title="Yedekleme & Sistem Sağlık" icon="download" color="text-blue" onClose={() => setOpen(null)}>
           <AutoBackupCard cfg={s.autobackup} state={state} onPatch={onPatch} onRestore={onRestore} toast={toast} />
+          <CloudBackupCard cfg={s.cloud} state={state} onPatch={onPatch} onRestore={onRestore} toast={toast} />
           <HealthCheckCard state={state} toast={toast} />
         </SettingsModal>
       )}

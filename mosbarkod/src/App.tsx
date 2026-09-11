@@ -39,6 +39,7 @@ import {
 import { translations } from './locales';
 import { applyAutoTranslate } from './locales/autoTranslate';
 import { createSnapshot } from './lib/backup';
+import { cloudUpload } from './lib/cloudBackup';
 import {
   ADMIN_ID,
   USERS,
@@ -443,6 +444,26 @@ export default function App() {
         createSnapshot(stateRef.current, 'auto', keepDays);
       } catch {
         /* depolama dolu */
+      }
+      const cloud = stateRef.current.settings.cloud;
+      if (cloud && cloud.provider !== 'none' && cloud.enabled) {
+        cloudUpload(cloud, stateRef.current)
+          .then((r) => {
+            setState((s) => ({
+              ...s,
+              settings: {
+                ...s.settings,
+                cloud: {
+                  ...s.settings.cloud,
+                  lastUpload: r.ok ? new Date().toISOString() : s.settings.cloud.lastUpload,
+                  lastError: r.ok ? '' : r.error || '',
+                },
+              },
+            }));
+          })
+          .catch(() => {
+            /* ağ hatası — sessizce geç */
+          });
       }
       setState((s) => ({
         ...s,
