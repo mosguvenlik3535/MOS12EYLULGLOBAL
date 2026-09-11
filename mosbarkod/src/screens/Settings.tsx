@@ -1219,7 +1219,37 @@ export default function SettingsScreen({
     taxNo: s.taxNo,
     brandTitle: s.brandTitle,
     logoIcon: s.logoIcon,
+    customerLogo: s.customerLogo ?? '',
   });
+  const logoRef = useRef<HTMLInputElement>(null);
+
+  // Bayi logosu — küçültülmüş PNG data URL'e çevrilir (kayıtlar şişmesin).
+  const onLogoFile = (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      toast('Lütfen bir görsel dosyası seçin', 'err');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 160;
+        const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+        const w = Math.max(1, Math.round(img.width * scale));
+        const h = Math.max(1, Math.round(img.height * scale));
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        ctx.drawImage(img, 0, 0, w, h);
+        setCompany((c) => ({ ...c, customerLogo: canvas.toDataURL('image/png') }));
+        toast('Logo hazır — "Kaydet"e basın');
+      };
+      img.src = String(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
 
   // updates.json'dan update listesini yükle
   useEffect(() => {
@@ -1685,7 +1715,7 @@ export default function SettingsScreen({
               </div>
               <div className="grid gap-3 md:grid-cols-2">
                 <Field label="Tabela Yazısı"><Inp value={company.brandTitle} onChange={(e) => setCompany({ ...company, brandTitle: e.target.value })} /></Field>
-                <Field label="Logo Simgesi">
+                <Field label="Logo Simgesi (logo yoksa)">
                   <Sel value={company.logoIcon} onChange={(e) => setCompany({ ...company, logoIcon: e.target.value })}>
                     <option value="flame">Alev</option>
                     <option value="barcode">Barkod</option>
@@ -1695,6 +1725,45 @@ export default function SettingsScreen({
                   </Sel>
                 </Field>
               </div>
+              <Field label="Bayi / Mağaza Logosu">
+                <div className="flex items-center gap-3">
+                  {company.customerLogo ? (
+                    <img
+                      src={company.customerLogo}
+                      alt="Bayi logosu"
+                      className="h-14 w-14 shrink-0 rounded-lg border border-line bg-ink/40 object-contain p-1"
+                    />
+                  ) : (
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-line bg-ink/40 text-amber2">
+                      <Ic n={company.logoIcon || 'flame'} c="h-7 w-7" />
+                    </div>
+                  )}
+                  <div className="flex flex-wrap gap-2">
+                    <Btn v="ghost" className="border-blue/50 bg-blue/10 text-blue hover:bg-blue/20" onClick={() => logoRef.current?.click()}>
+                      <Ic n="file" c="h-4 w-4" /> Logo Yükle
+                    </Btn>
+                    {company.customerLogo && (
+                      <Btn v="ghost" className="border-red/40 text-red" onClick={() => setCompany((c) => ({ ...c, customerLogo: '' }))}>
+                        <Ic n="trash" c="h-4 w-4" /> Kaldır
+                      </Btn>
+                    )}
+                  </div>
+                </div>
+                <p className="mt-1.5 text-[10px] leading-relaxed text-mut2">
+                  Logo yoksa soldaki simge kullanılır. Önerilen: kare, şeffaf arka planlı PNG. Görsel otomatik küçültülür.
+                </p>
+                <input
+                  ref={logoRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) onLogoFile(f);
+                    e.target.value = '';
+                  }}
+                />
+              </Field>
               <Btn v="primary" onClick={() => { onPatch(company); toast('Şirket bilgileri kaydedildi'); }}>
                 <Ic n="check" c="h-4 w-4" /> Kaydet
               </Btn>

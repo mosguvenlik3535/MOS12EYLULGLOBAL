@@ -1209,7 +1209,7 @@ export default function App() {
           collapsed={collapsed}
           setCollapsed={setCollapsed}
           isCashier={!isAdmin}
-          logoIcon={state.settings.logoIcon}
+          settings={state.settings}
         />
         <main className="min-w-0 flex-1 overflow-hidden p-3 pb-20 md:pb-3">
           <ErrorBoundary>

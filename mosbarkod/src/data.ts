@@ -402,6 +402,8 @@ export interface Settings {
   taxNo: string;
   brandTitle: string;
   logoIcon: string;
+  /** Bayinin kendi logosu — data URL (PNG). Boşsa logoIcon simgesi kullanılır. */
+  customerLogo?: string;
   receiptHeader: string;
   receiptFooter: string;
   autoShowReceipt: boolean;
@@ -966,6 +968,7 @@ export const defaultSettings = (): Settings => ({
   taxNo: '3880456123',
   brandTitle: 'MOSBARKODYAZILIM',
   logoIcon: 'flame',
+  customerLogo: '',
   receiptHeader: 'MOSBARKODYAZILIM - HOŞGELDİNİZ',
   receiptFooter: 'Bizi Tercih Ettiğiniz İçin Teşekkür Ederiz!',
   autoShowReceipt: true,

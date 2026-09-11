@@ -29,14 +29,40 @@ export const NAV: { id: ViewId; key: string; icon: string }[] = [
   { id: 'settings', key: 'nav.settings', icon: 'gear' },
 ];
 
-export function Logo({ small, icon = 'flame' }: { small?: boolean; icon?: string }) {
+export function StoreCard({ settings, collapsed }: { settings: Settings; collapsed: boolean }) {
+  const logo = settings.customerLogo;
+  const icon = settings.logoIcon || 'flame';
   return (
-    <BrandLogo
-      fallbackIcon={icon}
-      imgClassName={small ? 'h-8 w-auto max-w-[42px]' : 'h-9 w-auto max-w-[200px]'}
-      boxClassName={small ? 'h-8 w-8' : 'h-9 w-9'}
-      iconSize={small ? 'h-4 w-4' : 'h-5 w-5'}
-    />
+    <div className={cn('border-b border-line px-3 py-3', collapsed && 'flex justify-center px-2')}>
+      {collapsed ? (
+        logo ? (
+          <img src={logo} alt={settings.storeName} draggable={false} className="h-9 w-9 shrink-0 rounded-lg object-contain ring-1 ring-line" />
+        ) : (
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-amber/40 bg-panel3 text-amber2">
+            <Ic n={icon} c="h-5 w-5" />
+          </div>
+        )
+      ) : (
+        <div className="flex items-center gap-2.5">
+          {logo ? (
+            <img src={logo} alt={settings.storeName} draggable={false} className="h-10 w-10 shrink-0 rounded-lg object-contain ring-1 ring-line" />
+          ) : (
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-amber/40 bg-panel3 text-amber2">
+              <Ic n={icon} c="h-5 w-5" />
+            </div>
+          )}
+          <div className="min-w-0">
+            <div className="truncate text-[12.5px] font-bold leading-tight text-txt">{settings.storeName || 'Mağaza'}</div>
+            {settings.phone && (
+              <div className="mt-0.5 flex items-center gap-1 font-mono text-[9px] text-mut2">
+                <Ic n="phone" c="h-2.5 w-2.5" /> {settings.phone}
+              </div>
+            )}
+            {settings.address && <div className="mt-0.5 truncate text-[9px] text-mut2">{settings.address}</div>}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -46,14 +72,14 @@ export function Sidebar({
   collapsed,
   setCollapsed,
   isCashier,
-  logoIcon,
+  settings,
 }: {
   view: ViewId;
   go: (v: ViewId) => void;
   collapsed: boolean;
   setCollapsed: (b: boolean) => void;
   isCashier: boolean;
-  logoIcon: string;
+  settings: Settings;
 }) {
   return (
     <aside
@@ -62,9 +88,7 @@ export function Sidebar({
         collapsed ? 'w-[64px]' : 'w-[228px]'
       )}
     >
-      <div className={cn('border-b border-line px-3 py-3.5', collapsed ? 'flex justify-center px-2' : '')}>
-        <Logo small={collapsed} icon={logoIcon} />
-      </div>
+      <StoreCard settings={settings} collapsed={collapsed} />
       <nav className="flex-1 space-y-1 overflow-y-auto p-2">
         {(() => {
           const { t } = useLocale();
@@ -200,9 +224,9 @@ export function TopBar({
       <div className="flex items-center gap-2.5">
         <BrandLogo fallbackIcon={settings.logoIcon || 'flame'} imgClassName="h-9 w-auto max-w-[168px]" />
         <div className="hidden md:block">
-          <div className="font-mono text-[13px] font-bold tracking-[0.14em]">{settings.brandTitle || 'MOSBARKODYAZILIM'}</div>
+          <div className="font-mono text-[13px] font-bold tracking-[0.14em]">MOS BARKOD</div>
           <div className="font-mono text-[8.5px] tracking-[0.2em] text-mut2">
-            YAPAY ZEKÂ DESTEKLİ BARKOD SATIŞ PROGRAMI
+            YAPAY ZEKA DESTEKLİ BARKOD SATIŞ PROGRAMI
           </div>
         </div>
       </div>
