@@ -38,6 +38,7 @@ import {
 } from './locales/i18n';
 import { translations } from './locales';
 import { applyAutoTranslate } from './locales/autoTranslate';
+import { createSnapshot } from './lib/backup';
 import {
   ADMIN_ID,
   USERS,
@@ -52,6 +53,7 @@ import {
   priceOf,
   round2,
   saveState,
+  setActiveCurrencyCode,
   todayKey,
   uid,
   type AppState,
@@ -433,12 +435,12 @@ export default function App() {
   /* ---------- otomatik tam yedekleme ---------- */
 
   useEffect(() => {
-    const { enabled, interval } = state.settings.autobackup;
+    const { enabled, interval, keepDays } = state.settings.autobackup;
     if (!enabled) return;
     const t = setInterval(() => {
       const nowIso = new Date().toISOString();
       try {
-        localStorage.setItem('mosbarkod_auto_backup', JSON.stringify(stateRef.current));
+        createSnapshot(stateRef.current, 'auto', keepDays);
       } catch {
         /* depolama dolu */
       }
@@ -448,7 +450,7 @@ export default function App() {
       }));
     }, Math.max(1, interval) * 60000);
     return () => clearInterval(t);
-  }, [state.settings.autobackup.enabled, state.settings.autobackup.interval]);
+  }, [state.settings.autobackup.enabled, state.settings.autobackup.interval, state.settings.autobackup.keepDays]);
 
   /* ---------- derived ---------- */
 
@@ -1078,30 +1080,10 @@ export default function App() {
     toast('İlk kurulum temizliği tamamlandı — tüm bakiyeler ve hareketler sıfırlandı', 'err');
   };
 
-  const exportJson = () => {
-    const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `mosbarkod-yedek-${todayKey()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast('Yedek dosyası indirildi');
-  };
-
-  const importJson = (file: File) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        const obj = JSON.parse(String(reader.result)) as AppState;
-        if (!obj || !Array.isArray(obj.products) || !Array.isArray(obj.sales) || !obj.settings) throw new Error();
-        setState({ ...defaultState(), ...obj });
-        toast('Yedek başarıyla yüklendi');
-      } catch {
-        toast('Geçersiz yedek dosyası', 'err');
-      }
-    };
-    reader.readAsText(file);
+  const applyRestore = (data: AppState) => {
+    setState(data);
+    if (data.settings?.currency?.active) setActiveCurrencyCode(data.settings.currency.active);
+    toast('Yedek başarıyla geri yüklendi');
   };
 
   void clearState;
@@ -1329,8 +1311,7 @@ export default function App() {
             <SettingsScreen
               state={state}
               onPatch={patchSettings}
-              onExport={exportJson}
-              onImportFile={importJson}
+              onRestore={applyRestore}
               onResetKasa={resetKasa}
               sync={sync}
               joinCode={joinCode}

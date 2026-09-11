@@ -1159,8 +1159,7 @@ function SecurityGateModal({
 export default function SettingsScreen({
   state,
   onPatch,
-  onExport,
-  onImportFile,
+  onRestore,
   onResetKasa,
   sync,
   joinCode,
@@ -1172,8 +1171,7 @@ export default function SettingsScreen({
 }: {
   state: AppState;
   onPatch: (p: Partial<Settings>) => void;
-  onExport: () => void;
-  onImportFile: (f: File) => void;
+  onRestore: (data: AppState) => void;
   onResetKasa: () => void;
   sync: {
     role: 'off' | 'host' | 'client';
@@ -1193,7 +1191,6 @@ export default function SettingsScreen({
 }) {
   const s = state.settings;
   const { locale, setLocale, t } = useLocale();
-  const fileRef = useRef<HTMLInputElement>(null);
   const visibleConnected = sync.connected;
   const [resetGateOpen, setResetGateOpen] = useState(false);
   const [dlPassOpen, setDlPassOpen] = useState(false);
@@ -1801,15 +1798,7 @@ export default function SettingsScreen({
 
       {open === 'backup' && (
         <SettingsModal title="Yedekleme & Sistem Sağlık" icon="download" color="text-blue" onClose={() => setOpen(null)}>
-          <AutoBackupCard cfg={s.autobackup} onPatch={onPatch} onFullBackup={onExport} toast={toast} />
-          <Panel icon="download" title="Manuel Yedekleme & Geri Yükleme" color="text-blue">
-            <p className="mb-3 text-[10.5px] leading-relaxed text-mut2">Tüm ürünler, stoklar, veresiye hesapları ve ayarlar JSON olarak indirilebilir ya da geri yüklenebilir.</p>
-            <div className="grid grid-cols-2 gap-2">
-              <Btn v="ghost" className="border-blue/50 bg-blue/10 text-blue hover:bg-blue/20" onClick={onExport}><Ic n="download" c="h-4 w-4" /> Yedek İndir</Btn>
-              <Btn v="ghost" onClick={() => fileRef.current?.click()}><Ic n="file" c="h-4 w-4" /> Yedek Yükle</Btn>
-            </div>
-            <input ref={fileRef} type="file" accept="application/json" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) onImportFile(f); e.target.value = ''; }} />
-          </Panel>
+          <AutoBackupCard cfg={s.autobackup} state={state} onPatch={onPatch} onRestore={onRestore} toast={toast} />
           <HealthCheckCard state={state} toast={toast} />
         </SettingsModal>
       )}

@@ -1,10 +1,24 @@
 import { useRef, useState } from 'react';
 import { cn } from '../utils/cn';
 import { Ic } from '../icons';
-import { Btn, Field, Inp, Sel } from '../components/ui';
+import { Btn, Confirm, Field, Inp, Sel } from '../components/ui';
 import { THEMES } from '../lib/themes';
 import { BEEP_PRESETS, playBeep } from '../lib/sounds';
-import { dstr, tstr, type AppState, type Settings } from '../data';
+import { dstr, todayKey, tstr, type AppState, type Settings } from '../data';
+import {
+  backupStorageUsage,
+  createSnapshot,
+  dataOnlyBackup,
+  deleteBackup,
+  downloadBackup,
+  fullBackupData,
+  humanBytes,
+  listBackups,
+  parseBackupFile,
+  readBackup,
+  settingsOnlyBackup,
+  type BackupMeta,
+} from '../lib/backup';
 
 type Toast = (msg: string, type?: 'ok' | 'err') => void;
 
@@ -252,22 +266,108 @@ export function SoundCard({
 
 export function AutoBackupCard({
   cfg,
+  state,
   onPatch,
-  onFullBackup,
+  onRestore,
   toast,
 }: {
   cfg: Settings['autobackup'];
+  state: AppState;
   onPatch: (p: Partial<Settings>) => void;
-  onFullBackup: () => void;
+  onRestore: (data: AppState) => void;
   toast: Toast;
 }) {
   const dirRef = useRef<HTMLInputElement>(null);
+  const importRef = useRef<HTMLInputElement>(null);
+  const [backups, setBackups] = useState<BackupMeta[]>(() => listBackups());
+  const [restoreId, setRestoreId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  const refresh = () => setBackups(listBackups());
+  const usage = backupStorageUsage();
+
+  const makeSnapshot = () => {
+    const meta = createSnapshot(state, 'manual', cfg.keepDays);
+    if (meta) {
+      onPatch({ autobackup: { ...cfg, lastRun: new Date().toISOString() } });
+      refresh();
+      toast(`Yedek oluşturuldu — ${humanBytes(meta.size)}`);
+    } else {
+      toast('Yedek oluşturulamadı — depolama dolu olabilir', 'err');
+    }
+  };
+
+  const downloadFull = () => {
+    downloadBackup(`mosbarkod-yedek-${todayKey()}.json`, fullBackupData(state), 'full');
+    toast('Tam yedek indirildi');
+  };
+  const downloadData = () => {
+    downloadBackup(`mosbarkod-veri-${todayKey()}.json`, dataOnlyBackup(state), 'data');
+    toast('Veri yedeği indirildi');
+  };
+  const downloadSettings = () => {
+    downloadBackup(`mosbarkod-ayarlar-${todayKey()}.json`, settingsOnlyBackup(state), 'settings');
+    toast('Ayar yedeği indirildi');
+  };
+
+  const downloadSnapshot = (m: BackupMeta) => {
+    const file = readBackup(m.id);
+    if (!file) {
+      toast('Yedek okunamadı — silinmiş olabilir', 'err');
+      refresh();
+      return;
+    }
+    const fname = `mosbarkod-${m.createdAt.slice(0, 16).replace(/[:T]/g, '-')}.json`;
+    downloadBackup(fname, file.data, file.scope ?? 'full');
+  };
+
+  const confirmRestore = () => {
+    if (!restoreId) return;
+    const file = readBackup(restoreId);
+    if (!file) {
+      toast('Yedek okunamadı — silinmiş olabilir', 'err');
+      setRestoreId(null);
+      refresh();
+      return;
+    }
+    const parsed = parseBackupFile(JSON.stringify(file), state);
+    if (!parsed.ok) {
+      toast(parsed.error, 'err');
+      setRestoreId(null);
+      return;
+    }
+    onRestore(parsed.data);
+    setRestoreId(null);
+  };
+
+  const confirmDelete = () => {
+    if (!deleteId) return;
+    deleteBackup(deleteId);
+    refresh();
+    setDeleteId(null);
+    toast('Yedek silindi');
+  };
+
+  const onImportFile = (f: File) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const parsed = parseBackupFile(String(reader.result), state);
+      if (parsed.ok) {
+        onRestore(parsed.data);
+        refresh();
+      } else {
+        toast(parsed.error, 'err');
+      }
+    };
+    reader.readAsText(f);
+  };
+
   return (
     <Card
       icon="download"
       title="Otomatik Tam Yedekleme"
       color="text-blue"
-      desc="Ürün, satış, stok, müşteri, veresiye, kasa, fatura, personel, ayar ve entegrasyon verilerinizin tamamını kaydeder."
+      desc="Ürün, satış, stok, müşteri, veresiye, kasa, fatura, personel, ayar ve entegrasyon verilerinizin tamamını sağlama imzalı arşivler halinde kaydeder."
       right={<Toggle on={cfg.enabled} onChange={(b) => onPatch({ autobackup: { ...cfg, enabled: b } })} />}
     >
       <div className="grid gap-2.5 sm:grid-cols-2">
@@ -279,17 +379,6 @@ export function AutoBackupCard({
             <option value="60">1 saat</option>
           </Sel>
         </Field>
-        <Field label="Yedek Klasörü">
-          <div className="flex gap-1.5">
-            <Inp value={cfg.folder} onChange={(e) => onPatch({ autobackup: { ...cfg, folder: e.target.value } })} className="font-mono text-[11.5px]" />
-            <Btn v="subtle" className="flex-none px-2.5" onClick={() => dirRef.current?.click()} title="Klasör seç">
-              <Ic n="box" c="h-3.5 w-3.5" />
-            </Btn>
-          </div>
-        </Field>
-        <Field label="Son Başarılı Yedek">
-          <Inp readOnly value={cfg.lastRun ? `${dstr(cfg.lastRun)} ${tstr(cfg.lastRun)}` : 'Henüz yapılmadı'} className="font-mono text-[11.5px]" />
-        </Field>
         <Field label="Saklama Süresi">
           <Sel value={String(cfg.keepDays)} onChange={(e) => onPatch({ autobackup: { ...cfg, keepDays: Number(e.target.value) } })}>
             <option value="7">7 gün</option>
@@ -297,8 +386,19 @@ export function AutoBackupCard({
             <option value="30">30 gün</option>
           </Sel>
         </Field>
-        <Field label="Dosya Düzeni" className="sm:col-span-2">
-          <Inp readOnly value="Son yedek + 5 dakikalık arşiv" className="font-mono text-[11.5px]" />
+        <Field label="Son Başarılı Yedek">
+          <Inp readOnly value={cfg.lastRun ? `${dstr(cfg.lastRun)} ${tstr(cfg.lastRun)}` : 'Henüz yapılmadı'} className="font-mono text-[11.5px]" />
+        </Field>
+        <Field label="Arşiv Durumu">
+          <Inp readOnly value={`${usage.count} arşiv · ${humanBytes(usage.bytes)}`} className="font-mono text-[11.5px]" />
+        </Field>
+        <Field label="Yedek Klasörü (.exe)" className="sm:col-span-2">
+          <div className="flex gap-1.5">
+            <Inp value={cfg.folder} onChange={(e) => onPatch({ autobackup: { ...cfg, folder: e.target.value } })} className="font-mono text-[11.5px]" />
+            <Btn v="subtle" className="flex-none px-2.5" onClick={() => dirRef.current?.click()} title="Klasör seç">
+              <Ic n="folder" c="h-3.5 w-3.5" />
+            </Btn>
+          </div>
         </Field>
       </div>
       <input
@@ -317,34 +417,122 @@ export function AutoBackupCard({
           e.target.value = '';
         }}
       />
-      <div className="mt-3 rounded-lg border border-line bg-ink/40 px-3 py-2 text-[10.5px] leading-relaxed text-mut2">
-        Her dosya tüm işletme verilerinizi içerir: <span className="font-mono text-blue">MOSBARKOD_Son_Yedek.json</span>{' '}
-        sürekli güncellenir; ayrıca saat-dakika damgalı arşiv oluşturulur. Süresi dolan arşivler otomatik temizlenir.
+
+      <div className="mt-3 rounded-lg border border-blue/25 bg-blue/5 p-3">
+        <div className="mb-2 flex flex-wrap items-center gap-2">
+          <span className="font-mono text-[10.5px] font-bold uppercase tracking-widest text-blue">İşlemler</span>
+          <span className="ml-auto font-mono text-[10px] text-mut2">{humanBytes(usage.bytes)} yerel depolama kullanımı</span>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Btn v="ghost" className="border-blue/50 bg-blue/10 text-blue hover:bg-blue/20" onClick={makeSnapshot}>
+            <Ic n="check" c="h-4 w-4" /> Şimdi Yedekle
+          </Btn>
+          <Btn v="ghost" onClick={downloadFull}>
+            <Ic n="download" c="h-4 w-4" /> Tam Yedek İndir
+          </Btn>
+          <Btn v="ghost" onClick={downloadData} title="Ayarlar hariç tüm işletme verileri">
+            <Ic n="download" c="h-4 w-4" /> Sadece Veri
+          </Btn>
+          <Btn v="ghost" onClick={downloadSettings} title="Yalnızca program ayarları">
+            <Ic n="download" c="h-4 w-4" /> Sadece Ayarlar
+          </Btn>
+          <Btn v="ghost" onClick={() => importRef.current?.click()}>
+            <Ic n="file" c="h-4 w-4" /> Yedek Yükle
+          </Btn>
+        </div>
+        <input
+          ref={importRef}
+          type="file"
+          accept="application/json,.json"
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) onImportFile(f);
+            e.target.value = '';
+          }}
+        />
       </div>
+
+      <div className="mt-3">
+        <div className="mb-2 flex items-center gap-2">
+          <span className="font-mono text-[10.5px] font-bold uppercase tracking-widest text-mut">Yedek Arşivi</span>
+          <span className="rounded border border-line2 bg-ink/50 px-1.5 py-0.5 font-mono text-[9px] text-mut2">{backups.length}</span>
+          <span className="h-px flex-1 bg-line" />
+          <span className="text-[10px] text-mut2">En fazla 30 kayıt · süresi dolanlar otomatik silinir</span>
+        </div>
+        {backups.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-line2 px-4 py-5 text-center text-[11.5px] text-mut2">
+            Henüz yedek arşivi yok. &quot;Şimdi Yedekle&quot; ile ilk anlık görüntüyü oluşturun.
+          </div>
+        ) : (
+          <div className="max-h-[260px] space-y-1.5 overflow-y-auto pr-1">
+            {backups.map((m) => (
+              <div key={m.id} className="flex items-center gap-2.5 rounded-lg border border-line bg-panel2/50 px-3 py-2">
+                <span className="flex h-7 w-8 shrink-0 items-center justify-center rounded-md bg-blue/10 text-blue">
+                  <Ic n="clock" c="h-3.5 w-3.5" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-[11px] font-bold text-txt">{dstr(m.createdAt)} {tstr(m.createdAt)}</span>
+                    <span
+                      className={cn(
+                        'rounded px-1.5 py-0.5 font-mono text-[8.5px] font-bold uppercase tracking-widest',
+                        m.source === 'auto' ? 'bg-mint/10 text-mint' : 'bg-amber/10 text-amber2'
+                      )}
+                    >
+                      {m.source === 'auto' ? 'Otomatik' : 'Manuel'}
+                    </span>
+                  </div>
+                  <div className="font-mono text-[9.5px] text-mut2">
+                    {humanBytes(m.size)} · sağlama #{m.checksum.slice(0, 8)}
+                  </div>
+                </div>
+                <div className="flex shrink-0 gap-1">
+                  <Btn v="subtle" className="px-2 py-1 text-[10px]" onClick={() => setRestoreId(m.id)} title="Bu yedeği geri yükle">
+                    <Ic n="reset" c="h-3.5 w-3.5" /> Geri Yükle
+                  </Btn>
+                  <Btn v="subtle" className="px-2 py-1 text-[10px]" onClick={() => downloadSnapshot(m)} title="İndir">
+                    <Ic n="download" c="h-3.5 w-3.5" />
+                  </Btn>
+                  <Btn v="subtle" className="px-2 py-1 text-[10px] hover:text-red" onClick={() => setDeleteId(m.id)} title="Sil">
+                    <Ic n="trash" c="h-3.5 w-3.5" />
+                  </Btn>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="mt-3 rounded-lg border border-line bg-ink/40 px-3 py-2 text-[10.5px] leading-relaxed text-mut2">
+        Her yedek tüm işletme verilerinizi <b className="text-txt">sağlama (checksum) imzalı</b> olarak içerir. Otomatik yedekler arşivlenir;
+        saklama süresi dolan veya 30 kaydı aşan en eski arşivler otomatik temizlenir. Geri yükleme öncesi bütünlük doğrulanır.
+      </div>
+
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <span className={cn('font-mono text-[10.5px]', cfg.enabled ? 'text-blue' : 'text-mut2')}>
           {cfg.enabled ? `Aktif — Tüm veriler ${cfg.interval} dakikada bir yedekleniyor.` : 'Devre dışı'}
         </span>
-        <div className="ml-auto flex gap-2">
-          <Btn v="subtle" className="px-2.5 py-1.5 text-[11px]" onClick={() => toast('Yedek klasörü seçildi')}>
-            <Ic n="box" c="h-3.5 w-3.5" /> Yedek Klasörü Seç
-          </Btn>
-          <Btn v="ghost" className="px-2.5 py-1.5 text-[11px]" onClick={() => onFullBackup()}>
-            <Ic n="download" c="h-3.5 w-3.5" /> Tam Yedeği İndir
-          </Btn>
-          <Btn
-            v="ghost"
-            className="border-blue/50 bg-blue/10 px-2.5 py-1.5 text-[11px] text-blue hover:bg-blue/20"
-            onClick={() => {
-              onFullBackup();
-              onPatch({ autobackup: { ...cfg, lastRun: new Date().toISOString() } });
-              toast('Yedekleme tamamlandı');
-            }}
-          >
-            <Ic n="check" c="h-3.5 w-3.5" /> Şimdi Yedekle
-          </Btn>
-        </div>
       </div>
+
+      {restoreId && (
+        <Confirm
+          title="Yedeği Geri Yükle"
+          msg="Mevcut tüm veriler bu yedekle değiştirilecek. Bu işlem geri alınamaz — devam edilsin mi?"
+          label="Geri Yükle"
+          onCancel={() => setRestoreId(null)}
+          onOk={confirmRestore}
+        />
+      )}
+      {deleteId && (
+        <Confirm
+          title="Yedeği Sil"
+          msg="Bu arşiv kalıcı olarak silinecek. Devam edilsin mi?"
+          label="Sil"
+          onCancel={() => setDeleteId(null)}
+          onOk={confirmDelete}
+        />
+      )}
     </Card>
   );
 }
@@ -425,9 +613,13 @@ export function HealthCheckCard({ state, toast }: { state: AppState; toast: Toas
       {
         label: 'Otomatik yedek durumu',
         status: state.settings.autobackup.lastRun ? 'ok' : 'warn',
-        detail: state.settings.autobackup.lastRun
-          ? `Son yedek: ${dstr(state.settings.autobackup.lastRun)} ${tstr(state.settings.autobackup.lastRun)}`
-          : 'Henüz otomatik yedek çalıştırılmadı',
+        detail: (() => {
+          const u = backupStorageUsage();
+          const last = state.settings.autobackup.lastRun;
+          return last
+            ? `Son yedek: ${dstr(last)} ${tstr(last)} · ${u.count} arşiv · ${humanBytes(u.bytes)}`
+            : `Henüz otomatik yedek yok · ${u.count} arşiv`;
+        })(),
       },
       {
         label: 'Entegrasyon yapılandırması',
