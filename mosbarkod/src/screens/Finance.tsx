@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '../utils/cn';
 import { Ic } from '../icons';
 import {
@@ -1728,6 +1728,7 @@ export function ExpenseScreen({
   const countryVat = useMemo(() => getCountryVatProfile(locale), [locale]);
   const vatRates = countryVat.rates;
   const vatMeta = countryVat.meta;
+  const vatName = countryVat.vatName;
 
   const [date, setDate] = useState(todayKey());
   const [cat, setCat] = useState(EXPENSE_CATS[0].name);
@@ -1738,6 +1739,11 @@ export function ExpenseScreen({
   const [exVat, setExVat] = useState(() => countryVat.defaultRate);
   const [exVatIncluded, setExVatIncluded] = useState(true);
   const [exHasInvoice, setExHasInvoice] = useState(true);
+
+  // Ülke/dil değişince varsayılan KDV oranı da yeni ülkenin oranına göre güncellenir.
+  useEffect(() => {
+    setExVat(countryVat.defaultRate);
+  }, [locale, countryVat.defaultRate]);
 
   const amtNum = Number(amount.replace(',', '.')) || 0;
   const exBase = exHasInvoice && exVat > 0 ? round2(exVatIncluded ? amtNum / (1 + exVat / 100) : amtNum) : amtNum;
@@ -1784,7 +1790,7 @@ export function ExpenseScreen({
     });
     setAmount('');
     setNote('');
-    toast(exHasInvoice && exVat > 0 ? `Masraf kaydedildi — indirilecek KDV: ${fmt(exVatAmt)}` : 'Masraf kaydedildi (KDV indirimi yok)');
+    toast(exHasInvoice && exVat > 0 ? `Masraf kaydedildi — indirilecek ${vatName}: ${fmt(exVatAmt)}` : `Masraf kaydedildi (${vatName} indirimi yok)`);
   };
 
   return (
