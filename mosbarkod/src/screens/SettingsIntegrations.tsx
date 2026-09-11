@@ -13,6 +13,13 @@ import {
   hardwareRegionModels,
 } from '../lib/hardware';
 import {
+  EMAIL_PROVIDERS,
+  RECOMMENDED_PROVIDERS,
+  smtpPresetsFor,
+  type EmailProviderId,
+  type SmtpPreset,
+} from '../lib/emailProviders';
+import {
   ALL_REPORT_IDS,
   REPORT_ITEMS,
   dstr,
@@ -404,8 +411,17 @@ export function EmailCard({
   toast: Toast;
 }) {
   const e = settings.email;
+  const { locale } = useLocale();
   const [draft, setDraft] = useState({ ...e });
   const [newTimeInput, setNewTimeInput] = useState('');
+
+  const provider = (draft.provider ?? 'emailjs') as EmailProviderId;
+  const info = EMAIL_PROVIDERS.find((p) => p.id === provider);
+  const recommended = RECOMMENDED_PROVIDERS[locale] ?? ['smtp', 'emailjs', 'resend'];
+  const presets = smtpPresetsFor(locale);
+
+  const patchProvider = (id: EmailProviderId) =>
+    setDraft((d) => ({ ...d, provider: id }));
 
   const save = () => {
     onPatch({ email: draft });
@@ -425,25 +441,42 @@ export function EmailCard({
   };
   const removeTime = (t: string) => setDraft({ ...draft, times: draft.times.filter((x) => x !== t) });
 
+  const missing = (): string => {
+    if (!draft.toEmail) return 'Alıcı E-posta Adresi gereklidir';
+    switch (provider) {
+      case 'emailjs':
+        if (!draft.serviceId || !draft.templateId || !draft.publicKey) return 'EmailJS için Service ID, Template ID ve Public Key gereklidir';
+        break;
+      case 'resend':
+      case 'sendgrid':
+      case 'brevo':
+      case 'smtp2go':
+        if (!draft.privateKey) return `${info?.name ?? provider} için API Key gereklidir`;
+        break;
+      case 'mailgun':
+        if (!draft.privateKey || !draft.domain) return 'Mailgun için API Key ve Domain gereklidir';
+        break;
+      case 'mailjet':
+        if (!draft.publicKey || !draft.privateKey) return 'Mailjet için API Key ve Secret Key gereklidir';
+        break;
+      case 'smtp':
+        if (!draft.smtpHost || !draft.smtpUser || !draft.smtpPass) return 'SMTP için Sunucu, Kullanıcı Adı ve Şifre gereklidir';
+        break;
+    }
+    return '';
+  };
+
   const testMail = async () => {
-    const p = draft.provider ?? 'emailjs';
-    if (p === 'resend' && (!draft.privateKey || !draft.toEmail)) {
-      toast('Resend için API Key ve Alıcı E-posta gereklidir', 'err');
-      return;
-    }
-    if (p === 'emailjs' && (!draft.serviceId || !draft.templateId || !draft.publicKey || !draft.toEmail)) {
-      toast('EmailJS için Service ID, Template ID, Public Key ve Alıcı E-posta gereklidir', 'err');
-      return;
-    }
-    if (p === 'smtp' && (!draft.smtpHost || !draft.smtpUser || !draft.smtpPass || !draft.toEmail)) {
-      toast('SMTP için Sunucu, Kullanıcı Adı, Şifre ve Alıcı E-posta gereklidir', 'err');
+    const m = missing();
+    if (m) {
+      toast(m, 'err');
       return;
     }
     toast('Test e-posta gönderiliyor...');
     const subj = `[MOSBARKOD] Test E-posta — ${new Date().toLocaleString('tr-TR')}`;
     const msg = buildReport(state, (state.settings.report.items ?? []).slice(0, 8));
     const res = await sendEmail({
-      provider: (p as 'emailjs' | 'resend' | 'smtp'),
+      provider,
       serviceId: draft.serviceId,
       templateId: draft.templateId,
       publicKey: draft.publicKey,
@@ -452,6 +485,8 @@ export function EmailCard({
       message: msg,
       fromName: draft.fromName || 'MOSBARKODYAZILIM',
       toEmail: draft.toEmail,
+      domain: draft.domain,
+      fromEmail: draft.fromEmail,
       smtpHost: draft.smtpHost,
       smtpPort: draft.smtpPort,
       smtpStarttls: draft.smtpStarttls,
@@ -478,9 +513,9 @@ export function EmailCard({
   return (
     <Card
       icon="mail"
-      title="E-posta Entegrasyonu (EmailJS)"
+      title="E-posta Entegrasyonu"
       color="text-mint"
-      desc="Gün sonu raporunu işletme sahibi mail adresine otomatik gönderir. EmailJS ücretsiz 200 mail/ay."
+      desc="Gün sonu raporunu işletme sahibi mail adresine otomatik gönderir. 8 farklı sağlayıcı — ülkenize göre önerilerle."
     >
       <div className="grid gap-2.5 sm:grid-cols-2">
         <Field label="E-posta Gönderimi">
@@ -489,20 +524,47 @@ export function EmailCard({
             <option value="aktif">Aktif</option>
           </Sel>
         </Field>
-        <Field label="Sağlayıcı">
-          <Sel
-            value={draft.provider ?? 'emailjs'}
-            onChange={(ev) => setDraft({ ...draft, provider: ev.target.value as 'emailjs' | 'resend' | 'smtp' })}
-          >
-            <option value="smtp">SMTP (Nodemailer — kalıcı, .exe için ideal)</option>
-            <option value="emailjs">EmailJS (EmailJS Cloud API)</option>
-            <option value="resend">Resend (Cloud API)</option>
-          </Sel>
-        </Field>
         <Field label="Alıcı E-posta Adresi">
           <Inp type="email" value={draft.toEmail} onChange={(ev) => setDraft({ ...draft, toEmail: ev.target.value })} placeholder="owner@firma.com" />
         </Field>
-        {(draft.provider ?? 'emailjs') === 'emailjs' ? (
+
+        <Field label="Sağlayıcı" className="sm:col-span-2">
+          <Sel value={provider} onChange={(ev) => patchProvider(ev.target.value as EmailProviderId)}>
+            {EMAIL_PROVIDERS.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name} — {p.freeTier}
+                {recommended[0] === p.id ? ' (ÖNERİLEN)' : ''}
+              </option>
+            ))}
+          </Sel>
+        </Field>
+
+        {info && (
+          <div className="sm:col-span-2 rounded-lg border border-mint/25 bg-mint/5 px-3 py-2.5 text-[11px] leading-relaxed text-mut2">
+            <b className="text-mint">{info.name}</b> · {info.blurb}
+            {info.docsUrl !== '—' && (
+              <span className="text-mut"> · Kayıt: {info.docsUrl}</span>
+            )}
+          </div>
+        )}
+
+        <Field label="Gönderen Adı">
+          <Inp value={draft.fromName} onChange={(ev) => setDraft({ ...draft, fromName: ev.target.value })} placeholder="MOSBARKODYAZILIM" />
+        </Field>
+
+        {provider !== 'smtp' && provider !== 'emailjs' && (
+          <Field label="Gönderici E-posta (doğrulanmış)">
+            <Inp
+              type="email"
+              value={draft.fromEmail}
+              onChange={(ev) => setDraft({ ...draft, fromEmail: ev.target.value })}
+              className="font-mono"
+              placeholder="sender@sizin-domain.com"
+            />
+          </Field>
+        )}
+
+        {provider === 'emailjs' && (
           <>
             <Field label="EmailJS Service ID">
               <Inp value={draft.serviceId} onChange={(ev) => setDraft({ ...draft, serviceId: ev.target.value })} className="font-mono" placeholder="service_abc123" />
@@ -513,21 +575,44 @@ export function EmailCard({
             <Field label="EmailJS Public Key" className="sm:col-span-2">
               <Inp value={draft.publicKey} onChange={(ev) => setDraft({ ...draft, publicKey: ev.target.value })} className="font-mono" placeholder="XXXXXXXXXXXX_hedef" />
             </Field>
+            <Field label="EmailJS Private API Key (opsiyonel)" className="sm:col-span-2">
+              <Inp type="password" value={draft.privateKey} onChange={(ev) => setDraft({ ...draft, privateKey: ev.target.value })} className="font-mono" placeholder="403 hatası alırsanız Private Key ekleyin" />
+            </Field>
           </>
-        ) : draft.provider === 'resend' ? (
-          <Field label="Resend API Key (100/gün ücretsiz)" className="sm:col-span-2">
-            <Inp
-              type="password"
-              value={draft.privateKey}
-              onChange={(ev) => setDraft({ ...draft, privateKey: ev.target.value })}
-              className="font-mono"
-              placeholder="re_..."
-            />
+        )}
+
+        {(provider === 'resend' || provider === 'sendgrid' || provider === 'brevo' || provider === 'smtp2go') && (
+          <Field label={`${info?.name ?? ''} API Key`} className="sm:col-span-2">
+            <Inp type="password" value={draft.privateKey} onChange={(ev) => setDraft({ ...draft, privateKey: ev.target.value })} className="font-mono" placeholder={provider === 'resend' ? 're_...' : provider === 'sendgrid' ? 'SG.xxx' : 'API Key'} />
           </Field>
-        ) : (
+        )}
+
+        {provider === 'mailgun' && (
+          <>
+            <Field label="Mailgun API Key">
+              <Inp type="password" value={draft.privateKey} onChange={(ev) => setDraft({ ...draft, privateKey: ev.target.value })} className="font-mono" placeholder="key-..." />
+            </Field>
+            <Field label="Mailgun Domain (alan adı)">
+              <Inp value={draft.domain} onChange={(ev) => setDraft({ ...draft, domain: ev.target.value })} className="font-mono" placeholder="mg.sizin-domain.com" />
+            </Field>
+          </>
+        )}
+
+        {provider === 'mailjet' && (
+          <>
+            <Field label="Mailjet API Key">
+              <Inp value={draft.publicKey} onChange={(ev) => setDraft({ ...draft, publicKey: ev.target.value })} className="font-mono" placeholder="API Key" />
+            </Field>
+            <Field label="Mailjet Secret Key">
+              <Inp type="password" value={draft.privateKey} onChange={(ev) => setDraft({ ...draft, privateKey: ev.target.value })} className="font-mono" placeholder="Secret Key" />
+            </Field>
+          </>
+        )}
+
+        {provider === 'smtp' && (
           <>
             <div className="sm:col-span-2 rounded-lg border border-blue/25 bg-blue/5 px-3 py-2.5 text-[11px] text-blue">
-              <b>Kalıcı SMTP çözüm.</b> Gmail / Outlook / Hotmail SMTP ayarlarınızla direkt gönderim yapar. Nodemailer tabanlıdır, exe içinden %100 çalışır ve üçüncü parti API bloklarına takılmaz.
+              <b>Kalıcı SMTP çözüm.</b> Gmail, Outlook, Yahoo, Yandex ve ülkenizdeki yaygın sağlayıcılarla doğrudan gönderim yapar. Nodemailer tabanlıdır, .exe içinden %100 çalışır ve üçüncü parti API bloklarına takılmaz.
             </div>
             <Field label="SMTP Sunucusu">
               <Inp value={draft.smtpHost} onChange={(ev) => setDraft({ ...draft, smtpHost: ev.target.value })} className="font-mono" />
@@ -550,36 +635,56 @@ export function EmailCard({
             <Field label="Gönderici E-posta (Reply-To)">
               <Inp type="email" value={draft.smtpFrom} onChange={(ev) => setDraft({ ...draft, smtpFrom: ev.target.value })} className="font-mono" placeholder="boş bırakılırsa kullanıcı adı kullanılır" />
             </Field>
-            <div className="flex flex-wrap gap-2">
-              <Btn
-                v="ghost"
-                className="border-blue/50 text-blue"
-                onClick={() => setDraft({ ...draft, smtpHost: 'smtp.gmail.com', smtpPort: 587, smtpStarttls: true })}
-              >
-                Gmail (587)
-              </Btn>
-              <Btn
-                v="ghost"
-                className="border-blue/50 text-blue"
-                onClick={() => setDraft({ ...draft, smtpHost: 'smtp.gmail.com', smtpPort: 465, smtpStarttls: false })}
-              >
-                Gmail (465)
-              </Btn>
-              <Btn
-                v="ghost"
-                className="border-blue/50 text-blue"
-                onClick={() => setDraft({ ...draft, smtpHost: 'smtp.office365.com', smtpPort: 587, smtpStarttls: true })}
-              >
-                Outlook/Hotmail
-              </Btn>
+            <div className="sm:col-span-2 flex flex-wrap gap-2">
+              {presets.map((p: SmtpPreset) => (
+                <Btn
+                  key={p.id}
+                  v="ghost"
+                  className="border-blue/50 text-blue"
+                  onClick={() => setDraft({ ...draft, smtpHost: p.host, smtpPort: p.port, smtpStarttls: p.starttls })}
+                  title={p.note}
+                >
+                  {p.name} ({p.port})
+                </Btn>
+              ))}
             </div>
           </>
         )}
       </div>
-      <div className="mt-2 space-y-2.5">
-        <Field label="Gönderen Adı" className="sm:col-span-2">
-          <Inp value={draft.fromName} onChange={(ev) => setDraft({ ...draft, fromName: ev.target.value })} placeholder="MOSBARKODYAZILIM" />
-        </Field>
+
+      <div className="mt-3 rounded-lg border border-amber/25 bg-amber/5 p-3">
+        <div className="mb-1 font-mono text-[10.5px] font-bold uppercase tracking-widest text-amber">
+          Ülkenize Göre Önerilen Sağlayıcılar
+        </div>
+        <p className="mb-2.5 text-[10.5px] text-mut2">
+          Her ülkede farklı e-posta hizmetleri yaygındır. Şu an seçili ülkeye göre önerilen sıralama:
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {recommended.map((rid) => {
+            const p = EMAIL_PROVIDERS.find((x) => x.id === rid);
+            if (!p) return null;
+            return (
+              <button
+                key={p.id}
+                onClick={() => patchProvider(p.id)}
+                className={cn(
+                  'rounded-lg border px-3 py-1.5 text-left text-[11px] transition-colors',
+                  provider === p.id
+                    ? 'border-mint bg-mint/15 text-mint'
+                    : 'border-line bg-panel2/40 text-mut2 hover:border-mint/40 hover:text-mint'
+                )}
+              >
+                <span className="block font-bold">{p.name}</span>
+                <span className="block text-[9.5px] opacity-75">{p.freeTier}</span>
+              </button>
+            );
+          })}
+          {recommended[0] === 'smtp' && (
+            <span className="rounded-lg border border-blue/30 bg-blue/5 px-3 py-1.5 text-[11px] text-blue">
+              SMTP'de ülkenize özel hazır ayarlar aşağıda tek tıkla doldurulur.
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="mt-3.5 rounded-lg border border-line bg-panel2/40 p-3">
@@ -615,7 +720,7 @@ export function EmailCard({
           </Btn>
         </div>
         <p className="mt-2 text-[10px] text-mut2">
-          Günlük gönderim limiti: {draft.times.length * 5} e-posta. EmailJS ücretsiz planı (200 mail/ay) aşmamak için gün birden tanımlı saat sayısını önde tutmayla ayarlayın.
+          Günlük gönderim limiti: {draft.times.length * 5} e-posta. Seçili sağlayıcının ücretsiz kotasını ({info?.freeTier ?? '—'}) aşmamak için saat sayısını buna göre ayarlayın.
         </p>
       </div>
 
@@ -631,12 +736,14 @@ export function EmailCard({
           </ol>
         </div>
         <div className="rounded-lg border border-line bg-ink/40 px-3 py-2.5 text-[11px] leading-relaxed text-mut2">
-          <div className="mb-1 font-mono text-[9.5px] font-bold uppercase tracking-widest text-mut">Alt Email Sağlayıcıları:</div>
+          <div className="mb-1 font-mono text-[9.5px] font-bold uppercase tracking-widest text-mut">Diğer API Sağlayıcıları:</div>
           <ol className="list-decimal space-y-0.5 pl-4 text-[11px]">
-            <li><b className="text-mut">Resend.</b>API key 100 mail/gün ücretsiz — dashboard.resend.com</li>
-            <li><b className="text-mut">SendGrid.</b>100 mail/gün ücretsiz — sendgrid.com</li>
-            <li><b className="text-mut">Mailgun.</b>5.000/ay ücretsiz — mailgun.com</li>
-            <li><b className="text-mut">SMTP2GO.</b>1.000/ay free tier — smtp2go.com</li>
+            <li><b className="text-mut">Resend.</b> API key 100 mail/gün ücretsiz — resend.com</li>
+            <li><b className="text-mut">SendGrid.</b> 100 mail/gün ücretsiz — sendgrid.com</li>
+            <li><b className="text-mut">Mailgun.</b> 5.000/ay ücretsiz (3 ay) — mailgun.com</li>
+            <li><b className="text-mut">Mailjet.</b> 200 mail/gün ücretsiz — mailjet.com</li>
+            <li><b className="text-mut">Brevo.</b> 300 mail/gün ücretsiz — brevo.com</li>
+            <li><b className="text-mut">SMTP2GO.</b> 1.000/ay ücretsiz — smtp2go.com</li>
           </ol>
         </div>
       </div>

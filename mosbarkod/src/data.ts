@@ -446,12 +446,16 @@ export interface Settings {
   };
   email: {
     enabled: boolean;
-    provider: 'emailjs' | 'resend' | 'smtp';
+    provider: 'emailjs' | 'resend' | 'smtp' | 'sendgrid' | 'mailgun' | 'mailjet' | 'brevo' | 'smtp2go';
     serviceId: string;
     templateId: string;
     publicKey: string;
-    /** EmailJS Private API Key veya Resend API Key */
+    /** EmailJS Private API Key, Resend/SendGrid/Brevo/SMTP2GO API Key veya Mailjet Secret Key */
     privateKey: string;
+    /** Mailgun gönderim alan adı */
+    domain?: string;
+    /** API sağlayıcıları için gönderici adresi */
+    fromEmail?: string;
     toEmail: string;
     fromName: string;
     /** SMTP doğrudan gönderim (Electron/.exe için — Nodemailer) */
@@ -1021,6 +1025,8 @@ export const defaultSettings = (): Settings => ({
     templateId: '',
     publicKey: '',
     privateKey: '',
+    domain: '',
+    fromEmail: '',
     toEmail: '',
     fromName: 'MOSBARKODYAZILIM',
     smtpHost: '',

@@ -227,6 +227,12 @@ const P: Record<string, ReactNode> = {
       <circle cx="12" cy="13" r="4" />
     </>
   ),
+  mail: (
+    <>
+      <rect x="2" y="4" width="20" height="16" rx="2" />
+      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+    </>
+  ),
 };
 
 export function Ic({ n, c = 'h-5 w-5' }: { n: string; c?: string }) {

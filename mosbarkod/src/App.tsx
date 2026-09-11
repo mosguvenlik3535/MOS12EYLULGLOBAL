@@ -396,6 +396,8 @@ export default function App() {
                 message: text,
                 fromName: emailCfg.fromName,
                 toEmail: emailCfg.toEmail,
+                domain: emailCfg.domain,
+                fromEmail: emailCfg.fromEmail,
                 smtpHost: emailCfg.smtpHost,
                 smtpPort: emailCfg.smtpPort,
                 smtpStarttls: emailCfg.smtpStarttls,
