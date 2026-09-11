@@ -16,4 +16,13 @@ export default defineConfig({
       "@": path.resolve(__dirname, "src"),
     },
   },
+  server: {
+    host: "0.0.0.0",
+    // Arena/E2B canlı önizleme host'larına (ör. *.e2b.app) izin ver
+    allowedHosts: true,
+  },
+  preview: {
+    host: "0.0.0.0",
+    allowedHosts: true,
+  },
 });
