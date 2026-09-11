@@ -1195,7 +1195,7 @@ export default function SettingsScreen({
   const { locale, setLocale, t } = useLocale();
   const fileRef = useRef<HTMLInputElement>(null);
   const visibleConnected = sync.connected;
-  const [resetOpen, setResetOpen] = useState(false);
+  const [resetGateOpen, setResetGateOpen] = useState(false);
   const [dlPassOpen, setDlPassOpen] = useState(false);
   const [open, setOpen] = useState<TileId | null>(null);
   const [winBusy, setWinBusy] = useState(false);
@@ -1370,9 +1370,11 @@ export default function SettingsScreen({
               color={t.color}
               badge={t.badge}
               onOpen={() => {
-                // Kurulum & Sürüm Dosyaları yalnızca güvenlik şifresiyle açılır.
+                // Kritik bölümler yalnızca güvenlik şifresiyle açılır.
                 if (t.id === 'downloads') {
                   setDlPassOpen(true);
+                } else if (t.id === 'reset') {
+                  setResetGateOpen(true);
                 } else {
                   setOpen(t.id);
                 }
@@ -1888,7 +1890,7 @@ export default function SettingsScreen({
               Ulaşım Kartı, stok miktarları ve personel ödeme geçmişleri sıfırlanır. Ürün/personel kartları ve şirket
               ayarları korunur.
             </p>
-            <Btn v="danger" className="w-full" onClick={() => setResetOpen(true)}><Ic n="alert" c="h-4 w-4" /> Tüm İşletme Değerlerini Sıfırla</Btn>
+            <Btn v="danger" className="w-full" onClick={() => { onResetKasa(); setOpen(null); toast('Tüm ciro, satış ve işletme verileri başarıyla sıfırlandı'); }}><Ic n="alert" c="h-4 w-4" /> Tüm İşletme Değerlerini Sıfırla</Btn>
           </Panel>
         </SettingsModal>
       )}
@@ -1910,26 +1912,23 @@ export default function SettingsScreen({
         </SettingsModal>
       )}
 
-      {resetOpen && (
+      {resetGateOpen && (
         <SecurityGateModal
-          title="Ciro & Kasa Sıfırlama — Güvenlik Şifresi Gerekli"
-          confirmLabel="Şifreyi Onayla ve Sıfırla"
+          title="Kasa & Ciro Sıfırlama — Güvenlik Şifresi Gerekli"
+          confirmLabel="Şifreyi Onayla ve Aç"
           color="text-red"
           warning={
             <div className="rounded-lg border border-red/30 bg-red/10 p-3 text-[11px] leading-relaxed text-red">
-              <b className="font-bold">DİKKAT:</b> Satışlar ({state.sales.length}), paket siparişler ({state.deliveries.length}),
-              veresiye bakiyeleri, masraflar ({state.expenses.length}), alış faturaları ({state.invoices.length}),
-              kasa hareketleri ve stoklar sıfırlanacaktır. Bu işlem geri alınamaz.
+              <b className="font-bold">DİKKAT:</b> Bu bölümde tüm satış/ciro, paket sipariş, veresiye, masraf, alış faturası,
+              kasa hareketleri ve stoklar sıfırlanır. İşlem geri alınamaz — yalnızca yetkili yöneticiler açmalıdır.
             </div>
           }
           onAuthorized={() => {
-            setResetOpen(false);
-            setOpen(null);
-            onResetKasa();
-            toast('Tüm ciro, satış ve işletme verileri başarıyla sıfırlandı');
+            setResetGateOpen(false);
+            setOpen('reset');
           }}
-          onError={() => toast('Hatalı sıfırlama şifresi!', 'err')}
-          onClose={() => setResetOpen(false)}
+          onError={() => toast('Hatalı güvenlik şifresi!', 'err')}
+          onClose={() => setResetGateOpen(false)}
         />
       )}
 
