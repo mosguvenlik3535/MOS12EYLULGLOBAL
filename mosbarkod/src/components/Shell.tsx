@@ -4,6 +4,7 @@ import { Ic } from '../icons';
 import { useLocale } from '../locales/i18n';
 import { LOCALES } from '../locales/i18n';
 import Flag from './Flag';
+import BrandLogo from './BrandLogo';
 import {
   USERS,
   VIEWS_LOCKED_FOR_CASHIER,
@@ -31,12 +32,7 @@ export const NAV: { id: ViewId; key: string; icon: string }[] = [
 export function Logo({ small, icon = 'flame' }: { small?: boolean; icon?: string }) {
   return (
     <div className={cn('flex items-center gap-2.5', small ? '' : '')}>
-      <div
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-amber/50 text-[#180c02] shadow-[0_0_18px_rgba(245,158,11,0.2)]"
-        style={{ background: 'linear-gradient(135deg, var(--color-amber), var(--color-amber2))' }}
-      >
-        <Ic n={icon} c="h-5 w-5" />
-      </div>
+      <BrandLogo fallbackIcon={icon} />
       {!small && (
         <div className="min-w-0">
           <div className="truncate font-mono text-[12.5px] font-bold tracking-[0.08em] text-txt">MOSBARKODYA…</div>
@@ -205,12 +201,7 @@ export function TopBar({
   return (
     <header className="flex h-[58px] shrink-0 items-center gap-3 border-b border-line bg-panel px-3">
       <div className="flex items-center gap-2.5">
-        <div
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-amber/50 text-[#180c02] shadow-[0_0_18px_rgba(245,158,11,0.2)]"
-          style={{ background: 'linear-gradient(135deg, var(--color-amber), var(--color-amber2))' }}
-        >
-          <Ic n={settings.logoIcon || 'flame'} c="h-5 w-5" />
-        </div>
+        <BrandLogo fallbackIcon={settings.logoIcon || 'flame'} />
         <div className="hidden md:block">
           <div className="font-mono text-[13px] font-bold tracking-[0.14em]">{settings.brandTitle || 'MOSBARKODYAZILIM'}</div>
           <div className="font-mono text-[8.5px] tracking-[0.2em] text-mut2">
