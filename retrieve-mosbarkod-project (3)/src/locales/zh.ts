@@ -1,0 +1,31 @@
+import type { TranslationTable } from './i18n';
+import { en } from './en';
+
+export const zh: TranslationTable = {
+  ...en,
+  'nav.sales': '快速销售',
+  'nav.delivery': '配送订单',
+  'nav.imkart': '城市卡',
+  'nav.posIntegration': 'POS 集成',
+  'nav.stock': '商品与库存',
+  'nav.purchase': '采购发票',
+  'nav.credit': '赊账管理',
+  'nav.expense': '费用账簿',
+  'nav.staff': '员工与工资',
+  'nav.cash': '收银与分析',
+  'nav.settings': '设置',
+  'login.selectUser': '选择用户',
+  'login.switchUser': '切换用户',
+  'login.enterPin': '输入 PIN',
+  'login.wrongPin': 'PIN 错误',
+  'login.ok': '登录成功',
+  'login.cancel': '取消',
+  'login.admin': '以管理员身份继续',
+  'topbar.subtitle': 'AI 智能条码销售系统',
+  'topbar.register': '收银台',
+  'pos.payBtn': '收款',
+  'pay.title': '完成销售 / 收款',
+  'settings.language': '语言',
+  'poslock.subtitle': 'POS 集成 — 需要许可证密钥',
+  'poslock.unlock': '解锁',
+};

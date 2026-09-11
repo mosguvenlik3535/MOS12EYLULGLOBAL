@@ -1,0 +1,31 @@
+import type { TranslationTable } from './i18n';
+import { en } from './en';
+
+export const pl: TranslationTable = {
+  ...en,
+  'nav.sales': 'Szybka Sprzedaż',
+  'nav.delivery': 'Zamówienia Dostawy',
+  'nav.imkart': 'Karta Miejska',
+  'nav.posIntegration': 'Integracja POS',
+  'nav.stock': 'Produkty i Magazyn',
+  'nav.purchase': 'Faktury Zakupu',
+  'nav.credit': 'Ewidencja Kredytów',
+  'nav.expense': 'Księga Wydatków',
+  'nav.staff': 'Personel i Płace',
+  'nav.cash': 'Kasa i Analizy',
+  'nav.settings': 'Ustawienia',
+  'login.selectUser': 'WYBIERZ UŻYTKOWNIKA',
+  'login.switchUser': 'ZMIEŃ UŻYTKOWNIKA',
+  'login.enterPin': 'WPROWADŹ PIN',
+  'login.wrongPin': 'BŁĘDNY PIN',
+  'login.ok': 'LOGOWANIE UDANE',
+  'login.cancel': 'Anuluj',
+  'login.admin': 'Kontynuuj jako Admin',
+  'topbar.subtitle': 'SYSTEM SPRZEDAŻY KODÓW KRESKOWYCH Z AI',
+  'topbar.register': 'Kasa',
+  'pos.payBtn': 'PRZYJMIJ PŁATNOŚĆ',
+  'pay.title': 'Zamknij Sprzedaż / Płatność',
+  'settings.language': 'Język',
+  'poslock.subtitle': 'Integracja POS — wymagany klucz licencyjny',
+  'poslock.unlock': 'ODBLOKUJ',
+};

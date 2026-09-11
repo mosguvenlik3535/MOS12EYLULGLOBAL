@@ -1,0 +1,31 @@
+import type { TranslationTable } from './i18n';
+import { en } from './en';
+
+export const ro: TranslationTable = {
+  ...en,
+  'nav.sales': 'Vânzare Rapidă',
+  'nav.delivery': 'Comenzi de Livrare',
+  'nav.imkart': 'Card Urban',
+  'nav.posIntegration': 'Integrare POS',
+  'nav.stock': 'Produse și Stoc',
+  'nav.purchase': 'Facturi de Achiziție',
+  'nav.credit': 'Urmărire Credit',
+  'nav.expense': 'Registru Cheltuieli',
+  'nav.staff': 'Personal și Salarii',
+  'nav.cash': 'Casă și Analize',
+  'nav.settings': 'Setări',
+  'login.selectUser': 'SELECTAȚI UTILIZATORUL',
+  'login.switchUser': 'SCHIMBAȚI UTILIZATORUL',
+  'login.enterPin': 'INTRODUCEȚI PIN-UL',
+  'login.wrongPin': 'PIN INCORECT',
+  'login.ok': 'AUTENTIFICARE REUȘITĂ',
+  'login.cancel': 'Anulare',
+  'login.admin': 'Continuați ca Admin',
+  'topbar.subtitle': 'SISTEM DE VÂNZĂRI CU CODURI DE BARE ȘI AI',
+  'topbar.register': 'Casă',
+  'pos.payBtn': 'ÎNCASAȚI',
+  'pay.title': 'Închide Vânzarea / Încasare',
+  'settings.language': 'Limbă',
+  'poslock.subtitle': 'Integrare POS — cheie de licență necesară',
+  'poslock.unlock': 'DEBLOCARE',
+};

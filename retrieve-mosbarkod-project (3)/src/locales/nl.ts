@@ -1,0 +1,31 @@
+import type { TranslationTable } from './i18n';
+import { en } from './en';
+
+export const nl: TranslationTable = {
+  ...en,
+  'nav.sales': 'Snelle Verkoop',
+  'nav.delivery': 'Bezorgbestellingen',
+  'nav.imkart': 'Stadskaart',
+  'nav.posIntegration': 'POS-integratie',
+  'nav.stock': 'Producten en Voorraad',
+  'nav.purchase': 'Inkoopfacturen',
+  'nav.credit': 'Kredietbeheer',
+  'nav.expense': 'Uitgavenboek',
+  'nav.staff': 'Personeel en Salaris',
+  'nav.cash': 'Kassa en Analyse',
+  'nav.settings': 'Instellingen',
+  'login.selectUser': 'KIES GEBRUIKER',
+  'login.switchUser': 'GEBRUIKER WISSELEN',
+  'login.enterPin': 'VOER PIN IN',
+  'login.wrongPin': 'ONJUISTE PIN',
+  'login.ok': 'INLOGGEN GELUKT',
+  'login.cancel': 'Annuleren',
+  'login.admin': 'Doorgaan als Admin',
+  'topbar.subtitle': 'AI-GESTUURD BARCODEVERKOOPSYSTEEM',
+  'topbar.register': 'Kassa',
+  'pos.payBtn': 'BETALING ONTVANGEN',
+  'pay.title': 'Verkoop Afsluiten / Betaling',
+  'settings.language': 'Taal',
+  'poslock.subtitle': 'POS-integratie — licentiesleutel vereist',
+  'poslock.unlock': 'ONTGRENDELEN',
+};

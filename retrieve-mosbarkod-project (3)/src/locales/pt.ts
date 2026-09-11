@@ -1,0 +1,31 @@
+import type { TranslationTable } from './i18n';
+import { en } from './en';
+
+export const pt: TranslationTable = {
+  ...en,
+  'nav.sales': 'Venda Rápida',
+  'nav.delivery': 'Pedidos de Entrega',
+  'nav.imkart': 'Cartão da Cidade',
+  'nav.posIntegration': 'Integração POS',
+  'nav.stock': 'Produtos e Estoque',
+  'nav.purchase': 'Notas de Compra',
+  'nav.credit': 'Controle de Crédito',
+  'nav.expense': 'Livro de Despesas',
+  'nav.staff': 'Equipe e Salários',
+  'nav.cash': 'Caixa e Análises',
+  'nav.settings': 'Configurações',
+  'login.selectUser': 'SELECIONE O USUÁRIO',
+  'login.switchUser': 'TROCAR USUÁRIO',
+  'login.enterPin': 'DIGITE SEU PIN',
+  'login.wrongPin': 'PIN INCORRETO',
+  'login.ok': 'LOGIN REALIZADO',
+  'login.cancel': 'Cancelar',
+  'login.admin': 'Continuar como Admin',
+  'topbar.subtitle': 'SISTEMA DE VENDAS POR CÓDIGO DE BARRAS COM IA',
+  'topbar.register': 'Caixa',
+  'pos.payBtn': 'RECEBER PAGAMENTO',
+  'pay.title': 'Finalizar Venda / Receber Pagamento',
+  'settings.language': 'Idioma',
+  'poslock.subtitle': 'Integração POS — Chave de licença necessária',
+  'poslock.unlock': 'DESBLOQUEAR',
+};

@@ -1,0 +1,31 @@
+import type { TranslationTable } from './i18n';
+import { en } from './en';
+
+export const el: TranslationTable = {
+  ...en,
+  'nav.sales': 'Γρήγορη Πώληση',
+  'nav.delivery': 'Παραγγελίες Διανομής',
+  'nav.imkart': 'Κάρτα Πόλης',
+  'nav.posIntegration': 'Ενσωμάτωση POS',
+  'nav.stock': 'Προϊόντα και Απόθεμα',
+  'nav.purchase': 'Τιμολόγια Αγορών',
+  'nav.credit': 'Παρακολούθηση Πίστωσης',
+  'nav.expense': 'Βιβλίο Εξόδων',
+  'nav.staff': 'Προσωπικό και Μισθοί',
+  'nav.cash': 'Ταμείο και Αναλύσεις',
+  'nav.settings': 'Ρυθμίσεις',
+  'login.selectUser': 'ΕΠΙΛΕΞΤΕ ΧΡΗΣΤΗ',
+  'login.switchUser': 'ΑΛΛΑΓΗ ΧΡΗΣΤΗ',
+  'login.enterPin': 'ΕΙΣΑΓΕΤΕ PIN',
+  'login.wrongPin': 'ΛΑΘΟΣ PIN',
+  'login.ok': 'ΕΠΙΤΥΧΗΣ ΣΥΝΔΕΣΗ',
+  'login.cancel': 'Ακύρωση',
+  'login.admin': 'Συνέχεια ως Διαχειριστής',
+  'topbar.subtitle': 'ΣΥΣΤΗΜΑ ΠΩΛΗΣΕΩΝ BARCODE ΜΕ AI',
+  'topbar.register': 'Ταμείο',
+  'pos.payBtn': 'ΕΙΣΠΡΑΞΗ',
+  'pay.title': 'Κλείσιμο Πώλησης / Πληρωμή',
+  'settings.language': 'Γλώσσα',
+  'poslock.subtitle': 'Ενσωμάτωση POS — απαιτείται κλειδί άδειας',
+  'poslock.unlock': 'ΞΕΚΛΕΙΔΩΜΑ',
+};
