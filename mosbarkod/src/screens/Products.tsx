@@ -5,6 +5,7 @@ import { Ic } from '../icons';
 import { Badge, Btn, Confirm, Field, Inp, Modal, Sel, Td, Th } from '../components/ui';
 import CameraScanner from '../components/CameraScanner';
 import LabelStudioModal from '../components/LabelStudioModal';
+import StockImportModal from '../components/StockImportModal';
 import Barcode from '../components/Barcode';
 import { CATEGORIES, dstr, fmt, fmtN, tstr, uid, type Product, type Sale, type Settings, type StockCountSession } from '../data';
 import { fetchProductByBarcode, generateEan13, searchProductsByName, type AiProductMeta } from '../lib/productAi';
@@ -114,8 +115,8 @@ export default function Products({
   const [aiSearchOpen, setAiSearchOpen] = useState(false);
   const [scanOpen, setScanOpen] = useState(false);
   const [intelOpen, setIntelOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [intelWindow, setIntelWindow] = useState<7 | 30 | 90>(30);
-  const importRef = useRef<HTMLInputElement>(null);
   const imgFileRef = useRef<HTMLInputElement>(null);
   const imgCamRef = useRef<HTMLInputElement>(null);
 
@@ -237,175 +238,6 @@ export default function Products({
 
 
 
-  /* Türkçe sayı: "1.234,56" / "12,5" / "1234.56" → 1234.56 */
-  const toNum = (v: unknown): number => {
-    if (typeof v === 'number') return isFinite(v) ? v : 0;
-    let s = String(v ?? '').trim().replace(/[₺\s]/g, '');
-    if (!s) return 0;
-    if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.');
-    const n = Number(s);
-    return isFinite(n) ? n : 0;
-  };
-
-  type ColMap = {
-    barcode: number;
-    name: number;
-    brand: number;
-    gram: number;
-    category: number;
-    unit: number;
-    stock: number;
-    cost: number;
-    p1: number;
-    p2: number;
-    p3: number;
-    critical: number;
-    expiry: number;
-  };
-
-  const FALLBACK_MAP: ColMap = { barcode: 0, name: 1, brand: 2, gram: 3, category: 4, unit: 5, stock: 6, cost: 7, p1: 8, p2: 9, p3: 10, critical: 11, expiry: 12 };
-
-  /* Başlık satırından sütun eşleme — farklı Excel şablonlarına uyum */
-  const mapCols = (header: (string | number)[]): ColMap => {
-    const H = header.map((h) => String(h ?? '').toLocaleLowerCase('tr-TR'));
-    const known = H.some((h) => h.includes('barkod') || h.includes('ürün') || h.includes('kategor') || h.includes('name'));
-    if (!known) return FALLBACK_MAP;
-    const find = (pred: (h: string) => boolean, fb: number) => {
-      const i = H.findIndex(pred);
-      return i >= 0 ? i : fb;
-    };
-    return {
-      barcode: find((h) => h.includes('barkod'), 0),
-      name: find((h) => (h.includes('ürün') && h.includes('ad')) || h.includes('name') || h.includes('urun ad'), 1),
-      brand: find((h) => h.includes('marka'), 2),
-      gram: find((h) => h.includes('gram') || h.includes('boyut'), 3),
-      category: find((h) => h.includes('kategor'), 4),
-      unit: find((h) => h.includes('birim'), 5),
-      stock: find((h) => h.includes('stok'), 6),
-      cost: find((h) => h.includes('alış') || h.includes('alis') || h.includes('maliyet') || h.includes('cost'), 7),
-      p1: find((h) => h.includes('f1'), 8),
-      p2: find((h) => h.includes('f2'), 9),
-      p3: find((h) => h.includes('f3'), 10),
-      critical: find((h) => h.includes('kritik'), 11),
-      expiry: find((h) => h.includes('skt') || h.includes('kullanma'), 12),
-    };
-  };
-
-  const getCell = (row: (string | number)[], i: number) => (i >= 0 && i < row.length ? String(row[i] ?? '').trim() : '');
-
-  const applyImportRows = (rows: (string | number)[][]) => {
-    if (rows.length < 2) {
-      toast('Dosyada ver satırı bulunamadı — başlık + en az 1 ürün satırı olmalı', 'err');
-      return;
-    }
-    const map = mapCols(rows[0]);
-    const out = [...products];
-    let added = 0;
-    let updated = 0;
-    let skipped = 0;
-    for (let i = 1; i < rows.length; i++) {
-      const row = rows[i];
-      if (!row || row.every((c) => String(c ?? '').trim() === '')) continue;
-      const name = getCell(row, map.name);
-      const barcode = getCell(row, map.barcode);
-      if (!name && !barcode) {
-        skipped++;
-        continue;
-      }
-      const idx = out.findIndex((p) => (barcode ? p.barcode === barcode : p.name.toLocaleLowerCase('tr-TR') === name.toLocaleLowerCase('tr-TR')));
-      const rec: Product = {
-        id: idx >= 0 ? out[idx].id : 'p' + uid(),
-        name: name || out[idx]?.name || 'İsimsiz Ürün',
-        brand: getCell(row, map.brand) || undefined,
-        gram: getCell(row, map.gram) || undefined,
-        barcode,
-        category: getCell(row, map.category) || CATEGORIES[0].name,
-        unit: getCell(row, map.unit) || 'adet',
-        stock: toNum(getCell(row, map.stock)),
-        cost: toNum(getCell(row, map.cost)),
-        p1: toNum(getCell(row, map.p1)),
-        p2: toNum(getCell(row, map.p2)),
-        p3: toNum(getCell(row, map.p3)),
-        critical: toNum(getCell(row, map.critical)) || settings.criticalDefault,
-        expiry: getCell(row, map.expiry) || undefined,
-        image: idx >= 0 ? out[idx].image : undefined,
-      };
-      if (idx >= 0) {
-        out[idx] = rec;
-        updated++;
-      } else {
-        out.push(rec);
-        added++;
-      }
-    }
-    if (added + updated === 0) {
-      toast('Aktarılabilir ürün satırı bulunamadı. Şablon: "Barkod Listesi" butonundan indirin.', 'err');
-      return;
-    }
-    bulkUpdate(out);
-    toast(`İçe aktarıldı: ${added} yeni eklendi, ${updated} güncellendi${skipped ? `, ${skipped} satır atlandı` : ''}`);
-  };
-
-  /* CSV metni → satırlar (ayıraç tespiti + tırnak toleransı) */
-  const parseCsvText = (text: string): (string | number)[][] => {
-    const lines = text.replace(/^\uFEFF/, '').split(/\r?\n/).filter((l) => l.trim() !== '');
-    if (lines.length === 0) return [];
-    const semi = (lines[0].match(/;/g) ?? []).length;
-    const comma = (lines[0].match(/,/g) ?? []).length;
-    const sep = semi >= comma ? ';' : ',';
-    const parseLine = (str: string) => {
-      const res: string[] = [];
-      let cur = '';
-      let inside = false;
-      for (let i = 0; i < str.length; i++) {
-        const ch = str[i];
-        if (ch === '"') inside = !inside;
-        else if (ch === sep && !inside) {
-          res.push(cur.trim());
-          cur = '';
-        } else cur += ch;
-      }
-      res.push(cur.trim());
-      return res;
-    };
-    return lines.map(parseLine);
-  };
-
-  /* .xlsx / .xls / .csv / .txt — tek giriş noktası */
-  const importFile = (file: File) => {
-    const ext = (file.name.split('.').pop() ?? '').toLowerCase();
-    if (ext === 'xlsx' || ext === 'xls') {
-      const reader = new FileReader();
-      reader.onload = () => {
-        try {
-          const wb = XLSX.read(new Uint8Array(reader.result as ArrayBuffer), { type: 'array' });
-          const ws = wb.Sheets[wb.SheetNames[0]];
-          const rows = XLSX.utils.sheet_to_json<(string | number)[]>(ws, { header: 1, defval: '' });
-          applyImportRows(rows);
-        } catch {
-          toast('.xlsx dosyası okunamadı — bozulmamış bir Excel dosyası seçin', 'err');
-        }
-      };
-      reader.onerror = () => toast('Dosya okunamadı', 'err');
-      reader.readAsArrayBuffer(file);
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        const buf = new Uint8Array(reader.result as ArrayBuffer);
-        let text: string;
-        if (buf.length > 2 && buf[0] === 0xff && buf[1] === 0xfe) text = new TextDecoder('utf-16le').decode(buf.subarray(2));
-        else if (buf.length > 2 && buf[0] === 0xfe && buf[1] === 0xff) text = new TextDecoder('utf-16be').decode(buf.subarray(2));
-        else text = new TextDecoder('utf-8').decode(buf);
-        applyImportRows(parseCsvText(text));
-      } catch {
-        toast('CSV dosyası okunamadı — desteklenenler: .xlsx, .xls, .csv, .txt', 'err');
-      }
-    };
-    reader.onerror = () => toast('Dosya okunamadı', 'err');
-    reader.readAsArrayBuffer(file);
-  };
 
   /* ----- Yapay Zekâ Meta Veri Sihirbazı (barkod / isim → barkod + bilgi + görsel) ----- */
 
@@ -568,7 +400,7 @@ export default function Products({
           <Btn v="ghost" onClick={exportXlsx} title="Gerçek .xlsx dosyası indirir">
             <Ic n="download" c="h-4 w-4" /> Excel Dışarı Aktar
           </Btn>
-          <Btn v="ghost" onClick={() => importRef.current?.click()} title="Desteklenenler: .xlsx, .xls, .csv, .txt">
+          <Btn v="ghost" onClick={() => setImportOpen(true)} title="Desteklenenler: .xlsx, .xls, .csv, .txt — farklı program formatlarını eşler">
             <Ic n="file" c="h-4 w-4" /> Excel İçe Aktar
           </Btn>
           <Btn v="ghost" onClick={() => setCountOpen(true)}>
@@ -597,17 +429,6 @@ export default function Products({
         </div>
         )}
       </div>
-      <input
-        ref={importRef}
-        type="file"
-        accept=".csv,.txt,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
-        className="hidden"
-        onChange={(e) => {
-          const f = e.target.files?.[0];
-          if (f) importFile(f);
-          e.target.value = '';
-        }}
-      />
 
 
 
@@ -1201,6 +1022,16 @@ export default function Products({
           products={products}
           settings={settings}
           onClose={() => setLabelStudioOpen(false)}
+        />
+      )}
+
+      {importOpen && (
+        <StockImportModal
+          products={products}
+          settings={settings}
+          onApply={bulkUpdate}
+          onClose={() => setImportOpen(false)}
+          toast={toast}
         />
       )}
 

@@ -11,6 +11,36 @@ import type { Locale } from './i18n';
 export type TipTranslations = Record<Exclude<Locale, 'tr'>, string>;
 
 export const TIP_PHRASES: Record<string, TipTranslations> = {
+  'Stok Yükleme Sihirbazı': {
+    en: 'Stock Import Wizard',
+    ar: 'معالج استيراد المخزون',
+    ru: 'Мастер импорта склада',
+    es: 'Asistente de importación de stock',
+    de: 'Bestandsimport-Assistent',
+    fr: "Assistant d'importation de stock",
+    it: 'Procedura di importazione stock',
+    pt: 'Assistente de importação de estoque',
+    zh: '库存导入向导',
+    pl: 'Kreator importu magazynu',
+    ro: 'Asistent import stoc',
+    el: 'Οδηγός εισαγωγής αποθέματος',
+    nl: 'Voorraad-importwizard',
+  },
+  'Desteklenenler: .xlsx, .xls, .csv, .txt — farklı program formatlarını eşler': {
+    en: 'Supported: .xlsx, .xls, .csv, .txt — maps formats from other programs',
+    ar: 'المدعومة: .xlsx و .xls و .csv و .txt — يطابق صيغ البرامج الأخرى',
+    ru: 'Поддерживаются: .xlsx, .xls, .csv, .txt — сопоставляет форматы других программ',
+    es: 'Soportados: .xlsx, .xls, .csv, .txt — mapea formatos de otros programas',
+    de: 'Unterstützt: .xlsx, .xls, .csv, .txt — ordnet Formate anderer Programme zu',
+    fr: "Pris en charge : .xlsx, .xls, .csv, .txt — mappe les formats d'autres logiciels",
+    it: 'Supportati: .xlsx, .xls, .csv, .txt — mappa i formati di altri programmi',
+    pt: 'Suportados: .xlsx, .xls, .csv, .txt — mapeia formatos de outros programas',
+    zh: '支持：.xlsx、.xls、.csv、.txt — 匹配其他程序的格式',
+    pl: 'Obsługiwane: .xlsx, .xls, .csv, .txt — dopasowuje formaty innych programów',
+    ro: 'Suportate: .xlsx, .xls, .csv, .txt — potrivește formatele altor programe',
+    el: 'Υποστηριζόμενα: .xlsx, .xls, .csv, .txt — αντιστοιχίζει μορφές άλλων προγραμμάτων',
+    nl: 'Ondersteund: .xlsx, .xls, .csv, .txt — koppelt formaten van andere programma’s',
+  },
   '2. Müşteri Bilgi Ekranı Ayarları (Customer Facing Display)': {
     en: 'Customer Display Settings (Customer Facing Display)',
     ar: 'إعدادات شاشة العميل (شاشة مواجهة العميل)',
