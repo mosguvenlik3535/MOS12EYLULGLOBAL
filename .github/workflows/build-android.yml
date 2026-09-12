@@ -1,0 +1,53 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Install dependencies
+        working-directory: mosbarkod
+        run: npm install
+
+      - name: Build web app
+        working-directory: mosbarkod
+        run: npm run build
+
+      - name: Sync Capacitor
+        working-directory: mosbarkod
+        run: npx cap sync android
+
+      - name: Build APK (debug)
+        working-directory: mosbarkod/android
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MOSBARKODYAZILIM-Android-APK
+          path: mosbarkod/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+
+      - name: Create GitHub Release (tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: mosbarkod/android/app/build/outputs/apk/debug/app-debug.apk

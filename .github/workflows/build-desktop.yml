@@ -1,0 +1,56 @@
+name: Build Desktop (Windows EXE + Linux AppImage)
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            args: --win nsis portable
+            artifact: win
+          - os: ubuntu-latest
+            args: --linux AppImage
+            artifact: linux
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        working-directory: mosbarkod
+        run: npm install
+
+      - name: Build web app
+        working-directory: mosbarkod
+        run: npm run build
+
+      - name: Package with electron-builder
+        working-directory: mosbarkod
+        run: npx electron-builder ${{ matrix.args }} --publish never
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MOSBARKODYAZILIM-${{ matrix.artifact }}
+          path: |
+            mosbarkod/release/*.exe
+            mosbarkod/release/*.AppImage
+          if-no-files-found: warn
+
+      - name: Create GitHub Release (tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            mosbarkod/release/*.exe
+            mosbarkod/release/*.AppImage

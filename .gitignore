@@ -28,3 +28,11 @@ Thumbs.db
 .env
 .env.*
 !.env.example
+
+# Elektron paket çıktıları
+release/
+
+# Capacitor Android derleme çıktıları
+mosbarkod/android/app/src/main/assets/public/
+mosbarkod/android/.gradle/
+mosbarkod/android/local.properties
