@@ -161,6 +161,26 @@ D-U-N-S beklemek istemiyorsanız 4 pratik yol var (en hızlıdan en yavaşa):
 
 ---
 
+## 11. Kişisel hesapla satış (299 TL/ay) onaylanır mı?
+
+**Kısa cevap: Evet, onaylanır.** Fiyat, hesap türünden bağımsız onaylanır.
+
+- Google'ın resmî dokümanı: *"Personal and organization accounts have access to the same functionality and are able to monetize on Google Play using a payments profile."* → Kişisel hesapla abonelik satmak tam desteklenir.
+- Red/onay kriteri **fiyat veya hesap türü değil**; uygulamanın politika uyumu (Play Billing kullanımı, veri güvenliği formu, gizlilik politikası).
+- Kişisel hesabın asıl şartı: **12 testçi / 14 gün** kapalı test (üretime çıkış kapısı).
+- POS/barkod programı "finansal hizmet" sayılmaz (banka/kredi/borsa/kripto değil; ödeme uygulama içinde işlenmez) → bu gerekçeyle kurumsal hesap zorunluluğu doğmaz.
+
+### Dikkat edilmesi gereken tek gerçek fark
+Para kazanınca Google, Play'de **tam yasal ad + TAM EV ADRESİNİ** herkese açık gösterir (AB/TR tüketici koruma gereği). Kurumsal hesapta bunun yerine şirket adı/adresi görünür.
+
+### Ödeme almak için
+- Ödeme (merchant) profili + **banka hesabı** doğrulaması gerekir (kişisel hesapta yapılabilir).
+- Gelir bireysel olarak vergilendirilir (muhasebe konusu, Play engeli değil).
+
+> Sonuç: 299 TL/ay satış kişisel hesapla onaylanır. Ev adresinin görünmesini istemiyorsanız D-U-N-S gelince kurumsala geçiş en temiz çözüm — ama bu satış onayı için değil, gizlilik ve profesyonel görünüm içindir.
+
+---
+
 ## 9. Kaynaklar (resmî)
 - Get started with Play Console: https://support.google.com/googleplay/android-developer/answer/6112435
 - Hesap türü seçimi: https://support.google.com/googleplay/android-developer/answer/13634885
