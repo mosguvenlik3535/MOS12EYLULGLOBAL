@@ -11,6 +11,21 @@ import type { Locale } from './i18n';
 export type TipTranslations = Record<Exclude<Locale, 'tr'>, string>;
 
 export const TIP_PHRASES: Record<string, TipTranslations> = {
+  'MOSBARKOD PRO': {
+    en: 'MOSBARKOD PRO',
+    ar: 'MOSBARKOD PRO',
+    ru: 'MOSBARKOD PRO',
+    es: 'MOSBARKOD PRO',
+    de: 'MOSBARKOD PRO',
+    fr: 'MOSBARKOD PRO',
+    it: 'MOSBARKOD PRO',
+    pt: 'MOSBARKOD PRO',
+    zh: 'MOSBARKOD PRO',
+    pl: 'MOSBARKOD PRO',
+    ro: 'MOSBARKOD PRO',
+    el: 'MOSBARKOD PRO',
+    nl: 'MOSBARKOD PRO',
+  },
   'Stok Yükleme Sihirbazı': {
     en: 'Stock Import Wizard',
     ar: 'معالج استيراد المخزون',

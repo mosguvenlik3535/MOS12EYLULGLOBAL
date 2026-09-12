@@ -26,7 +26,9 @@ import {
   type SyncStatus,
 } from './lib/sync';
 import LicenseGate, { getStoredLicense, getStoredLicenseAsync } from './components/LicenseGate';
-import { IS_DEMO, DEMO_MAX_SALES } from './lib/buildMode';
+import { IS_DEMO, IS_PLAY, DEMO_MAX_SALES, FREE_MAX_PRODUCTS } from './lib/buildMode';
+import { initPlayBilling, isPlayBillingAvailable, isProActive } from './lib/playBilling';
+import ProUpsellModal from './components/ProUpsellModal';
 import LoginGate from './components/LoginGate';
 import { CustomerDisplay } from './components/CustomerDisplay';
 import {
@@ -167,6 +169,8 @@ export default function App() {
   const [sync, setSync] = useState<SyncStatus>({ role: 'off', code: '', connected: false });
   const [joinCode, setJoinCode] = useState('');
   const [licensed, setLicensed] = useState(() => IS_DEMO || Boolean(getStoredLicense()));
+  const [pro, setPro] = useState(false);
+  const [proOpen, setProOpen] = useState(false);
   const [demo, setDemo] = useState(IS_DEMO);
   const [demoExpired, setDemoExpired] = useState(false);
   const [locale, setLocaleState] = useState<Locale>(() => loadLocale());
@@ -221,6 +225,27 @@ export default function App() {
         if (v) setLicensed(true);
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Play Store (freemium) sürümü: PRO aboneliği başlat ve sahiplik değişimini dinle.
+  // CdvPurchase native köprü kurulana kadar kısa süre beklenir (plugin WebView'e sonradan yüklenebilir).
+  useEffect(() => {
+    if (!IS_PLAY) return;
+    let tries = 0;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const attempt = () => {
+      if (isPlayBillingAvailable()) {
+        void initPlayBilling((p) => setPro(p));
+        setPro(isProActive());
+        return;
+      }
+      if (tries++ < 20) timer = setTimeout(attempt, 250);
+    };
+    attempt();
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -828,19 +853,30 @@ export default function App() {
 
   /* ---------- screen mutators ---------- */
 
-  const saveProduct = (p: Product) =>
-    setState((s) => {
-      const exists = s.products.some((x) => x.id === p.id);
-      return {
-        ...s,
-        products: exists ? s.products.map((x) => (x.id === p.id ? p : x)) : [...s.products, p],
-      };
-    });
+  const saveProduct = (p: Product) => {
+    const exists = state.products.some((x) => x.id === p.id);
+    if (!exists && IS_PLAY && !licensed && !pro && state.products.length >= FREE_MAX_PRODUCTS) {
+      toast(`Ücretsiz sürümde en fazla ${FREE_MAX_PRODUCTS} ürün — PRO'ya yükseltin`, 'err');
+      setProOpen(true);
+      return;
+    }
+    setState((s) => ({
+      ...s,
+      products: exists ? s.products.map((x) => (x.id === p.id ? p : x)) : [...s.products, p],
+    }));
+  };
 
   const removeProduct = (id: string) =>
     setState((s) => ({ ...s, products: s.products.filter((x) => x.id !== id) }));
 
-  const bulkUpdateProducts = (list: Product[]) => setState((s) => ({ ...s, products: list }));
+  const bulkUpdateProducts = (list: Product[]) => {
+    if (IS_PLAY && !licensed && !pro && list.length > FREE_MAX_PRODUCTS) {
+      toast(`Ücretsiz sürümde en fazla ${FREE_MAX_PRODUCTS} ürün — PRO'ya yükseltin`, 'err');
+      setProOpen(true);
+      return;
+    }
+    setState((s) => ({ ...s, products: list }));
+  };
 
   const applyStockCount = (counts: Record<string, string>) => {
     const entries = buildCountEntries(state.products, counts);
@@ -1174,7 +1210,7 @@ export default function App() {
     );
   }
 
-  if (!licensed || (demo && demoExpired)) {
+  if ((!licensed && !pro && !IS_PLAY) || (demo && demoExpired)) {
     return (
       <LicenseGate
         demo={demo}
@@ -1439,6 +1475,16 @@ export default function App() {
           onDone={() => setReceipt(null)}
         />
       )}
+      {proOpen && (
+        <ProUpsellModal
+          onClose={() => setProOpen(false)}
+          onActivated={() => {
+            setPro(true);
+            setProOpen(false);
+          }}
+          toast={toast}
+        />
+      )}
 
       <div className="pointer-events-none fixed bottom-4 right-4 z-[70] flex w-[340px] flex-col gap-2">
         {toasts.map((t) => (
@@ -1459,6 +1505,14 @@ export default function App() {
         <div className="pointer-events-none fixed left-1/2 top-[70px] z-[80] -translate-x-1/2 rounded-full border border-amber/50 bg-amber/90 px-3 py-1 font-mono text-[10px] font-black tracking-[0.2em] text-black shadow-lg">
           DEMO SÜRÜM
         </div>
+      )}
+      {IS_PLAY && !licensed && !pro && (
+        <button
+          onClick={() => setProOpen(true)}
+          className="fixed left-1/2 top-[70px] z-[80] -translate-x-1/2 rounded-full border border-mint/70 bg-mint px-3 py-1 font-mono text-[10px] font-black tracking-[0.2em] text-[#04211a] shadow-lg transition-transform hover:scale-105"
+        >
+          ★ ÜCRETSİZ SÜRÜM — PRO'YA YÜKSELT
+        </button>
       )}
     </div>
     </LocaleContext.Provider>

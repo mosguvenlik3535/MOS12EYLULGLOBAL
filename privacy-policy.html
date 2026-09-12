@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MOSBARKODYAZILIM — Gizlilik Politikası / Privacy Policy</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; line-height: 1.6; max-width: 820px; margin: 0 auto; padding: 24px 20px 80px; color: #1a1a1a; background: #fff; }
+  @media (prefers-color-scheme: dark) { body { color: #e5e7eb; background: #0a0e13; } }
+  h1 { font-size: 1.6rem; }
+  h2 { font-size: 1.15rem; margin-top: 2em; border-bottom: 1px solid #8883; padding-bottom: 6px; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+  th, td { border: 1px solid #8886; padding: 8px 10px; text-align: left; vertical-align: top; }
+  code { background: #8882; padding: 1px 5px; border-radius: 4px; font-size: 0.9em; }
+  .muted { opacity: 0.75; font-size: 0.9rem; }
+  a { color: #0d9488; }
+</style>
+</head>
+<body>
+<h1>MOSBARKODYAZILIM — Gizlilik Politikası / Privacy Policy</h1>
+<p class="muted">Son güncelleme / Last updated: 12 Eylül 2026 · Uygulama / App: MOSBARKODYAZILIM (MOSBARKOD POS)</p>
+
+<h2>1. Özet</h2>
+<p>MOSBARKODYAZILIM, <strong>yerel öncelikli (local-first)</strong> bir barkod satış / POS / kasa programıdır. Ürün, satış, müşteri, personel ve ayar verileriniz <strong>yalnızca sizin cihazınızda</strong> saklanır. Geliştirici olarak biz, işletme verilerinizi kendi sunucularımızda <strong>toplamayız, saklamayız ve işlemeyiz</strong>. Hesap açma yoktur; reklam yoktur; izleme/analitik SDK'sı yoktur.</p>
+
+<h2>2. Verilerin tutulduğu yerler</h2>
+<table>
+  <tr><th>Veri</th><th>Konum</th><th>Ne zaman</th></tr>
+  <tr><td>Ürünler, stok, fiyatlar</td><td>Cihazda (yerel depolama)</td><td>Her zaman yerel</td></tr>
+  <tr><td>Satışlar, raporlar</td><td>Cihazda</td><td>Her zaman yerel</td></tr>
+  <tr><td>Müşteriler, personel, ayarlar</td><td>Cihazda</td><td>Her zaman yerel</td></tr>
+  <tr><td>Yapay zekâ görüntü modelleri</td><td>Cihazda</td><td>Yalnızca siz eğitirseniz</td></tr>
+  <tr><td>Yedekler</td><td><strong>Sizin</strong> Google Drive / Dropbox hesabınız</td><td>Yalnızca siz başlatırsanız</td></tr>
+</table>
+
+<h2>3. Üçüncü taraf hizmetler (yalnızca siz kullanırsanız)</h2>
+<ul>
+  <li><strong>Bulut yedekleme (Google Drive / Dropbox):</strong> Yedekleme yaparsanız verileriniz resmî OAuth ile <strong>kendi</strong> hesabınıza yüklenir; geliştirici erişemez.</li>
+  <li><strong>E-posta (EmailJS, Resend, SMTP, SendGrid, Mailgun, Mailjet, Brevo, SMTP2GO):</strong> Raporları kendi yapılandırdığınız sağlayıcı üzerinden gönderir.</li>
+  <li><strong>Ürün sorgulama (Open Food Facts):</strong> Yalnızca sorgu metni (barkod/ad) <code>world.openfoodfacts.org</code> açık veritabanına gönderilir.</li>
+  <li><strong>Cihaz eşzamanlama (PeerJS/WebRTC):</strong> Eşleştirme için <code>0.peerjs.com</code> sinyal sunucusu kullanılır; satış verileri cihazlar arasında doğrudan (P2P) aktarılır.</li>
+  <li><strong>Google Play Billing:</strong> PRO ödemeleri Google tarafından işlenir; kart bilgileri geliştiriciye iletilmez.</li>
+</ul>
+
+<h2>4. Toplamadıklarımız</h2>
+<p>Konum, rehber/kişiler, SMS veya arama kayıtları, reklam kimlikleri, tarama geçmişi ve ödeme/kart bilgileri toplanmaz.</p>
+
+<h2>5. Kamera</h2>
+<p>Kamera yalnızca siz taratırken, barkod okuma ve yapay zekâ görsel tanıma için kullanılır; görüntüler cihaz dışına gönderilmez.</p>
+
+<h2>6. İletişim / Contact</h2>
+<p>E-posta: <a href="mailto:m.ortayayla@gmail.com">m.ortayayla@gmail.com</a> · Telefon: +90 555 406 61 43</p>
+
+<hr>
+<h2>1. Summary (English)</h2>
+<p>MOSBARKODYAZILIM is a <strong>local-first</strong> barcode sales / POS / cash-register program. Your products, sales, customers, staff and settings are stored <strong>only on your device</strong>. We, as the developer, do <strong>not</strong> collect, store or process your business data on any of our servers. There is no account sign-up, no advertising and no analytics/tracking SDK.</p>
+
+<h2>2. Where data lives</h2>
+<table>
+  <tr><th>Data</th><th>Location</th><th>When</th></tr>
+  <tr><td>Products, stock, prices</td><td>On-device (local storage)</td><td>Always local</td></tr>
+  <tr><td>Sales, reports</td><td>On-device</td><td>Always local</td></tr>
+  <tr><td>Customers, staff, settings</td><td>On-device</td><td>Always local</td></tr>
+  <tr><td>AI vision models</td><td>On-device</td><td>Only if you train them</td></tr>
+  <tr><td>Backups</td><td><strong>Your own</strong> Google Drive / Dropbox</td><td>Only if you initiate</td></tr>
+</table>
+
+<h2>3. Third-party services (only if you use them)</h2>
+<ul>
+  <li><strong>Cloud backup (Google Drive / Dropbox):</strong> uploads via official OAuth to <strong>your own</strong> account; the developer cannot access them.</li>
+  <li><strong>Email (EmailJS, Resend, SMTP, SendGrid, Mailgun, Mailjet, Brevo, SMTP2GO):</strong> reports are sent through a provider <strong>you</strong> configure.</li>
+  <li><strong>Product lookup (Open Food Facts):</strong> only the query text (barcode/name) is sent to <code>world.openfoodfacts.org</code>.</li>
+  <li><strong>Device sync (PeerJS/WebRTC):</strong> pairing uses the <code>0.peerjs.com</code> signaling server; sales data transfers peer-to-peer between your own devices.</li>
+  <li><strong>Google Play Billing:</strong> PRO payments are processed by Google; card details are never sent to the developer.</li>
+</ul>
+
+<h2>4. What we do NOT collect</h2>
+<p>Location, contacts, SMS/call logs, advertising IDs, browsing history, or payment/card details.</p>
+
+<h2>5. Camera</h2>
+<p>Used only while you actively scan, for barcode reading and AI visual recognition; images never leave the device.</p>
+
+<h2>6. Contact</h2>
+<p>Email: <a href="mailto:m.ortayayla@gmail.com">m.ortayayla@gmail.com</a> · Phone: +90 555 406 61 43</p>
+</body>
+</html>
