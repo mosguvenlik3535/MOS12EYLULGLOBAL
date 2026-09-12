@@ -134,6 +134,33 @@ D-U-N-S beklemek istemiyorsanız 4 pratik yol var (en hızlıdan en yavaşa):
 
 ---
 
+## 10. ✅ Kişisel hesap AÇILDI — sıradaki adımlar (kontrol listesi)
+
+> Durum: Kişisel (Personal) Play Console hesabı açıldı. Kişisel hesapta D-U-N-S gerekmez;
+> bunun yerine **12 testçi / 14 gün** kapalı test zorunludur. Adımlar:
+
+1. **Kimlik doğrulaması** — Play Console → *Developer account → Account details*. Resmî kimlik + adres belgesi. (2–5 gün)
+2. **Cihaz doğrulaması** — yeni kişisel hesaplarda Play Console mobil uygulamasıyla bir Android cihazın doğrulanması istenebilir.
+3. **Keystore + GitHub Secret** — imzalı AAB için **zorunlu** (bkz. `PLAYSTORE_YAYIN_PLANI.md` §6b). Bu adım sizde; secret eklenince AAB otomatik üretilir.
+4. **AAB üret** — secret eklendikten sonra `v*` tag push'u imzalı AAB'yi otomatik üretir (CI hazır).
+5. **Uygulama oluştur** — Play Console → *Create app*; paket adı: `com.mosbarkodyazilim.pos`.
+6. **Kapalı test (Closed testing) kur:**
+   - *Testing → Closed testing → Create track*
+   - AAB yükle → test sürümü olarak yayınla
+   - Testçileri e-posta listesiyle ekle (Google hesabı olmalı)
+   - **12 testçi × 14 ardışık gün** opt-in + kurulum
+7. **Üretim erişimi başvurusu** — 14 gün dolunca *Apply for production access* (3 bölümlü form; inceleme ~7 gün).
+8. **Paralel (isteğe bağlı):** D-U-N-S başvurusu → numara gelince *About you → Change account type* ile kurumsala yükselt.
+9. **`mos_pro_aylik` abonelik ürünü** — *Monetize → Products → Subscriptions* (299 TL/ay; kod bu kimliği kullanıyor).
+
+### Testçi bulma ipuçları (12 kişi kolay)
+- Çalışanlar, aile, komşu esnaf, arkadaşlar.
+- Testçiler opt-in linkine tıklayıp uygulamayı **gerçek cihaza kurmalı** ve 14 gün içinde birkaç kez açıp kullanmalı (sadece kurup bırakanlar sayılmaz).
+- Sayı 12'nin altına düşerse süreç sıfırlanabilir → güvenlik için **15–20 testçi** ekleyin.
+- Testçilerden geri bildirim almak, üretim başvurusu formundaki "testçiler nasıl kullandı, ne geri bildirdi" sorularına cevap yazmanızı kolaylaştırır.
+
+---
+
 ## 9. Kaynaklar (resmî)
 - Get started with Play Console: https://support.google.com/googleplay/android-developer/answer/6112435
 - Hesap türü seçimi: https://support.google.com/googleplay/android-developer/answer/13634885
