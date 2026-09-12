@@ -99,7 +99,42 @@ D-U-N-S, Dun & Bradstreet tarafından işletmelere verilen **9 haneli** ücretsi
 
 ---
 
-## 7. Kaynaklar (resmî)
+## 8. D-U-N-S 30 gün sürüyorsa — alternatif yollar
+
+D-U-N-S beklemek istemiyorsanız 4 pratik yol var (en hızlıdan en yavaşa):
+
+### Yol A — Kişisel hesap aç, hemen başla (D-U-N-S GEREKMEZ) ⭐ önerilen
+- Kişisel (Personal) hesap için **D-U-N-S istenmez**; resmî kimlik doğrulaması yeterli (2–5 gün).
+- Karşılığında: **12 testçi / 14 gün** kapalı test zorunluluğu var (bu, 1 aylık D-U-N-S beklemekten çok daha kısa ve sizin kontrolünüzde).
+- Mağazada **kişisel yasal adınız** görünür.
+- **Önemli:** Google artık kişisel hesabı **sonradan kurumsala dönüştürmeyi resmî olarak destekliyor** (Play Console → Developer account → About you → *Change account type*). Bunun için D-U-N-S + doğrulanmış kurumsal web sitesi + kurumsal ödeme profili gerekir. Yani: **şimdi kişisel aç → uygulama yayında → D-U-N-S gelince yerinde kurumsala yükselt.** (Tek yönlü: kurumsaldan kişisele dönüş yok.)
+
+### Yol B — Hızlandırılmış (ücretli) D-U-N-S
+- Dun & Bradstreet, ücretli **ekspres işlem** sunuyor: **1–5 iş günü**, yaklaşık **229 USD** (ülkeye göre değişir).
+- Kurumsal hesabı 1. günden istiyorsanız ve bütçe varsa, 1 aylık beklemeyi tamamen ortadan kaldırır.
+
+### Yol C — D-U-N-S zaten var olabilir (önce kontrol edin)
+- Türkiye'de birçok firma banka, ihracat veya kamu ihaleleri nedeniyle **zaten D-U-N-S almıştır**.
+- Sorgulama: https://www.dnb.com/duns-number/lookup.html — varsa hiç bekleme yok.
+
+### Yol D — D-U-N-S'siz kurumsal (Türkiye için UYGUN DEĞİL)
+- D-U-N-S'siz kurumsal doğrulama yalnızca **kamu kurumlarına** veya D&B'nin **desteklemediği bölgelere** tanınan istisnadır. Türkiye D&B kapsamında olduğu için bu yol kapalıdır.
+
+### Süre karşılaştırması (2026 gerçekçi)
+
+| Yol | Yayına çıkış süresi |
+|---|---|
+| Kurumsal + D-U-N-S zaten var | 1–2 hafta |
+| Kişisel + testçi (elle toplama) | 3–6 hafta |
+| Kişisel + test servisi | ~16 gün |
+| Kurumsal + ücretli ekspres D-U-N-S | ~1–2 hafta |
+| Kurumsal + ücretsiz yeni D-U-N-S | 2–6 hafta |
+
+> **Öneri:** Şirket kaydınız hazırsa ve hızlı çıkış istiyorsanız **Yol A** en pratik: kişisel hesap açın, 12 testçiyi (çalışanlar, diğer esnaf) kolayca bulursunuz, uygulama yayına çıkar; paralelde ücretsiz D-U-N-S başvurusu yapın, numara gelince kurumsala yükseltirsiniz. POS uygulaması için 14 günlük gerçek beta testi zaten faydalıdır.
+
+---
+
+## 9. Kaynaklar (resmî)
 - Get started with Play Console: https://support.google.com/googleplay/android-developer/answer/6112435
 - Hesap türü seçimi: https://support.google.com/googleplay/android-developer/answer/13634885
 - Gerekli bilgiler: https://support.google.com/googleplay/android-developer/answer/13628312
