@@ -1,30 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { cn } from '../utils/cn';
 import { Ic } from '../icons';
 import { Btn, Field, Inp, Sel, Td, Th } from '../components/ui';
+import Flag from '../components/Flag';
 import { ensureLicenseChain } from '../lib/license';
+import { POS_BRANDS, POS_COUNTRIES, brandsForCountry, brandForCountry, countryById, type PosBrand } from '../lib/posCatalog';
 import { fmt, dstr, tstr, type Sale, type Settings } from '../data';
 
 type Toast = (msg: string, type?: 'ok' | 'err') => void;
-
-const BRANDS: { id: string; name: string; models: string[] }[] = [
-  { id: 'beko', name: 'Beko', models: ['Beko 400 TR', 'Beko 500 TR', 'Beko 600 TR', 'Beko 400 TR FE'] },
-  { id: 'verifone', name: 'Verifone', models: ['VX 520', 'VX 680', 'VX 690', 'Engage V400m', 'Engage V600m', 'Engage e280'] },
-  { id: 'ingenico', name: 'Ingenico', models: ['iCT220', 'iCT250', 'iWL220', 'iWL250', 'Move 5000', 'Lane 3000'] },
-  { id: 'newland', name: 'Newland', models: ['N95', 'N94', 'N86', 'N7000'] },
-  { id: 'sunmi', name: 'Sunmi', models: ['V2', 'V2 Pro', 'P2', 'T2 Pro', 'M2'] },
-  { id: 'pax', name: 'PAX', models: ['S80', 'S90', 'A920', 'A920 Pro', 'D210'] },
-  { id: 'datecs', name: 'Datecs', models: ['MP55', 'MP55S', 'FP-700'] },
-  { id: 'ziraat', name: 'Ziraat Bankası POS', models: ['Ziraat Mobil POS', 'Ziraat Sabit POS'] },
-  { id: 'garanti', name: 'Garanti BBVA POS', models: ['Garanti Mobil POS', 'Garanti Sabit POS'] },
-  { id: 'ykb', name: 'Yapı Kredi POS', models: ['YKB Mobil POS', 'YKB Sabit POS'] },
-  { id: 'akbank', name: 'Akbank POS', models: ['Akbank Mobil POS', 'Akbank Sabit POS'] },
-  { id: 'isbank', name: 'İş Bankası POS', models: ['İşbank Mobil POS', 'İşbank Sabit POS'] },
-  { id: 'vakif', name: 'VakıfBank POS', models: ['VakıfBank Mobil POS'] },
-  { id: 'deniz', name: 'DenizBank POS', models: ['DenizBank Mobil POS'] },
-  { id: 'qnb', name: 'QNB Finansbank POS', models: ['QNB Mobil POS'] },
-  { id: 'ing', name: 'ING POS', models: ['ING Mobil POS'] },
-];
 
 const CONN_TYPES: { id: 'mobile' | 'tcp' | 'serial' | 'usb' | 'http'; name: string; icon: string; desc: string }[] = [
   { id: 'mobile', name: 'Mobil POS (SIM Kart)', icon: 'phone', desc: 'SIM kartlı mobil POS (GPRS/4G). Statik IP ve APN girin.' },
@@ -92,8 +75,34 @@ export default function PosIntegrationScreen({
 
   const setPos = (patch: Partial<Settings['pos']>) => onPatch({ pos: { ...pos, ...patch } });
 
-  const brand = BRANDS.find((b) => b.id === pos.brand);
+  const brand = brandForCountry(pos.country, pos.brand);
   const conn = CONN_TYPES.find((c) => c.id === pos.connectionType) ?? CONN_TYPES[0];
+  const country = countryById(pos.country);
+
+  // Marka seçilince önerilen bağlantı ayarlarını otomatik uygula
+  const applyBrandDefaults = (b: PosBrand | undefined): Partial<Settings['pos']> => {
+    const patch: Partial<Settings['pos']> = {};
+    if (!b) return patch;
+    patch.connectionType = b.defaultConn;
+    if (b.defaultPort) {
+      if (b.defaultConn === 'tcp') patch.tcpPort = b.defaultPort;
+      if (b.defaultConn === 'mobile') patch.mobilePort = b.defaultPort;
+    }
+    if (b.defaultEncoding) patch.encoding = b.defaultEncoding;
+    return patch;
+  };
+
+  // Marka listesi: ülke seçiliyse o ülke; değilse tümü (eski kayıtlarla uyumlu)
+  const brandGroups = useMemo(() => {
+    const source = pos.country ? brandsForCountry(pos.country) : POS_BRANDS;
+    const map = new Map<string, PosBrand[]>();
+    for (const b of source) {
+      const arr = map.get(b.country) ?? [];
+      arr.push(b);
+      map.set(b.country, arr);
+    }
+    return Array.from(map.entries()).map(([cid, list]) => ({ country: countryById(cid), list }));
+  }, [pos.country]);
 
   const provSales = sales.filter((s) => s.posAuth).slice(0, 12);
 
@@ -102,6 +111,11 @@ export default function PosIntegrationScreen({
     setTestResult(null);
     setTimeout(() => {
       setTesting(false);
+      if (!pos.country) {
+        setTestResult({ ok: false, msg: 'Önce ülke/bölge seçin.' });
+        toast('Test başarısız: bölge seçilmedi', 'err');
+        return;
+      }
       if (!pos.brand) {
         setTestResult({ ok: false, msg: 'Önce marka/model seçin.' });
         toast('Test başarısız: marka seçilmedi', 'err');
@@ -117,7 +131,7 @@ export default function PosIntegrationScreen({
         toast('Test başarısız: statik IP girin', 'err');
         return;
       }
-      setTestResult({ ok: true, msg: `Bağlantı başarılı — ${brand?.name ?? 'POS'} yanıt verdi (simülasyon).` });
+      setTestResult({ ok: true, msg: `Bağlantı başarılı — ${brand?.name ?? 'POS'} ${pos.model || ''} yanıt verdi (simülasyon).` });
       toast('POS bağlantı testi başarılı');
     }, 1200);
   };
@@ -259,13 +273,58 @@ export default function PosIntegrationScreen({
         {/* Sol: cihaz + bağlantı */}
         <div className="space-y-3">
           <section className="rounded-xl border border-line bg-panel p-4">
-            <h3 className="mb-3 font-mono text-[12px] font-bold uppercase tracking-widest text-amber2">Cihaz Seçimi</h3>
+            {/* ADIM 1 — Ülke */}
+            <h3 className="mb-2 flex items-center gap-2 font-mono text-[12px] font-bold uppercase tracking-widest text-amber2">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber/15 font-mono text-[11px] text-amber2">1</span>
+              Ülke / Bölge Seçin
+            </h3>
+            <div className="flex flex-wrap gap-1.5">
+              {POS_COUNTRIES.map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => {
+                    setPos({ country: c.id, brand: '', model: '' });
+                    toast(`Bölge seçildi: ${c.name} — marka listesi bu bölgeye göre güncellendi`);
+                  }}
+                  className={cn(
+                    'flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 transition-colors',
+                    pos.country === c.id ? 'border-amber bg-amber/15 text-amber2' : 'border-line2 bg-ink/40 text-mut hover:border-line hover:text-txt'
+                  )}
+                >
+                  <Flag code={c.id} className="h-3.5 w-[18px]" />
+                  <span className="font-mono text-[11px] font-semibold">{c.name}</span>
+                </button>
+              ))}
+            </div>
+            {country && (
+              <div className="mt-2 rounded-lg border border-line bg-ink/40 px-3 py-2 text-[10.5px] leading-relaxed text-mut2">
+                <b className="text-amber2">{country.name}:</b> {country.tip}
+              </div>
+            )}
+
+            {/* ADIM 2 — Marka & Model */}
+            <h3 className="mb-2 mt-4 flex items-center gap-2 font-mono text-[12px] font-bold uppercase tracking-widest text-amber2">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber/15 font-mono text-[11px] text-amber2">2</span>
+              Marka &amp; Model
+            </h3>
             <div className="grid gap-3 sm:grid-cols-2">
               <Field label="Marka">
-                <Sel value={pos.brand} onChange={(e) => setPos({ brand: e.target.value, model: '' })}>
+                <Sel
+                  value={pos.brand}
+                  onChange={(e) => {
+                    const bid = e.target.value;
+                    const b = brandForCountry(pos.country, bid);
+                    setPos({ brand: bid, model: '', ...applyBrandDefaults(b) });
+                    if (b) toast(`"${b.name}" seçildi — önerilen bağlantı ayarları uygulandı`);
+                  }}
+                >
                   <option value="">-- Marka Seçin --</option>
-                  {BRANDS.map((b) => (
-                    <option key={b.id} value={b.id}>{b.name}</option>
+                  {brandGroups.map((g) => (
+                    <optgroup key={g.country?.id ?? 'x'} label={g.country?.name ?? ''}>
+                      {g.list.map((b) => (
+                        <option key={`${g.country?.id}-${b.id}`} value={b.id}>{b.name}</option>
+                      ))}
+                    </optgroup>
                   ))}
                 </Sel>
               </Field>
@@ -278,9 +337,17 @@ export default function PosIntegrationScreen({
                 </Sel>
               </Field>
             </div>
+            {brand?.tip && (
+              <div className="mt-2 rounded-lg border border-blue/30 bg-blue/5 px-3 py-2 text-[10.5px] leading-relaxed text-mut2">
+                <b className="text-blue">Kurulum ipucu:</b> {brand.tip}
+              </div>
+            )}
 
             <div className="mt-3">
-              <span className="mb-1.5 block font-mono text-[10px] uppercase tracking-widest text-mut">Bağlantı Yöntemi</span>
+              <span className="mb-1.5 flex items-center gap-2 font-mono text-[12px] font-bold uppercase tracking-widest text-amber2">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber/15 font-mono text-[11px] text-amber2">3</span>
+                Bağlantı Yöntemi
+              </span>
               <div className="grid gap-2 sm:grid-cols-2">
                 {CONN_TYPES.map((c) => (
                   <button
@@ -396,6 +463,10 @@ export default function PosIntegrationScreen({
             </div>
 
             <div className="mt-3 flex flex-wrap items-center gap-2">
+              <span className="mr-1 flex items-center gap-2 font-mono text-[12px] font-bold uppercase tracking-widest text-amber2">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber/15 font-mono text-[11px] text-amber2">4</span>
+                Bağlantı Testi
+              </span>
               <Btn v="ghost" className="border-blue/40 text-blue" onClick={testConn} disabled={testing}>
                 {testing ? (
                   <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
@@ -404,6 +475,18 @@ export default function PosIntegrationScreen({
                 )}
                 Bağlantıyı Test Et
               </Btn>
+              {brand && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPos(applyBrandDefaults(brand));
+                    toast('Önerilen bağlantı ayarları yeniden uygulandı');
+                  }}
+                  className="rounded-lg border border-mint/40 bg-mint/10 px-2.5 py-2 font-mono text-[11px] font-semibold text-mint transition-colors hover:bg-mint/20"
+                >
+                  <Ic n="sparkles" c="h-3.5 w-3.5 inline" /> Önerilen ayarları uygula
+                </button>
+              )}
               {testResult && (
                 <span className={cn('font-mono text-[11px] font-semibold', testResult.ok ? 'text-mint' : 'text-red')}>
                   {testResult.msg}
@@ -455,11 +538,11 @@ export default function PosIntegrationScreen({
           <section className="rounded-xl border border-line bg-panel p-4">
             <h3 className="mb-2 font-mono text-[12px] font-bold uppercase tracking-widest text-amber2">Nasıl Çalışır?</h3>
             <ol className="list-decimal space-y-1 pl-4 text-[11px] leading-relaxed text-mut">
-              <li>Tam Entegre Mod'u açın ve cihaz marka/model + bağlantı yöntemi seçin.</li>
-              <li>Bağlantıyı Test Et ile bağlantıyı doğrulayın.</li>
+              <li>Önce <b className="text-mut">ülke/bölgeyi</b> seçin — marka listesi o bölgenin yaygın cihazlarına göre filtrelenir.</li>
+              <li>Marka seçtiğinizde önerilen bağlantı türü, port ve kodlama otomatik uygulanır.</li>
+              <li>Tam Entegre Mod'u açın ve Bağlantıyı Test Et ile bağlantıyı doğrulayın.</li>
               <li>Hızlı Satış'ta kart/nakit+POS ödemesi seçildiğinde tutar cihaza gider, provizyon onayı beklenir.</li>
-              <li>Onay gelince satış tamamlanır, provizyon kodu satışa işlenir.</li>
-              <li>Mod kapatılırsa program yarı entegre (manuel) moda döner.</li>
+              <li>Onay gelince satış tamamlanır, provizyon kodu satışa işlenir; mod kapatılırsa yarı entegre (manuel) moda döner.</li>
             </ol>
           </section>
         </div>

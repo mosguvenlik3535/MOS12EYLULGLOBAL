@@ -517,6 +517,7 @@ export interface Settings {
     enabled: boolean;
     brand: string;           // BEKO, ZIRAAT, GARANTI, YKB, AKBANK, ISBANK, VAKIF, DENIZ, QNB, ING, FINANS, vs.
     model: string;           // Model numarası
+    country: string;         // Ülke kodu (tr, en, de, ...) — marka kataloğunu filtreler
     connectionType: 'tcp' | 'serial' | 'usb' | 'mobile' | 'http';
     // TCP/IP
     tcpIp?: string;
@@ -1085,6 +1086,7 @@ export const defaultSettings = (): Settings => ({
     enabled: false,
     brand: '',
     model: '',
+    country: '',
     connectionType: 'tcp',
     tcpIp: '',
     tcpPort: 2030,
