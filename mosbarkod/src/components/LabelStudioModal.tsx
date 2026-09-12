@@ -5,6 +5,7 @@ import { Ic } from '../icons';
 import { Btn, Field, Inp, Modal, Sel } from './ui';
 import Barcode from './Barcode';
 import { CATEGORIES, fmt, type Product, type Settings } from '../data';
+import { sendLabels } from '../lib/printLabel';
 
 type LabelFormat = 'shelf_standard' | 'shelf_promo' | 'thermal_barcode' | 'a4_sheet_24' | 'a4_sheet_40';
 
@@ -61,8 +62,28 @@ export default function LabelStudioModal({
     setSelectedIds((prev) => prev.filter((id) => !ids.has(id)));
   };
 
+  const [thermalState, setThermalState] = useState<'idle' | 'busy' | 'ok' | 'err'>('idle');
+  const [thermalMsg, setThermalMsg] = useState('');
+
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleThermal = async () => {
+    setThermalState('busy');
+    setThermalMsg('');
+    const r = await sendLabels(selectedProducts, settings);
+    if (r.ok) {
+      setThermalState('ok');
+      setThermalMsg(
+        r.via === 'clipboard'
+          ? 'Etiket komutu panoya kopyalandı — yazıcı aracına yapıştırın.'
+          : `Termal yazıcıya gönderildi (${settings.label.protocol.toUpperCase()})`
+      );
+    } else {
+      setThermalState('err');
+      setThermalMsg(r.error || 'Termal yazdırma başarısız');
+    }
   };
 
   return (
@@ -72,17 +93,32 @@ export default function LabelStudioModal({
       onClose={onClose}
       w="max-w-5xl"
       footer={
-        <div className="flex w-full items-center justify-between">
-          <div className="font-mono text-xs text-mut">
-            <span className="font-bold text-amber2">{selectedProducts.length}</span> ürün basıma hazır
-          </div>
-          <div className="flex gap-2">
-            <Btn v="ghost" onClick={onClose}>
-              Kapat
-            </Btn>
-            <Btn v="primary" onClick={handlePrint} disabled={selectedProducts.length === 0} className="gap-2 px-5">
-              <Ic n="print" c="h-4 w-4" /> Etiketleri Yazdır ({selectedProducts.length})
-            </Btn>
+        <div className="w-full">
+          {thermalState !== 'idle' && (
+            <div
+              className={cn(
+                'mb-2 rounded-md px-3 py-1.5 font-mono text-[11px]',
+                thermalState === 'err' ? 'bg-red-500/15 text-red-400' : 'bg-mint/10 text-mint'
+              )}
+            >
+              {thermalState === 'busy' ? 'Yazıcıya gönderiliyor…' : thermalMsg}
+            </div>
+          )}
+          <div className="flex w-full items-center justify-between">
+            <div className="font-mono text-xs text-mut">
+              <span className="font-bold text-amber2">{selectedProducts.length}</span> ürün basıma hazır
+            </div>
+            <div className="flex gap-2">
+              <Btn v="ghost" onClick={onClose}>
+                Kapat
+              </Btn>
+              <Btn v="mint" onClick={handleThermal} disabled={selectedProducts.length === 0 || thermalState === 'busy'} className="gap-2">
+                <Ic n="print" c="h-4 w-4" /> Termal Yazıcıya Gönder
+              </Btn>
+              <Btn v="primary" onClick={handlePrint} disabled={selectedProducts.length === 0} className="gap-2 px-5">
+                <Ic n="print" c="h-4 w-4" /> Etiketleri Yazdır ({selectedProducts.length})
+              </Btn>
+            </div>
           </div>
         </div>
       }

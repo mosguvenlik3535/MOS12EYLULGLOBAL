@@ -6,6 +6,7 @@ import ReportModal from '../components/ReportModal';
 import { buildReport, waLink } from '../lib/report';
 import { sendEmail } from '../lib/email';
 import { printTest } from '../lib/printReceipt';
+import { sendLabelTest } from '../lib/printLabel';
 import { useLocale } from '../locales/i18n';
 import {
   DEFAULT_ENABLED_DEVICES,
@@ -788,7 +789,9 @@ export function HardwareCard({
   const enabled = settings.hardware?.enabledDevices ?? DEFAULT_ENABLED_DEVICES;
   const country = hardwareCountryName(locale);
   const printer = settings.printer;
+  const label = settings.label;
   const [testing, setTesting] = useState(false);
+  const [testingLabel, setTestingLabel] = useState(false);
 
   const toggle = (id: string) => {
     const next = enabled.includes(id) ? enabled.filter((x) => x !== id) : [...enabled, id];
@@ -798,6 +801,7 @@ export function HardwareCard({
   };
 
   const patchPrinter = (p: Partial<Settings['printer']>) => onPatch({ printer: { ...printer, ...p } });
+  const patchLabel = (p: Partial<Settings['label']>) => onPatch({ label: { ...label, ...p } });
 
   const testPrint = async () => {
     setTesting(true);
@@ -809,6 +813,19 @@ export function HardwareCard({
     } else {
       toast(r.error || 'Yazdırma başarısız', 'err');
       patchPrinter({ lastTestAt: new Date().toISOString(), lastTestResult: 'failed', lastTestError: r.error });
+    }
+  };
+
+  const testLabel = async () => {
+    setTestingLabel(true);
+    const r = await sendLabelTest(settings);
+    setTestingLabel(false);
+    if (r.ok) {
+      toast('Etiket yazıcıya gönderildi');
+      patchLabel({ lastTestAt: new Date().toISOString(), lastTestResult: 'success', lastTestError: undefined });
+    } else {
+      toast(r.error || 'Etiket yazdırma başarısız', 'err');
+      patchLabel({ lastTestAt: new Date().toISOString(), lastTestResult: 'failed', lastTestError: r.error });
     }
   };
 
@@ -992,11 +1009,104 @@ export function HardwareCard({
         )}
       </div>
 
+      {/* ---- Etiket Yazıcı (ZPL/TSPL) Ayarı ---- */}
+      <div className="mt-4 rounded-xl border border-amber/25 bg-panel2/50 p-4">
+        <div className="mb-3 flex items-center justify-between gap-2">
+          <div>
+            <div className="font-mono text-[12px] font-bold uppercase tracking-widest text-amber">🏷️ Etiket Yazıcı (ZPL/TSPL)</div>
+            <div className="mt-0.5 text-[10.5px] text-mut2">
+              Zebra (ZPL) / TSC-Argox-Godex (TSPL) rulo termal yazıcı. Ürün stüdyosundan doğrudan raf/fiyat etiketi basılır.
+            </div>
+          </div>
+          <button
+            onClick={() => patchLabel({ enabled: !label.enabled })}
+            className={cn(
+              'relative h-5 w-9 shrink-0 rounded-full border transition-colors',
+              label.enabled ? 'border-amber bg-amber/80' : 'border-line2 bg-ink/60'
+            )}
+            title={label.enabled ? 'Etiket yazıcıyı kapat' : 'Etiket yazıcıyı aç'}
+          >
+            <span
+              className={cn(
+                'absolute top-0.5 h-3.5 w-3.5 rounded-full bg-[#0a0e13] transition-all',
+                label.enabled ? 'left-[18px]' : 'left-0.5'
+              )}
+            />
+          </button>
+        </div>
+
+        {label.enabled && (
+          <div className="space-y-3">
+            <div className="grid gap-3 sm:grid-cols-3">
+              <Field label="Protokol">
+                <Sel value={label.protocol} onChange={(e) => patchLabel({ protocol: e.target.value as 'zpl' | 'tspl' })}>
+                  <option value="zpl">ZPL (Zebra)</option>
+                  <option value="tspl">TSPL (TSC / Argox / Godex)</option>
+                </Sel>
+              </Field>
+              <Field label="Bağlantı Türü">
+                <Sel value={label.connection} onChange={(e) => patchLabel({ connection: e.target.value as 'tcp' | 'usb' })}>
+                  <option value="tcp">Ağ (TCP/IP)</option>
+                  <option value="usb">USB / Kopyala</option>
+                </Sel>
+              </Field>
+              <Field label="Baskı Yoğunluğu">
+                <Sel value={String(label.density)} onChange={(e) => patchLabel({ density: Number(e.target.value) as 203 | 300 })}>
+                  <option value="203">203 dpi</option>
+                  <option value="300">300 dpi</option>
+                </Sel>
+              </Field>
+              {label.connection === 'tcp' && (
+                <>
+                  <Field label="Yazıcı IP Adresi">
+                    <Inp placeholder="192.168.1.60" value={label.ip} onChange={(e) => patchLabel({ ip: e.target.value })} />
+                  </Field>
+                  <Field label="Port">
+                    <Inp type="number" value={label.port} onChange={(e) => patchLabel({ port: Number(e.target.value) || 9100 })} />
+                  </Field>
+                </>
+              )}
+              <Field label="Etiket Eni (mm)">
+                <Inp type="number" value={label.widthMm} onChange={(e) => patchLabel({ widthMm: Number(e.target.value) || 40 })} />
+              </Field>
+              <Field label="Etiket Boyu (mm)">
+                <Inp type="number" value={label.heightMm} onChange={(e) => patchLabel({ heightMm: Number(e.target.value) || 25 })} />
+              </Field>
+              <Field label="Kopya Sayısı">
+                <Inp type="number" value={label.copies} onChange={(e) => patchLabel({ copies: Math.max(1, Number(e.target.value) || 1) })} />
+              </Field>
+            </div>
+            <div className="flex flex-wrap items-center gap-4">
+              <label className="flex items-center gap-2 text-[12px] text-txt">
+                <input
+                  type="checkbox"
+                  checked={label.showPrice}
+                  onChange={(e) => patchLabel({ showPrice: e.target.checked })}
+                  className="accent-amber"
+                />
+                Fiyatı bas
+              </label>
+              <div className="ml-auto flex items-center gap-2">
+                {label.lastTestResult && (
+                  <span className={cn('font-mono text-[10px]', label.lastTestResult === 'success' ? 'text-mint' : 'text-red')}>
+                    {label.lastTestResult === 'success' ? '✓ Son test başarılı' : '✗ Son test başarısız'}
+                  </span>
+                )}
+                <Btn v="mint" onClick={testLabel} disabled={testingLabel}>
+                  <Ic n="print" c="h-4 w-4" /> {testingLabel ? 'Gönderiliyor...' : 'Test Etiketi Yazdır'}
+                </Btn>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
       <p className="mt-3 text-[10px] leading-relaxed text-mut2">
         💡 Barkod okuyucular klavye gibi çalışır (sürücü gerekmez). Fiş yazıcılar ESC/POS, etiket yazıcıları ZPL/TSPL
         protokolüyle yazdırır. Para çekmecesi fiş yazıcısının RJ11 çıkışından, terazi RS232/USB üzerinden bağlanır.
         Dil seçimi değiştiğinde ülkeye özel model önerileri otomatik güncellenir. Ağ fiş yazıcıları varsayılan olarak
         <b> 9100</b> portundan dinler; USB yazıcı işletim sistemine kurulduktan sonra sistem yazdırma penceresiyle basılır.
+        Etiket yazıcılar USB bağlıysa etiket komutu panoya kopyalanır — yazıcının kendi aracına yapıştırılarak basılır.
       </p>
     </Card>
   );

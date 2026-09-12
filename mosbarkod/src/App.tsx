@@ -43,6 +43,7 @@ import { createSnapshot } from './lib/backup';
 import { cloudUpload } from './lib/cloudBackup';
 import { applyDiscount } from './lib/pricing';
 import { addCredit, collectPayment, needsPosAuth, reduceStock, restock } from './lib/sale';
+import { applyCountToProducts, buildCountEntries } from './lib/stockCount';
 import {
   ADMIN_ID,
   USERS,
@@ -72,6 +73,7 @@ import {
   type SaleItem,
   type Settings,
   type Staff,
+  type StockCountSession,
   type ViewId,
 } from './data';
 
@@ -840,6 +842,23 @@ export default function App() {
 
   const bulkUpdateProducts = (list: Product[]) => setState((s) => ({ ...s, products: list }));
 
+  const applyStockCount = (counts: Record<string, string>) => {
+    const entries = buildCountEntries(state.products, counts);
+    if (entries.length === 0) return;
+    const by = USERS.find((u) => u.id === user)?.name ?? 'Kullanıcı';
+    const session: StockCountSession = {
+      id: uid(),
+      date: new Date().toISOString(),
+      by,
+      entries,
+    };
+    setState((s) => ({
+      ...s,
+      products: applyCountToProducts(s.products, counts),
+      stockCounts: [session, ...s.stockCounts],
+    }));
+  };
+
   const addCashMove = (dir: 'in' | 'out', amount: number, label: string) => {
     if (!amount || amount <= 0) return;
     setState((s) => ({
@@ -1313,6 +1332,8 @@ export default function App() {
               save={saveProduct}
               remove={removeProduct}
               bulkUpdate={bulkUpdateProducts}
+              stockCounts={state.stockCounts}
+              onApplyCount={applyStockCount}
               toast={toast}
             />
           ) : view === 'purchase' ? (

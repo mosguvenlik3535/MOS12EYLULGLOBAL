@@ -6,10 +6,11 @@ import { Badge, Btn, Confirm, Field, Inp, Modal, Sel, Td, Th } from '../componen
 import CameraScanner from '../components/CameraScanner';
 import LabelStudioModal from '../components/LabelStudioModal';
 import Barcode from '../components/Barcode';
-import { CATEGORIES, fmt, fmtN, uid, type Product, type Sale, type Settings } from '../data';
+import { CATEGORIES, dstr, fmt, fmtN, tstr, uid, type Product, type Sale, type Settings, type StockCountSession } from '../data';
 import { fetchProductByBarcode, generateEan13, searchProductsByName, type AiProductMeta } from '../lib/productAi';
 import { fileToDataUrl } from '../lib/image';
 import { analyzeStock, ABC_META, type AbcClass } from '../lib/stockIntel';
+import { buildCountEntries, summarizeCount, type StockCountSummary } from '../lib/stockCount';
 
 type Toast = (msg: string, type?: 'ok' | 'err') => void;
 
@@ -83,6 +84,8 @@ export default function Products({
   save,
   remove,
   bulkUpdate,
+  stockCounts,
+  onApplyCount,
   toast,
 }: {
   products: Product[];
@@ -92,6 +95,8 @@ export default function Products({
   save: (p: Product) => void;
   remove: (id: string) => void;
   bulkUpdate: (list: Product[]) => void;
+  stockCounts: StockCountSession[];
+  onApplyCount: (counts: Record<string, string>) => void;
   toast: Toast;
 }) {
   const [query, setQuery] = useState('');
@@ -1179,7 +1184,13 @@ export default function Products({
       )}
 
       {countOpen && (
-        <StockCountModal products={products} onClose={() => setCountOpen(false)} onApply={bulkUpdate} toast={toast} />
+        <StockCountModal
+          products={products}
+          history={stockCounts}
+          onClose={() => setCountOpen(false)}
+          onApply={onApplyCount}
+          toast={toast}
+        />
       )}
       {zamOpen && (
         <ZamModal products={products} onClose={() => setZamOpen(false)} onApply={bulkUpdate} toast={toast} />
@@ -1422,31 +1433,30 @@ export default function Products({
 
 function StockCountModal({
   products,
+  history,
   onClose,
   onApply,
   toast,
 }: {
   products: Product[];
+  history: StockCountSession[];
   onClose: () => void;
-  onApply: (list: Product[]) => void;
+  onApply: (counts: Record<string, string>) => void;
   toast: Toast;
 }) {
   const [q, setQ] = useState('');
   const [counts, setCounts] = useState<Record<string, string>>({});
+  const [showHistory, setShowHistory] = useState(false);
   const filtered = products.filter((p) => p.name.toLowerCase().includes(q.toLowerCase()) || p.barcode.includes(q));
 
-  const diffCount = Object.entries(counts).filter(([id, v]) => {
-    const p = products.find((x) => x.id === id);
-    return p && v !== '' && Number(v) !== p.stock;
-  }).length;
+  const entries = buildCountEntries(products, counts);
+  const summary: StockCountSummary = summarizeCount(entries);
 
   const apply = () => {
-    const next = products.map((p) => {
-      const v = counts[p.id];
-      return v !== undefined && v !== '' ? { ...p, stock: Number(v) } : p;
-    });
-    onApply(next);
-    toast(`Stok sayımı uygulandı — ${diffCount} üründe düzeltme yapıldı`);
+    onApply(counts);
+    toast(
+      `Sayım uygulandı — ${entries.length} üründe düzeltme (fire: ${fmtN(summary.minusQty)}, fazla: ${fmtN(summary.plusQty)})`
+    );
     onClose();
   };
 
@@ -1461,16 +1471,24 @@ function StockCountModal({
           <Btn v="ghost" onClick={onClose}>
             Vazgeç
           </Btn>
-          <Btn v="primary" onClick={apply} disabled={diffCount === 0}>
-            <Ic n="check" c="h-4 w-4" /> Sayımı Uygula ({diffCount})
+          <Btn v="primary" onClick={apply} disabled={entries.length === 0}>
+            <Ic n="check" c="h-4 w-4" /> Sayımı Uygula ({entries.length})
           </Btn>
         </>
       }
     >
+      {/* Özet kartları */}
+      <div className="mb-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <SummaryCard label="Fire (eksik)" value={`-${fmtN(summary.minusQty)}`} tone="text-red" />
+        <SummaryCard label="Fazla" value={`+${fmtN(summary.plusQty)}`} tone="text-mint" />
+        <SummaryCard label="Fire değeri" value={fmt(summary.minusValue)} tone="text-red" />
+        <SummaryCard label="Net fark değeri" value={fmt(summary.netValue)} tone={summary.netValue < 0 ? 'text-red' : 'text-mint'} />
+      </div>
+
       <div className="mb-2">
         <Inp placeholder="Ürün ara…" value={q} onChange={(e) => setQ(e.target.value)} />
       </div>
-      <div className="max-h-[50vh] space-y-1 overflow-y-auto">
+      <div className="max-h-[40vh] space-y-1 overflow-y-auto">
         {filtered.map((p) => {
           const v = counts[p.id] ?? '';
           const diff = v !== '' ? Number(v) - p.stock : 0;
@@ -1494,8 +1512,61 @@ function StockCountModal({
             </div>
           );
         })}
+        {filtered.length === 0 && (
+          <div className="rounded-lg border border-dashed border-line px-3 py-6 text-center text-[12px] text-mut2">
+            Ürün bulunamadı.
+          </div>
+        )}
+      </div>
+
+      {/* Sayım geçmişi */}
+      <div className="mt-3">
+        <button
+          onClick={() => setShowHistory((v) => !v)}
+          className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-mut hover:text-txt"
+        >
+          <Ic n={showHistory ? 'chevD' : 'chevR'} c="h-3.5 w-3.5" />
+          Sayım Geçmişi ({history.length})
+        </button>
+        {showHistory && (
+          <div className="mt-2 max-h-[30vh] space-y-1 overflow-y-auto">
+            {history.length === 0 && (
+              <div className="rounded-lg border border-dashed border-line px-3 py-4 text-center text-[11px] text-mut2">
+                Henüz sayım yapılmadı.
+              </div>
+            )}
+            {history.map((s) => {
+              const sum = summarizeCount(s.entries);
+              return (
+                <div key={s.id} className="flex items-center gap-2 rounded-lg border border-line bg-panel2/40 px-3 py-2">
+                  <Ic n="reset" c="h-4 w-4 text-mut" />
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-[12px] font-medium">
+                      {dstr(s.date)} {tstr(s.date)} · {s.by}
+                    </div>
+                    <div className="font-mono text-[10px] text-mut2">
+                      {s.entries.length} ürün · fire {fmtN(sum.minusQty)} · fazla {fmtN(sum.plusQty)}
+                    </div>
+                  </div>
+                  <span className={cn('font-mono text-[11px] font-bold', sum.netValue < 0 ? 'text-red' : 'text-mint')}>
+                    {fmt(sum.netValue)}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </Modal>
+  );
+}
+
+function SummaryCard({ label, value, tone }: { label: string; value: string; tone: string }) {
+  return (
+    <div className="rounded-lg border border-line bg-panel2/50 px-3 py-2">
+      <div className="font-mono text-[9px] uppercase tracking-wider text-mut2">{label}</div>
+      <div className={cn('mt-0.5 font-mono text-[13px] font-bold tabular-nums', tone)}>{value}</div>
+    </div>
   );
 }
 

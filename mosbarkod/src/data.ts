@@ -562,6 +562,24 @@ export interface Settings {
     lastTestResult?: 'success' | 'failed';
     lastTestError?: string;
   };
+  /** Etiket yazıcı (ZPL/TSPL termal — Zebra/TSC/Argox, TCP 9100 veya USB) */
+  label: {
+    enabled: boolean;
+    protocol: 'zpl' | 'tspl';
+    connection: 'tcp' | 'usb';
+    ip: string;
+    port: number;
+    /** Etiket ölçüsü (mm) */
+    widthMm: number;
+    heightMm: number;
+    /** Baskı yoğunluğu (dpi) */
+    density: 203 | 300;
+    copies: number;
+    showPrice: boolean;
+    lastTestAt?: string;
+    lastTestResult?: 'success' | 'failed';
+    lastTestError?: string;
+  };
   /** Bulut yedekleme — Google Drive / Dropbox */
   cloud: {
     enabled: boolean;           // otomatik yükleme (her yedeklemede buluta da gönder)
@@ -626,6 +644,24 @@ export interface DeliveryOrder {
   saleId?: string;
 }
 
+/** Stok sayımı kaydı (denetim izi) */
+export interface StockCountEntry {
+  productId: string;
+  name: string;
+  unit: string;
+  before: number;
+  after: number;
+  diff: number;
+  value: number;
+}
+
+export interface StockCountSession {
+  id: string;
+  date: string;
+  by: string;
+  entries: StockCountEntry[];
+}
+
 export interface AppState {
   products: Product[];
   sales: Sale[];
@@ -637,6 +673,7 @@ export interface AppState {
   imkart: Imkart;
   cashMoves: CashMove[];
   posCloses: PosClose[];
+  stockCounts: StockCountSession[];
   settings: Settings;
 }
 
@@ -1132,6 +1169,18 @@ export const defaultSettings = (): Settings => ({
     openDrawer: false,
     usbName: '',
   },
+  label: {
+    enabled: false,
+    protocol: 'zpl',
+    connection: 'tcp',
+    ip: '',
+    port: 9100,
+    widthMm: 40,
+    heightMm: 25,
+    density: 203,
+    copies: 1,
+    showPrice: true,
+  },
   cloud: {
     enabled: false,
     provider: 'none',
@@ -1161,6 +1210,7 @@ export const defaultState = (): AppState => {
     imkart: { limit: 3000, txns: [] },
     cashMoves: [],
     posCloses: [],
+    stockCounts: [],
     settings: defaultSettings(),
   };
 };
@@ -1194,6 +1244,7 @@ export function loadState(): AppState {
             cfd: { ...d.cfd, ...(s.settings.cfd || {}) },
             hardware: { ...d.hardware, ...(s.settings.hardware || {}) },
             printer: { ...d.printer, ...(s.settings.printer || {}) },
+            label: { ...d.label, ...(s.settings.label || {}) },
             pos: { ...d.pos, ...(s.settings.pos || {}) },
             cloud: { ...d.cloud, ...(s.settings.cloud || {}) },
           },
@@ -1208,6 +1259,7 @@ export function loadState(): AppState {
         if (!Array.isArray(merged.imkart.txns)) merged.imkart.txns = [];
         if (!Array.isArray(merged.cashMoves)) merged.cashMoves = [];
         if (!Array.isArray(merged.posCloses)) merged.posCloses = [];
+        if (!Array.isArray(merged.stockCounts)) merged.stockCounts = [];
         if (!Array.isArray(merged.deliveries)) merged.deliveries = [];
         merged.staff = merged.staff.map((st) => ({ 
           ...st,
