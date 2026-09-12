@@ -1,6 +1,6 @@
 {
   "name": "mosbarkodyazilim",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "MOSBARKODYAZILIM - Yapay Zeka Destekli Barkod Satış Programı",
   "author": "MOSBARKODYAZILIM",
   "license": "UNLICENSED",
@@ -35,9 +35,9 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
-    "@capacitor/android": "^7.0.0",
-    "@capacitor/cli": "^7.0.0",
-    "@capacitor/core": "^7.0.0",
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/cli": "^8.5.2",
+    "@capacitor/core": "^8.5.2",
     "@tailwindcss/vite": "4.1.17",
     "@types/node": "22.19.17",
     "@types/react": "19.2.7",

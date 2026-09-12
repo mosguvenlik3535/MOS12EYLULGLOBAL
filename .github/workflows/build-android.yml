@@ -29,6 +29,15 @@ jobs:
         working-directory: mosbarkod
         run: npm install
 
+      - name: Compute version (package.json)
+        id: version
+        working-directory: mosbarkod
+        run: |
+          V=$(node -p "require('./package.json').version")
+          echo "VERSION=$V" >> "$GITHUB_OUTPUT"
+          C=$(node -e "const [a,b,c]=process.argv[1].split('.').map(Number); console.log(a*10000+b*100+c)" "$V")
+          echo "VERSION_CODE=$C" >> "$GITHUB_OUTPUT"
+
       # ---- TAM SÜRÜM APK ----
       - name: Build web app
         working-directory: mosbarkod
@@ -40,6 +49,9 @@ jobs:
 
       - name: Build APK (debug)
         working-directory: mosbarkod/android
+        env:
+          MOS_VERSION_NAME: ${{ steps.version.outputs.VERSION }}
+          MOS_VERSION_CODE: ${{ steps.version.outputs.VERSION_CODE }}
         run: ./gradlew assembleDebug --no-daemon
 
       - name: Upload full APK artifact
@@ -60,6 +72,45 @@ jobs:
             mosbarkod/android/app/build/outputs/apk/debug/app-debug.apk 2>/dev/null || \
           gh release upload "${{ github.ref_name }}" mosbarkod/android/app/build/outputs/apk/debug/app-debug.apk --clobber
 
+      # ---- PLAY STORE AAB (imzalı release) ----
+      - name: Build release AAB (signed)
+        working-directory: mosbarkod/android
+        env:
+          MOS_VERSION_NAME: ${{ steps.version.outputs.VERSION }}
+          MOS_VERSION_CODE: ${{ steps.version.outputs.VERSION_CODE }}
+          MOS_KEYSTORE_BASE64: ${{ secrets.MOS_KEYSTORE_BASE64 }}
+          MOS_KEYSTORE_PASSWORD: ${{ secrets.MOS_KEYSTORE_PASSWORD }}
+          MOS_KEY_ALIAS: ${{ secrets.MOS_KEY_ALIAS }}
+          MOS_KEY_PASSWORD: ${{ secrets.MOS_KEY_PASSWORD }}
+        run: |
+          if [ -z "$MOS_KEYSTORE_BASE64" ]; then
+            echo "::warning::MOS_KEYSTORE_BASE64 secret'i yok — imzalı AAB üretilmedi. Keystore secret'larını ekleyin."
+            exit 0
+          fi
+          mkdir -p app/keystore
+          echo "$MOS_KEYSTORE_BASE64" | base64 -d > app/mos-release.jks
+          export MOS_KEYSTORE_PATH="$(pwd)/app/mos-release.jks"
+          ./gradlew bundleRelease --no-daemon
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MOSBARKODYAZILIM-Android-AAB
+          path: mosbarkod/android/app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: ignore
+
+      - name: Attach AAB to release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          AAB=mosbarkod/android/app/build/outputs/bundle/release/app-release.aab
+          if [ -f "$AAB" ]; then
+            gh release upload "${{ github.ref_name }}" "$AAB" --clobber
+          else
+            echo "::warning::AAB bulunamadı (imzalama secret'ları eksik olabilir)."
+          fi
+
       # ---- DEMO SÜRÜM APK ----
       - name: Build demo web app
         working-directory: mosbarkod
@@ -73,6 +124,8 @@ jobs:
         working-directory: mosbarkod/android
         env:
           MOS_APP_ID: com.mosbarkodyazilim.pos.demo
+          MOS_VERSION_NAME: ${{ steps.version.outputs.VERSION }}
+          MOS_VERSION_CODE: ${{ steps.version.outputs.VERSION_CODE }}
         run: ./gradlew clean assembleDebug --no-daemon
 
       - name: Stage demo APK
