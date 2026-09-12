@@ -115,8 +115,34 @@ Bu `.aab` dosyasını Play Console → *Create app* → **Kapalı test** bölüm
 
 | Sorun | Çözüm |
 |---|---|
-| `keytool` bulunamadı | JDK kurun (adoptium.net) veya Android Studio kullanın |
+| `keytool` bulunamadı (PowerShell: *"not recognized"*) | Java (JDK) kurulu değil. Aşağıdaki "JDK kurulumu" bölümünü uygulayın. |
 | PowerShell base64 komutu hata verdi | Komut İstemi yerine **PowerShell**'de çalıştırın; dosya adındaki yolu doğru yazın |
 | Base64'te birden fazla satır oldu | `-NoNewline` kullanın; GitHub'a tek satır yapıştırın |
 | CI'da "AAB bulunamadı" uyarısı | Secret isimleri yanlış — 4 ismi birebir kontrol edin |
 | Parolamı unuttum | Geri alınamaz; yeni keystore üretip 4 secret'ı yenileyin (uygulama henüz yayında değilse sorun yok) |
+
+---
+
+## JDK kurulumu (keytool için, Windows)
+
+`keytool` JDK ile gelir. Yoksa:
+
+**Yol 1 — winget (en hızlı, PowerShell):**
+
+```powershell
+winget install --id EclipseAdoptium.Temurin.21.JDK --source winget
+```
+
+**Yol 2 — elle indir:**
+
+1. https://adoptium.net/temurin/releases/?version=21
+2. Windows · x64 · **JDK** · **.msi** indirin ve kurun.
+3. Kurulumda **"Add to PATH"** ve **"Set JAVA_HOME"** seçeneklerini işaretleyin.
+
+**Kurulumdan sonra (şart):** PowerShell penceresini **kapatıp yeniden açın**, sonra doğrulayın:
+
+```powershell
+keytool -version
+```
+
+Sürüm yazarsa (ör. `keytool 21.x.x`) hazırsınız; Adım 1'deki keystore komutunu tekrar çalıştırın.
