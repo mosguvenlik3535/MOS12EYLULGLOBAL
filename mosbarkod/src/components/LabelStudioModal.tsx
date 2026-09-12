@@ -3,6 +3,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { cn } from '../utils/cn';
 import { Ic } from '../icons';
 import { Btn, Field, Inp, Modal, Sel } from './ui';
+import Barcode from './Barcode';
 import { CATEGORIES, fmt, type Product, type Settings } from '../data';
 
 type LabelFormat = 'shelf_standard' | 'shelf_promo' | 'thermal_barcode' | 'a4_sheet_24' | 'a4_sheet_40';
@@ -419,22 +420,7 @@ function SingleLabelCard({
         <div className="min-w-0 flex-1">
           {showBarcode && product.barcode ? (
             <div>
-              {/* Simulated crisp Barcode SVG lines */}
-              <div className="flex h-6 items-center gap-[1px] overflow-hidden bg-white">
-                {product.barcode.split('').map((ch, i) => {
-                  const code = parseInt(ch, 10) || 1;
-                  return (
-                    <span
-                      key={i}
-                      className="h-full bg-black shrink-0"
-                      style={{
-                        width: `${(code % 3) + 1.2}px`,
-                        marginRight: `${(i % 2) * 0.8}px`,
-                      }}
-                    />
-                  );
-                })}
-              </div>
+              <Barcode value={product.barcode} height={22} width={120} showText={false} className="px-0 py-0" />
               <div className="font-mono text-[9px] font-bold tracking-widest text-[#101828]">
                 {product.barcode}
               </div>

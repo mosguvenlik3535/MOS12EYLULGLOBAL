@@ -1949,6 +1949,32 @@ export default function SettingsScreen({
       {open === 'modules' && (
         <SettingsModal title="Modül Yönetimi" icon="box" color="text-blue" wide={false} onClose={() => setOpen(null)}>
           <Panel icon="box" title="Aktif Modüller (Sekmeler)" color="text-blue" desc="Her ülke veya müşteri bu sekmelerin tümüne ihtiyaç duymayabilir. Kapattığınız sekme menüden kaldırılır; değişiklik anında kaydedilir.">
+            <div className="mb-3 rounded-xl border border-line bg-ink/40 p-3">
+              <div className="mb-2 font-mono text-[9px] font-bold uppercase tracking-wider text-mut2">
+                Hazır Profiller — tek tıkla uygula:
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {[
+                  { label: 'Tam Paket', desc: 'İmkart + Sipariş', m: { imkart: true, delivery: true } },
+                  { label: 'Sipariş Yok', desc: 'yalnız İmkart', m: { imkart: true, delivery: false } },
+                  { label: 'İmkart Yok', desc: 'yalnız Sipariş', m: { imkart: false, delivery: true } },
+                  { label: 'Yalnız POS', desc: 'ikisi kapalı', m: { imkart: false, delivery: false } },
+                ].map((pr) => (
+                  <button
+                    key={pr.label}
+                    type="button"
+                    onClick={() => {
+                      onPatch({ modules: { ...s.modules, ...pr.m } });
+                      toast(`"${pr.label}" profili uygulandı`);
+                    }}
+                    className="rounded-lg border border-line2 bg-panel3 px-3 py-1.5 text-left transition-colors hover:border-amber/50"
+                  >
+                    <div className="font-mono text-[11px] font-bold text-txt">{pr.label}</div>
+                    <div className="font-mono text-[9px] text-mut2">{pr.desc}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
             <div className="space-y-2.5">
               {([
                 {

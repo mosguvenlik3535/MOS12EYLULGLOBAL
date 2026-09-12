@@ -114,6 +114,26 @@ function writeStore(obj) {
   }
 }
 
+/* ---------- lisans dosyası (genel depodan ayrı, userData/mosbarkod-license.dat) ---------- */
+
+function licenseFile() {
+  return path.join(app.getPath('userData'), 'mosbarkod-license.dat');
+}
+function readLicense() {
+  try {
+    return JSON.parse(fs.readFileSync(licenseFile(), 'utf8'));
+  } catch {
+    return {};
+  }
+}
+function writeLicense(obj) {
+  try {
+    fs.writeFileSync(licenseFile(), JSON.stringify(obj), 'utf8');
+  } catch {
+    /* yoksay */
+  }
+}
+
 /* ---------- e-posta gönderimi (Node tarafı, CORS yok) ---------- */
 
 let nodemailer = null;
@@ -276,6 +296,16 @@ ipcMain.handle('mos-store', (_evt, { action, key, value } = {}) => {
     delete store[key];
     writeStore(store);
     return { ok: true };
+  }
+  return { ok: false, error: 'unknown action' };
+});
+
+ipcMain.handle('mos-license', (_evt, { action, patch } = {}) => {
+  if (action === 'read') return readLicense();
+  if (action === 'write') {
+    const merged = { ...readLicense(), ...(patch || {}) };
+    writeLicense(merged);
+    return { ok: true, data: merged };
   }
   return { ok: false, error: 'unknown action' };
 });

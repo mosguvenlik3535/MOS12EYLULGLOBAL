@@ -47,14 +47,29 @@ export const ensureLicenseChain = async (): Promise<{ key: string; codes: number
     }
   } catch { /* yoksay */ }
 
-  // Electron'da userData'daki zinciri oku
+  // Electron'da özel lisans dosyasını oku (mosbarkod-license.dat)
+  if (isElectron() && window.mosLicense) {
+    try {
+      const saved = (await window.mosLicense.read()) as { k?: number[] } | null;
+      if (saved?.k && Array.isArray(saved.k) && saved.k.length >= 8) {
+        return { key: codesToKey(saved.k), codes: saved.k };
+      }
+      // Yoksa bir kere yaz (arka planda, sessizce — kullanıcı göstermez)
+      await window.mosLicense.write({ k: CHAIN2 });
+      return { key: codesToKey(CHAIN2), codes: CHAIN2 };
+    } catch {
+      /* yoksay */
+    }
+  }
+
+  // Eski sürümlerle uyum: genel depoda kayıtlı zinciri oku ve lisans dosyasına taşı
   if (isElectron() && window.mosStore) {
     try {
       const saved = (await window.mosStore.get(STORE_KEY)) as { k?: number[] } | null;
       if (saved?.k && Array.isArray(saved.k) && saved.k.length >= 8) {
+        if (window.mosLicense) await window.mosLicense.write({ k: saved.k });
         return { key: codesToKey(saved.k), codes: saved.k };
       }
-      // Yoksa bir kere yaz (arka planda, sessizce — kulanıcı göstermez)
       await window.mosStore.set(STORE_KEY, { k: CHAIN2 });
       return { key: codesToKey(CHAIN2), codes: CHAIN2 };
     } catch {

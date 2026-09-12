@@ -5,6 +5,7 @@ import { Ic } from '../icons';
 import { Badge, Btn, Confirm, Field, Inp, Modal, Sel, Td, Th } from '../components/ui';
 import CameraScanner from '../components/CameraScanner';
 import LabelStudioModal from '../components/LabelStudioModal';
+import Barcode from '../components/Barcode';
 import { CATEGORIES, fmt, fmtN, uid, type Product, type Settings } from '../data';
 import { fetchProductByBarcode, generateEan13, searchProductsByName, type AiProductMeta } from '../lib/productAi';
 
@@ -798,6 +799,17 @@ export default function Products({
             <p className="-mt-1.5 text-[9.5px] text-mut2">
               Barkodsuz ürünlerde alanı boş bırakın; sistem benzersiz bir iç kod oluşturur.
             </p>
+
+            {/* Canlı barkod önizleme */}
+            {/^\d{13}$/.test(form.barcode.trim()) && (
+              <div className="flex items-center gap-3 rounded-xl border border-line bg-white/95 p-3">
+                <Barcode value={form.barcode.trim()} height={40} width={180} />
+                <div className="min-w-0 text-[10px] leading-relaxed text-mut2">
+                  <div className="font-bold text-mint">Gerçek EAN-13 barkod önizlemesi</div>
+                  Bu barkod standart okuyucularla taranabilir; kaydettikten sonra raf etiketlerinde de aynı şekilde basılır.
+                </div>
+              </div>
+            )}
 
             {/* Row 2: Ürün Adı (AI) + Kategori */}
             <div className="grid gap-3 sm:grid-cols-[1fr_200px]">

@@ -22,3 +22,8 @@ contextBridge.exposeInMainWorld('mosStore', {
   set: (key, value) => ipcRenderer.invoke('mos-store', { action: 'set', key, value }),
   del: (key) => ipcRenderer.invoke('mos-store', { action: 'del', key }),
 });
+
+contextBridge.exposeInMainWorld('mosLicense', {
+  read: () => ipcRenderer.invoke('mos-license', { action: 'read' }),
+  write: (patch) => ipcRenderer.invoke('mos-license', { action: 'write', patch }),
+});
