@@ -26,6 +26,7 @@ import {
   type SyncStatus,
 } from './lib/sync';
 import LicenseGate, { getStoredLicense, getStoredLicenseAsync } from './components/LicenseGate';
+import { IS_DEMO, DEMO_MAX_SALES } from './lib/buildMode';
 import LoginGate from './components/LoginGate';
 import { CustomerDisplay } from './components/CustomerDisplay';
 import {
@@ -163,7 +164,9 @@ export default function App() {
   }, []);
   const [sync, setSync] = useState<SyncStatus>({ role: 'off', code: '', connected: false });
   const [joinCode, setJoinCode] = useState('');
-  const [licensed, setLicensed] = useState(() => Boolean(getStoredLicense()));
+  const [licensed, setLicensed] = useState(() => IS_DEMO || Boolean(getStoredLicense()));
+  const [demo, setDemo] = useState(IS_DEMO);
+  const [demoExpired, setDemoExpired] = useState(false);
   const [locale, setLocaleState] = useState<Locale>(() => loadLocale());
 
   const DOC_TITLES: Record<Locale, string> = {
@@ -218,6 +221,30 @@ export default function App() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Demo sürüm: ilk açılıştaki satış sayısı başlangıç alınır;
+  // bundan sonra DEMO_MAX_SALES kadar yeni satış yapılabilir (kapanıp açılsa da sürer).
+  useEffect(() => {
+    if (!demo || demoExpired) return;
+    let baseline = Number.NaN;
+    try {
+      baseline = Number(localStorage.getItem('mosbarkod_demo_baseline') ?? 'NaN');
+    } catch {
+      baseline = Number.NaN;
+    }
+    if (!Number.isFinite(baseline) || baseline > state.sales.length) {
+      baseline = state.sales.length;
+      try {
+        localStorage.setItem('mosbarkod_demo_baseline', String(baseline));
+      } catch {
+        /* yoksay */
+      }
+    }
+    if (state.sales.length - baseline >= DEMO_MAX_SALES) {
+      setDemoExpired(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [demo, demoExpired, state.sales.length]);
   const remoteFlag = useRef(false);
   const autoJoinRef = useRef(false);
 
@@ -1128,11 +1155,15 @@ export default function App() {
     );
   }
 
-  if (!licensed) {
+  if (!licensed || (demo && demoExpired)) {
     return (
       <LicenseGate
+        demo={demo}
+        demoExpired={demoExpired}
         onActivated={() => {
           setLicensed(true);
+          setDemo(false);
+          setDemoExpired(false);
           toast('Lisans etkinleştirildi — MOSBARKODYAZILIM kullanıma hazır');
         }}
       />
@@ -1402,6 +1433,12 @@ export default function App() {
           </div>
         ))}
       </div>
+
+      {demo && !demoExpired && (
+        <div className="pointer-events-none fixed left-1/2 top-[70px] z-[80] -translate-x-1/2 rounded-full border border-amber/50 bg-amber/90 px-3 py-1 font-mono text-[10px] font-black tracking-[0.2em] text-black shadow-lg">
+          DEMO SÜRÜM
+        </div>
+      )}
     </div>
     </LocaleContext.Provider>
   );

@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { cn } from '../utils/cn';
 import { Ic } from '../icons';
+import { isValidLicenseKey, normalizeLicenseKey } from '../lib/licenseCore';
 
-const LICENSE_KEY_STORAGE = 'mosbarkod_license_key';
-const VALID_LICENSE = 'MOS-1234-ABCD-9999';
+/** Anahtarın kendisi değil, yalnızca "etkin" işareti saklanır. */
+const LICENSE_MARKER = 'mosbarkod_licensed';
+/** Eski sürümlerden kalan ham anahtar (geçiş için okunur, doğrulanıp işarete çevrilir). */
+const LEGACY_KEY_STORAGE = 'mosbarkod_license_key';
 
 declare global {
   interface Window {
@@ -12,33 +15,51 @@ declare global {
       set: (key: string, value: unknown) => Promise<{ ok: boolean }>;
       del: (key: string) => Promise<{ ok: boolean }>;
     };
+    mosLicense?: {
+      read: () => Promise<Record<string, unknown>>;
+      write: (patch: Record<string, unknown>) => Promise<{ ok: boolean }>;
+      verify: (key: string) => Promise<{ ok: boolean }>;
+      activate: (key: string) => Promise<{ ok: boolean }>;
+      status: () => Promise<{ main?: boolean }>;
+      ensure: () => Promise<{ key?: string; codes?: number[] }>;
+    };
   }
 }
 
-/** Kayıtlı lisans anahtarını döndürür — Electron'da userData dosyasından, tarayıcıda localStorage'dan. */
+/** Kayıtlı etkinleştirme durumu — Electron'da doğrulama ana süreçte yapılır. */
 export const getStoredLicense = (): string | null => {
   try {
-    const v = localStorage.getItem(LICENSE_KEY_STORAGE);
-    if (!v || v.trim().toUpperCase() !== VALID_LICENSE) {
-      if (v) localStorage.removeItem(LICENSE_KEY_STORAGE);
-      return null;
+    if (localStorage.getItem(LICENSE_MARKER) === '1') return 'activated';
+    const legacy = localStorage.getItem(LEGACY_KEY_STORAGE);
+    if (legacy) {
+      if (isValidLicenseKey(legacy)) {
+        localStorage.setItem(LICENSE_MARKER, '1');
+        return 'activated';
+      }
+      localStorage.removeItem(LEGACY_KEY_STORAGE);
     }
-    return v;
+    return null;
   } catch {
     return null;
   }
 };
 
-/** Asenkron lisans kontrolü — Electron'da dosyadan da kurtarabilir. */
+/** Asenkron lisans kontrolü — Electron'da ana süreçten de doğrulanır. */
 export const getStoredLicenseAsync = async (): Promise<string | null> => {
   const local = getStoredLicense();
   if (local) return local;
   try {
-    if (window.mosStore) {
-      const v = await window.mosStore.get(LICENSE_KEY_STORAGE);
-      if (typeof v === 'string' && v.trim().toUpperCase() === VALID_LICENSE) {
-        localStorage.setItem(LICENSE_KEY_STORAGE, v);
-        return v;
+    if (window.mosLicense?.status) {
+      const st = await window.mosLicense.status();
+      if (st?.main) {
+        localStorage.setItem(LICENSE_MARKER, '1');
+        return 'activated';
+      }
+    } else if (window.mosStore) {
+      const v = await window.mosStore.get(LEGACY_KEY_STORAGE);
+      if (typeof v === 'string' && isValidLicenseKey(v)) {
+        localStorage.setItem(LICENSE_MARKER, '1');
+        return 'activated';
       }
     }
   } catch {
@@ -47,32 +68,24 @@ export const getStoredLicenseAsync = async (): Promise<string | null> => {
   return null;
 };
 
-const saveLicense = (key: string) => {
+const saveLicense = async (key: string) => {
   try {
-    localStorage.setItem(LICENSE_KEY_STORAGE, key);
-    if (window.mosStore) void window.mosStore.set(LICENSE_KEY_STORAGE, key);
+    localStorage.setItem(LICENSE_MARKER, '1');
+    if (window.mosLicense?.activate) await window.mosLicense.activate(key);
   } catch {
     /* yoksay */
   }
 };
 
-/** Girişi MOS-XXXX-XXXX-XXXX biçimine getirir. (İlk 3 hane MOS, sonraki 3 blok 4'er hane) */
-const formatKey = (raw: string) => {
-  const clean = raw
-    .toUpperCase()
-    .replace(/[^A-Z0-9]/g, '')
-    .slice(0, 15);
-  
-  if (clean.length <= 3) return clean;
-  const p1 = clean.slice(0, 3);
-  const rest = clean.slice(3);
-  const blocks = rest.match(/.{1,4}/g) ?? [];
-  return [p1, ...blocks].join('-');
-};
-
-
-
-export default function LicenseGate({ onActivated }: { onActivated: (key: string) => void }) {
+export default function LicenseGate({
+  onActivated,
+  demo = false,
+  demoExpired = false,
+}: {
+  onActivated: (key: string) => void;
+  demo?: boolean;
+  demoExpired?: boolean;
+}) {
   const [key, setKey] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
@@ -87,16 +100,28 @@ export default function LicenseGate({ onActivated }: { onActivated: (key: string
     }
     setBusy(true);
     setError('');
-    setTimeout(() => {
-      if (key.toUpperCase() !== VALID_LICENSE) {
+    void (async () => {
+      let ok = false;
+      // Elektron'da doğrulama ANA SÜREÇTE yapılır (anahtar renderer'a girmez)
+      if (window.mosLicense?.verify) {
+        try {
+          ok = Boolean((await window.mosLicense.verify(key))?.ok);
+        } catch {
+          ok = false;
+        }
+      }
+      // Web/APK yedeği: çekirdek doğrulama (hash + sağlama)
+      if (!ok) ok = isValidLicenseKey(key);
+
+      if (!ok) {
         setBusy(false);
         setError('Geçersiz lisans anahtarı. Lütfen doğru anahtarı girin.');
         return;
       }
-      saveLicense(key);
+      await saveLicense(key);
       setBusy(false);
       onActivated(key);
-    }, 550);
+    })();
   };
 
   return (
@@ -108,7 +133,9 @@ export default function LicenseGate({ onActivated }: { onActivated: (key: string
             <div className="font-mono text-[17px] font-extrabold tracking-[0.12em] text-amber2">MEHMET</div>
             <div className="mt-1 font-mono text-[6px] tracking-[0.35em] text-white/65">ORTAYAYLA</div>
           </div>
-          <div className="mt-4 font-mono text-[9px] tracking-[0.24em] text-white/60">LİSANSLI YAZILIM</div>
+          <div className="mt-4 font-mono text-[9px] tracking-[0.24em] text-white/60">
+            {demo ? 'DEMO SÜRÜM' : 'LİSANSLI YAZILIM'}
+          </div>
         </div>
 
         <div className="mt-5 font-mono text-[15px] font-bold tracking-[0.14em] text-amber2">MOSBARKODYAZILIM</div>
@@ -122,11 +149,13 @@ export default function LicenseGate({ onActivated }: { onActivated: (key: string
           </div>
           <div className="flex justify-between gap-3">
             <span className="text-mut2">Sürüm:</span>
-            <span className="font-bold text-txt">v1.5.0-PRO</span>
+            <span className="font-bold text-txt">{demo ? 'v1.5-DEMO' : 'v1.5.0-PRO'}</span>
           </div>
           <div className="flex justify-between gap-3">
             <span className="text-mut2">Lisans Tipi:</span>
-            <span className="font-bold text-mint">✓ ÖMÜR BOYU</span>
+            <span className={cn('font-bold', demo ? 'text-amber2' : 'text-mint')}>
+              {demo ? '★ DENEME' : '✓ ÖMÜR BOYU'}
+            </span>
           </div>
           <div className="flex justify-between gap-3">
             <span className="text-mut2">Destek Hattı:</span>
@@ -142,6 +171,12 @@ export default function LicenseGate({ onActivated }: { onActivated: (key: string
           </div>
         </div>
 
+        {demoExpired && (
+          <div className="mt-3 rounded-lg border border-amber/40 bg-amber/10 px-3 py-2 font-mono text-[10px] leading-relaxed text-amber2">
+            Demo sürüm satış limitine ulaştı. Tüm özellikleri kullanmaya devam etmek için lisans anahtarınızı girin.
+          </div>
+        )}
+
         {/* Lisans anahtarı girişi */}
         <div className="mt-4 text-left">
           <label className="mb-1.5 block font-mono text-[9.5px] uppercase tracking-widest text-mut">
@@ -150,7 +185,7 @@ export default function LicenseGate({ onActivated }: { onActivated: (key: string
           <input
             value={key}
             onChange={(e) => {
-              setKey(formatKey(e.target.value));
+              setKey(normalizeLicenseKey(e.target.value));
               setError('');
             }}
             onKeyDown={(e) => e.key === 'Enter' && activate()}

@@ -29,6 +29,7 @@ jobs:
         working-directory: mosbarkod
         run: npm install
 
+      # ---- TAM SÜRÜM APK ----
       - name: Build web app
         working-directory: mosbarkod
         run: npm run build
@@ -41,11 +42,38 @@ jobs:
         working-directory: mosbarkod/android
         run: ./gradlew assembleDebug --no-daemon
 
-      - name: Upload APK artifact
+      - name: Keep full APK aside
+        working-directory: mosbarkod/android
+        run: cp app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/app-debug-full.apk
+
+      # ---- DEMO SÜRÜM APK ----
+      - name: Build demo web app
+        working-directory: mosbarkod
+        run: VITE_DEMO=1 npm run build
+
+      - name: Sync Capacitor (demo)
+        working-directory: mosbarkod
+        run: npx cap sync android
+
+      - name: Build demo APK (debug)
+        working-directory: mosbarkod/android
+        env:
+          MOS_APP_ID: com.mosbarkodyazilim.pos.demo
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Rename demo APK and restore full APK
+        working-directory: mosbarkod/android
+        run: |
+          mv app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/app-debug-demo.apk
+          cp app/build/outputs/apk/debug/app-debug-full.apk app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Upload APK artifacts
         uses: actions/upload-artifact@v4
         with:
           name: MOSBARKODYAZILIM-Android-APK
-          path: mosbarkod/android/app/build/outputs/apk/debug/app-debug.apk
+          path: |
+            mosbarkod/android/app/build/outputs/apk/debug/app-debug.apk
+            mosbarkod/android/app/build/outputs/apk/debug/app-debug-demo.apk
           if-no-files-found: error
 
       - name: Create or update release
@@ -55,6 +83,9 @@ jobs:
         run: |
           gh release create "${{ github.ref_name }}" \
             --title "MOSBARKODYAZILIM ${{ github.ref_name }}" \
-            --notes "Yapay Zeka Destekli Barkod Satış Programı — Windows (.exe), Linux (AppImage) ve Android (APK) sürümleri." \
-            mosbarkod/android/app/build/outputs/apk/debug/app-debug.apk 2>/dev/null || \
-          gh release upload "${{ github.ref_name }}" mosbarkod/android/app/build/outputs/apk/debug/app-debug.apk --clobber
+            --notes "Yapay Zeka Destekli Barkod Satış Programı — Windows (.exe + DEMO), Linux (AppImage) ve Android (APK + DEMO) sürümleri." \
+            mosbarkod/android/app/build/outputs/apk/debug/app-debug.apk \
+            mosbarkod/android/app/build/outputs/apk/debug/app-debug-demo.apk 2>/dev/null || \
+          gh release upload "${{ github.ref_name }}" \
+            mosbarkod/android/app/build/outputs/apk/debug/app-debug.apk \
+            mosbarkod/android/app/build/outputs/apk/debug/app-debug-demo.apk --clobber

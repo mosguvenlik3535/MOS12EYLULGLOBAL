@@ -14,6 +14,7 @@ const fs = require('fs');
 const http = require('http');
 const os = require('os');
 const net = require('net');
+const crypto = require('crypto');
 
 const HTTP_PORT = Number(process.env.MOSBARKOD_PORT) || 8787;
 const ROOT = path.join(__dirname, '..', 'dist');
@@ -115,25 +116,93 @@ function writeStore(obj) {
   }
 }
 
-/* ---------- lisans dosyası (genel depodan ayrı, userData/mosbarkod-license.dat) ---------- */
+/* ---------- lisans kasası (şifreli + makineye bağlı, userData/mosbarkod-license.dat) ---------- */
 
 function licenseFile() {
   return path.join(app.getPath('userData'), 'mosbarkod-license.dat');
 }
+
+/** Kasa anahtarı — uygulama + makine kimliğinden türetilir (ikili dosyada bulunmaz). */
+function vaultKey() {
+  const machine = process.env.COMPUTERNAME || process.env.HOSTNAME || os.hostname() || 'pos';
+  const seed = 'MOSBARKOD-VAULT|' + machine + '|v2';
+  return crypto.createHash('sha256').update(seed, 'utf8').digest();
+}
+
+/** AES-256-GCM ile şifrele — içerik düz metin okunamaz ve değiştirilemez (auth tag). */
+function encryptVault(obj) {
+  const iv = crypto.randomBytes(12);
+  const cipher = crypto.createCipheriv('aes-256-gcm', vaultKey(), iv);
+  const enc = Buffer.concat([cipher.update(JSON.stringify(obj), 'utf8'), cipher.final()]);
+  const tag = cipher.getAuthTag();
+  return { v: 2, iv: iv.toString('base64'), tag: tag.toString('base64'), data: enc.toString('base64') };
+}
+
+function decryptVault(raw) {
+  try {
+    const p = JSON.parse(raw);
+    if (p && p.v === 2 && p.data && p.iv && p.tag) {
+      const iv = Buffer.from(p.iv, 'base64');
+      const tag = Buffer.from(p.tag, 'base64');
+      const data = Buffer.from(p.data, 'base64');
+      const d = crypto.createDecipheriv('aes-256-gcm', vaultKey(), iv);
+      d.setAuthTag(tag);
+      return JSON.parse(Buffer.concat([d.update(data), d.final()]).toString('utf8'));
+    }
+    return p; // eski düz JSON kaydı — bir sonraki yazımda şifrelenir
+  } catch {
+    return {};
+  }
+}
+
 function readLicense() {
   try {
-    return JSON.parse(fs.readFileSync(licenseFile(), 'utf8'));
+    return decryptVault(fs.readFileSync(licenseFile(), 'utf8'));
   } catch {
     return {};
   }
 }
 function writeLicense(obj) {
   try {
-    fs.writeFileSync(licenseFile(), JSON.stringify(obj), 'utf8');
+    fs.writeFileSync(licenseFile(), JSON.stringify(encryptVault(obj)), 'utf8');
   } catch {
     /* yoksay */
   }
 }
+
+/* ---------- lisans doğrulama (ana süreç — anahtar metni renderer'a inmez) ---------- */
+
+const MAIN_SALT = 'MOSBARKOD·2026·PRO';
+const MAIN_DIGEST = [
+  'a7569f65', 'b55afef1', '98bd7414', '278953ef',
+  '0736810a', '0a1390f9', '84ca2fd3', '95a27e24',
+].join('');
+const MAIN_CHECKSUM = 884;
+
+function formatLicenseKey(clean) {
+  return clean.slice(0, 3) + '-' + clean.slice(3, 7) + '-' + clean.slice(7, 11) + '-' + clean.slice(11, 15);
+}
+
+function isValidMainKey(raw) {
+  const clean = String(raw || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 15);
+  if (!/^MOS[A-Z0-9]{12}$/.test(clean)) return false;
+  const payload = clean.slice(3);
+  let s = 0;
+  for (const ch of payload) s = (s + ch.charCodeAt(0) * 7) % 997;
+  if (s !== MAIN_CHECKSUM) return false;
+  const digest = crypto.createHash('sha256').update(MAIN_SALT + formatLicenseKey(clean), 'utf8').digest('hex');
+  return digest === MAIN_DIGEST;
+}
+
+/* POS Entegrasyonu zincir anahtarı — XOR ile gizlenmiş, düz metin değildir. */
+const POS_KEY = (() => {
+  const x = [0x6b, 0x6f, 0x62, 0x62, 0x6b, 0x6f, 0x62, 0x62];
+  const k = 0x5a;
+  return x.map((c) => String.fromCharCode(c ^ k)).join('');
+})();
+
+const posCodes = () => [...POS_KEY].map((c) => c.charCodeAt(0));
+const codesToKey = (codes) => codes.map((c) => String.fromCharCode(c)).join('');
 
 /* ---------- e-posta gönderimi (Node tarafı, CORS yok) ---------- */
 
@@ -309,6 +378,30 @@ ipcMain.handle('mos-license', (_evt, { action, patch } = {}) => {
     return { ok: true, data: merged };
   }
   return { ok: false, error: 'unknown action' };
+});
+
+ipcMain.handle('mos-license-verify', (_evt, { key } = {}) => ({ ok: isValidMainKey(key) }));
+
+ipcMain.handle('mos-license-activate', (_evt, { key } = {}) => {
+  if (!isValidMainKey(key)) return { ok: false };
+  const lic = readLicense();
+  lic.main = true;
+  lic.mainTs = new Date().toISOString();
+  writeLicense(lic);
+  return { ok: true };
+});
+
+ipcMain.handle('mos-license-status', () => ({ main: Boolean(readLicense().main) }));
+
+ipcMain.handle('mos-license-ensure', () => {
+  const lic = readLicense();
+  if (lic.k && Array.isArray(lic.k) && lic.k.length >= 8) {
+    return { key: codesToKey(lic.k), codes: lic.k };
+  }
+  const codes = posCodes();
+  lic.k = codes;
+  writeLicense(lic);
+  return { key: POS_KEY, codes };
 });
 
 ipcMain.handle('mos-email-send', async (_evt, payload) => {

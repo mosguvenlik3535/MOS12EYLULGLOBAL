@@ -1,10 +1,14 @@
 apply plugin: 'com.android.application'
 
+// Demo APK için farklı uygulama kimliği (yan yana kurulabilir).
+// CI'da MOS_APP_ID=com.mosbarkodyazilim.pos.demo olarak verilir; yoksa tam sürüm kimliği kullanılır.
+def appId = System.getenv("MOS_APP_ID") ?: "com.mosbarkodyazilim.pos"
+
 android {
     namespace "com.mosbarkodyazilim.pos"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.mosbarkodyazilim.pos"
+        applicationId appId
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

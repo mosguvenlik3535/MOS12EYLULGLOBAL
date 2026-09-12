@@ -26,6 +26,10 @@ contextBridge.exposeInMainWorld('mosStore', {
 contextBridge.exposeInMainWorld('mosLicense', {
   read: () => ipcRenderer.invoke('mos-license', { action: 'read' }),
   write: (patch) => ipcRenderer.invoke('mos-license', { action: 'write', patch }),
+  verify: (key) => ipcRenderer.invoke('mos-license-verify', { key }),
+  activate: (key) => ipcRenderer.invoke('mos-license-activate', { key }),
+  status: () => ipcRenderer.invoke('mos-license-status'),
+  ensure: () => ipcRenderer.invoke('mos-license-ensure'),
 });
 
 contextBridge.exposeInMainWorld('mosPrint', {
