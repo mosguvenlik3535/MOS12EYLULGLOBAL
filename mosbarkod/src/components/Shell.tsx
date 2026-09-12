@@ -10,15 +10,16 @@ import {
   VIEWS_LOCKED_FOR_CASHIER,
   fmt,
   DEFAULT_CURRENCIES,
+  moduleEnabled,
   setActiveCurrencyCode,
   type Settings,
   type ViewId,
 } from '../data';
 
-export const NAV: { id: ViewId; key: string; icon: string }[] = [
+export const NAV: { id: ViewId; key: string; icon: string; module?: 'imkart' | 'delivery' }[] = [
   { id: 'sales', key: 'nav.sales', icon: 'cart' },
-  { id: 'delivery', key: 'nav.delivery', icon: 'bag' },
-  { id: 'imkart', key: 'nav.imkart', icon: 'card' },
+  { id: 'delivery', key: 'nav.delivery', icon: 'bag', module: 'delivery' },
+  { id: 'imkart', key: 'nav.imkart', icon: 'card', module: 'imkart' },
   { id: 'pos-integration', key: 'nav.posIntegration', icon: 'card' },
   { id: 'stock', key: 'nav.stock', icon: 'box' },
   { id: 'purchase', key: 'nav.purchase', icon: 'bag' },
@@ -93,7 +94,8 @@ export function Sidebar({
         {(() => {
           const { t } = useLocale();
           const labelOf = (id: string) => t(NAV.find((n) => n.id === id)?.key ?? 'nav.sales');
-          return NAV.map((it) => {
+          const visible = NAV.filter((n) => !n.module || moduleEnabled(settings, n.module));
+          return visible.map((it) => {
             const active = view === it.id;
             const locked = isCashier && VIEWS_LOCKED_FOR_CASHIER.includes(it.id);
             const label = labelOf(it.id);
@@ -137,14 +139,15 @@ export function Sidebar({
   );
 }
 
-export function MobileNav({ view, go }: { view: ViewId; go: (v: ViewId) => void }) {
+export function MobileNav({ view, go, settings }: { view: ViewId; go: (v: ViewId) => void; settings: Settings }) {
   const { t } = useLocale();
+  const visible = NAV.filter((n) => !n.module || moduleEnabled(settings, n.module));
   return (
     <nav
       className="fixed inset-x-0 bottom-0 z-40 flex gap-1 overflow-x-auto border-t border-line bg-panel/95 px-2 pb-[env(safe-area-inset-bottom)] pt-1.5 backdrop-blur md:hidden"
       style={{ WebkitOverflowScrolling: 'touch' }}
     >
-      {NAV.map((it) => {
+      {visible.map((it) => {
         const active = view === it.id;
         const label = t(it.key);
         return (
@@ -232,19 +235,21 @@ export function TopBar({
       </div>
 
       <div className="ml-auto flex items-center gap-2">
-        <button
-          onClick={onImkartClick}
-          title="Ulaşım Kartı dolum penceresini aç"
-          className="hidden flex-col rounded-lg border border-blue/30 bg-blue/5 px-2.5 py-1 text-left transition-colors hover:border-blue/60 hover:bg-blue/10 xl:flex"
-        >
-          <span className="flex items-center gap-1 font-mono text-[8.5px] uppercase tracking-[0.14em] text-mut2">
-            <Ic n="card" c="h-3 w-3" /> Ulaşım Kartı Limiti
-          </span>
-          <span className="font-mono text-[13px] font-bold leading-tight text-blue tabular-nums">
-            {fmt(imkartLimit)}
-          </span>
-          <span className="font-mono text-[8.5px] text-blue/80">dolum için tıkla →</span>
-        </button>
+        {moduleEnabled(settings, 'imkart') && (
+          <button
+            onClick={onImkartClick}
+            title="Ulaşım Kartı dolum penceresini aç"
+            className="hidden flex-col rounded-lg border border-blue/30 bg-blue/5 px-2.5 py-1 text-left transition-colors hover:border-blue/60 hover:bg-blue/10 xl:flex"
+          >
+            <span className="flex items-center gap-1 font-mono text-[8.5px] uppercase tracking-[0.14em] text-mut2">
+              <Ic n="card" c="h-3 w-3" /> Ulaşım Kartı Limiti
+            </span>
+            <span className="font-mono text-[13px] font-bold leading-tight text-blue tabular-nums">
+              {fmt(imkartLimit)}
+            </span>
+            <span className="font-mono text-[8.5px] text-blue/80">dolum için tıkla →</span>
+          </button>
+        )}
         <div className="hidden flex-col rounded-lg border border-mint/30 bg-mint/5 px-2.5 py-1 text-left xl:flex">
           <span className="flex items-center gap-1 font-mono text-[8.5px] uppercase tracking-[0.14em] text-mut2">
             <span className="blink-dot h-1.5 w-1.5 rounded-full bg-mint" /> Bugünkü Ciro

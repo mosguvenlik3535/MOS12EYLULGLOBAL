@@ -13,6 +13,7 @@ import {
   fmt,
   fmtN,
   isToday,
+  moduleEnabled,
   round2,
   todayKey,
   tstr,
@@ -756,47 +757,49 @@ export default function AnalyticsScreen({
       </section>
 
       {/* Ulaşım Kartı gün sonu */}
-      <section className="mt-3 rounded-xl border border-blue/25 bg-panel p-4">
-        <div className="mb-2 flex items-center gap-2">
-          <Ic n="card" c="h-4.5 w-4.5 text-blue" />
-          <h3 className="font-mono text-[12px] font-bold uppercase tracking-widest text-blue">
-            Ulaşım Kartı Gün Sonu Kapatma (Toplu Dolum Devri)
-          </h3>
-          <span className="ml-auto font-mono text-[10px] text-mut2">Aktif Limit: {fmt(state.imkart.limit)}</span>
-        </div>
-        <p className="mb-2.5 text-[11px] leading-relaxed text-mut2">
-          Gün içinde tek tek girmek yerine, akşam kapanışında fiziksel Ulaşım Kartı cihazınızdan aldığınız günlük toplam
-          dolum raporu tutarını tek seferde sisteme işleyebilirsiniz.
-        </p>
-        <div className="flex flex-wrap items-end gap-2">
-          <Field label="Günlük Toplam Satılan Dolum Tutarı (₺)" className="min-w-[180px] flex-1">
-            <Inp type="number" value={imBulk} onChange={(e) => setImBulk(e.target.value)} placeholder="₺ 0,00" className="font-mono" />
-          </Field>
-          <div className="flex gap-1 rounded-lg border border-line2 bg-ink/50 p-1">
-            {(['nakit', 'pos'] as const).map((m) => (
-              <button
-                key={m}
-                onClick={() => setImVia(m)}
-                className={cn('rounded-md px-4 py-1.5 text-[12px] font-bold transition-colors', imVia === m ? 'bg-blue text-[#04121f]' : 'text-mut hover:text-txt')}
-              >
-                {m === 'nakit' ? 'Nakit' : 'POS'}
-              </button>
-            ))}
+      {moduleEnabled(state.settings, 'imkart') && (
+        <section className="mt-3 rounded-xl border border-blue/25 bg-panel p-4">
+          <div className="mb-2 flex items-center gap-2">
+            <Ic n="card" c="h-4.5 w-4.5 text-blue" />
+            <h3 className="font-mono text-[12px] font-bold uppercase tracking-widest text-blue">
+              Ulaşım Kartı Gün Sonu Kapatma (Toplu Dolum Devri)
+            </h3>
+            <span className="ml-auto font-mono text-[10px] text-mut2">Aktif Limit: {fmt(state.imkart.limit)}</span>
           </div>
-          <Btn
-            v="ghost"
-            className="border-blue/50 bg-blue/10 text-blue hover:bg-blue/20"
-            onClick={() => {
-              const a = Number(imBulk.replace(',', '.'));
-              if (!a || a <= 0) return toast('Dolum tutarı girin', 'err');
-              onImkartBulk(a, imVia);
-              setImBulk('');
-            }}
-          >
-            TOPLU DOLUMLARI CİROYA İŞLE
-          </Btn>
-        </div>
-      </section>
+          <p className="mb-2.5 text-[11px] leading-relaxed text-mut2">
+            Gün içinde tek tek girmek yerine, akşam kapanışında fiziksel Ulaşım Kartı cihazınızdan aldığınız günlük toplam
+            dolum raporu tutarını tek seferde sisteme işleyebilirsiniz.
+          </p>
+          <div className="flex flex-wrap items-end gap-2">
+            <Field label="Günlük Toplam Satılan Dolum Tutarı (₺)" className="min-w-[180px] flex-1">
+              <Inp type="number" value={imBulk} onChange={(e) => setImBulk(e.target.value)} placeholder="₺ 0,00" className="font-mono" />
+            </Field>
+            <div className="flex gap-1 rounded-lg border border-line2 bg-ink/50 p-1">
+              {(['nakit', 'pos'] as const).map((m) => (
+                <button
+                  key={m}
+                  onClick={() => setImVia(m)}
+                  className={cn('rounded-md px-4 py-1.5 text-[12px] font-bold transition-colors', imVia === m ? 'bg-blue text-[#04121f]' : 'text-mut hover:text-txt')}
+                >
+                  {m === 'nakit' ? 'Nakit' : 'POS'}
+                </button>
+              ))}
+            </div>
+            <Btn
+              v="ghost"
+              className="border-blue/50 bg-blue/10 text-blue hover:bg-blue/20"
+              onClick={() => {
+                const a = Number(imBulk.replace(',', '.'));
+                if (!a || a <= 0) return toast('Dolum tutarı girin', 'err');
+                onImkartBulk(a, imVia);
+                setImBulk('');
+              }}
+            >
+              TOPLU DOLUMLARI CİROYA İŞLE
+            </Btn>
+          </div>
+        </section>
+      )}
 
       {/* charts row */}
       <div className="mt-3 grid gap-3 xl:grid-cols-[1.4fr_1fr_1fr]">

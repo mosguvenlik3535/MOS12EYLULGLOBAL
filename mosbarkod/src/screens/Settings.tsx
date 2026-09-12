@@ -7,7 +7,7 @@ import { Badge, Btn, Field, Inp, Modal, ScreenHead, Sel } from '../components/ui
 import { HardwareCard, ReportCard, WhatsAppCard, EmailCard } from './SettingsIntegrations';
 import { AutoBackupCard, CloudBackupCard, HealthCheckCard, SoundCard, ThemesCard } from './SettingsSystem';
 import { applyTheme } from '../lib/themes';
-import { defaultUI, DEFAULT_CURRENCIES, setActiveCurrencyCode, type AppState, type Settings, type CurrencyConfig } from '../data';
+import { defaultUI, DEFAULT_CURRENCIES, setActiveCurrencyCode, moduleEnabled, type AppState, type Settings, type CurrencyConfig } from '../data';
 import CameraScanner from '../components/CameraScanner';
 import { CustomerDisplay } from '../components/CustomerDisplay';
 import { useLocale } from '../locales/i18n';
@@ -346,6 +346,7 @@ type TileId =
   | 'update'
   | 'downloads'
   | 'mobileSetup'
+  | 'modules'
   | 'reset'
   | 'profile';
 
@@ -1362,6 +1363,9 @@ export default function SettingsScreen({
   );
 
   const activeCurrency = s.currency?.active || 'TRY';
+  const imkartOn = moduleEnabled(s, 'imkart');
+  const deliveryOn = moduleEnabled(s, 'delivery');
+  const MODULE_ON_COUNT = (imkartOn ? 1 : 0) + (deliveryOn ? 1 : 0);
 
   const TILES: { id: TileId; icon: string; color: string; title: string; desc: string; badge?: React.ReactNode }[] = [
     { id: 'language', icon: 'globe', color: 'text-mint', title: t('settings.language'), desc: `${t('settings.languageDesc')} (${LOCALES.length})` },
@@ -1377,6 +1381,7 @@ export default function SettingsScreen({
     { id: 'update', icon: 'reset', color: 'text-blue', title: 'Program Güncelleme', desc: 'Yeni sürüm paketlerini (.mosbupdate / .zip / .json) yükleyip doğrulayın.' },
     { id: 'downloads', icon: 'monitor', color: 'text-amber2', title: 'Kurulum & Sürüm Dosyaları', desc: 'Windows EXE build paketi, Linux Mint kurulumu ve hazır EXE indirme.' },
     { id: 'mobileSetup', icon: 'camera', color: 'text-mint', title: 'Mobil Kurulum (APK & iOS)', desc: 'Uygulamayı telefon ve tabletlere PWA olarak kurma adımları.' },
+    { id: 'modules', icon: 'box', color: 'text-blue', title: 'Modül Yönetimi', desc: 'Ulaşım Kartı ve Paket Sipariş sekmelerini ülkeye/müşteriye göre açıp kapatın.', badge: <Badge tone="warn">{MODULE_ON_COUNT}/2 AÇIK</Badge> },
     { id: 'reset', icon: 'alert', color: 'text-red', title: 'Kasa & Ciro Sıfırlama', desc: 'İlk kurulum için tüm işletme hareketlerini sıfırlayın (tehlikeli işlem).' },
     { id: 'profile', icon: 'user', color: 'text-amber2', title: 'Profil Özeti', desc: 'Mevcut mağaza, tema, ses, rapor ve kart görsel ayarlarının özeti.' },
   ];
@@ -1936,6 +1941,61 @@ export default function SettingsScreen({
                   <li>Tam donanımlı native app için Xcode + TestFlight dağıtımı gerekir; PWA çözümündeki tüm işlevler birebir çalışır.</li>
                 </ol>
               </div>
+            </div>
+          </Panel>
+        </SettingsModal>
+      )}
+
+      {open === 'modules' && (
+        <SettingsModal title="Modül Yönetimi" icon="box" color="text-blue" wide={false} onClose={() => setOpen(null)}>
+          <Panel icon="box" title="Aktif Modüller (Sekmeler)" color="text-blue" desc="Her ülke veya müşteri bu sekmelerin tümüne ihtiyaç duymayabilir. Kapattığınız sekme menüden kaldırılır; değişiklik anında kaydedilir.">
+            <div className="space-y-2.5">
+              {([
+                {
+                  id: 'imkart',
+                  icon: 'card',
+                  title: 'Ulaşım Kartı',
+                  desc: 'Toplu ulaşım kartına bakiye/dolum satışı sekmesi, limit yönetimi ve gün sonu dolum devri.',
+                  on: imkartOn,
+                  offHint: 'Kapatılırsa menüden, üst limit butonundan ve gün sonu kapatma ekranından kaldırılır.',
+                },
+                {
+                  id: 'delivery',
+                  icon: 'bag',
+                  title: 'Paket Sipariş',
+                  desc: 'Adrese paket/kargo siparişi alma, teslimat takibi ve kurye atama sekmesi.',
+                  on: deliveryOn,
+                  offHint: 'Kapatılırsa sipariş telefonları (order rolü) Satış ekranına yönlendirilir.',
+                },
+              ] as const).map((m) => (
+                <div
+                  key={m.id}
+                  className={cn('flex items-center gap-3 rounded-xl border p-4 transition-colors', m.on ? 'border-mint/40 bg-mint/5' : 'border-line2 bg-panel2/40')}
+                >
+                  <Ic n={m.icon} c={cn('h-5 w-5 shrink-0', m.on ? 'text-mint' : 'text-mut')} />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-[13px] font-bold text-txt">{m.title}</span>
+                      {m.on ? <Badge tone="ok">AÇIK</Badge> : <Badge tone="mut">KAPALI</Badge>}
+                    </div>
+                    <div className="text-[11px] leading-snug text-mut2">{m.desc}</div>
+                    <div className="mt-0.5 text-[10px] leading-snug text-mut2">{m.offHint}</div>
+                  </div>
+                  <button
+                    onClick={() => onPatch({ modules: { ...s.modules, [m.id]: !m.on } })}
+                    role="switch"
+                    aria-checked={m.on}
+                    aria-label={`${m.title} modülünü ${m.on ? 'kapat' : 'aç'}`}
+                    className={cn('relative h-7 w-12 shrink-0 rounded-full border transition-colors', m.on ? 'border-mint bg-mint/30' : 'border-line bg-ink/60')}
+                  >
+                    <span className={cn('absolute top-0.5 h-5.5 w-5.5 rounded-full bg-white shadow transition-all', m.on ? 'left-6' : 'left-0.5')} />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <div className="rounded-lg border border-line bg-ink/40 p-3 text-[10.5px] leading-relaxed text-mut2">
+              <b className="text-mut">Not:</b> Ayar cihazda kalıcı saklanır; uygulama yeniden açıldığında da geçerlidir. Kapattığınız
+              modüle ait mevcut veriler (dolum geçmişi, siparişler) silinmez — yalnızca ekranlar gizlenir.
             </div>
           </Panel>
         </SettingsModal>

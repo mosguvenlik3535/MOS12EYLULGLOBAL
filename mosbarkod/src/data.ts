@@ -429,6 +429,11 @@ export interface Settings {
     keepDays: number;
     lastRun: string | null;
   };
+  /** İsteğe bağlı kapatılabilen ana modüller (sekmeler) — ülkeye/müşteriye göre. */
+  modules: {
+    imkart: boolean;   // Ulaşım Kartı sekmesi
+    delivery: boolean; // Paket Sipariş sekmesi
+  };
   report: {
     enabled: boolean;
     ownerPhone: string;
@@ -726,6 +731,12 @@ export const METHOD_META: Record<PayMethod, { label: string; color: string }> = 
 
 export const VIEWS_LOCKED_FOR_CASHIER: ViewId[] = ['purchase', 'expense', 'staff', 'settings'];
 
+/** Kapatılabilen ana modüller (sekmeler). */
+export type ModuleId = 'imkart' | 'delivery';
+
+/** Bir modülün açık olup olmadığını döndürür (tanımsızsa açık kabul edilir). */
+export const moduleEnabled = (settings: Settings, mod: ModuleId): boolean => settings.modules?.[mod] !== false;
+
 export const REPORT_ITEMS: { id: string; label: string; desc: string }[] = [
   { id: 'ciro', label: 'Toplam satış cirosu', desc: 'Günlük toplam satış tutarı' },
   { id: 'brutKar', label: 'Brüt kâr', desc: 'Satış cirosu eksi ürün maliyeti' },
@@ -1017,6 +1028,7 @@ export const defaultSettings = (): Settings => ({
     keepDays: 7,
     lastRun: null,
   },
+  modules: { imkart: true, delivery: true },
   report: {
     enabled: false,
     ownerPhone: '00 90 555 406 61 43',
@@ -1143,6 +1155,7 @@ export function loadState(): AppState {
             ...s.settings,
             sound: { ...d.sound, ...(s.settings.sound || {}) },
             autobackup: { ...d.autobackup, ...(s.settings.autobackup || {}) },
+            modules: { ...d.modules, ...(s.settings.modules || {}) },
             report: { ...d.report, ...(s.settings.report || {}) },
             email: { ...d.email, ...(s.settings.email || {}) },
             update: { ...d.update, ...(s.settings.update || {}) },

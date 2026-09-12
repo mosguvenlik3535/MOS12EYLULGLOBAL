@@ -51,6 +51,7 @@ import {
   isToday,
   lineNet,
   loadState,
+  moduleEnabled,
   priceOf,
   round2,
   saveState,
@@ -268,11 +269,11 @@ export default function App() {
     if (effectiveRole === 'admin') {
       setUser(ADMIN_ID);
       setLoggedIn(true);
-      setView('sales');
+      goView('sales');
     } else {
       setUser('u2');
       setLoggedIn(true);
-      setView('delivery');
+      goView('delivery');
     }
 
     joinHost(code, handleRemoteState, () => stateRef.current, handleSyncStatus, effectiveRole);
@@ -296,11 +297,11 @@ export default function App() {
     if (device === 'admin') {
       setUser(ADMIN_ID);
       setLoggedIn(true);
-      setView('sales');
+      goView('sales');
     } else {
       setUser('u2');
       setLoggedIn(true);
-      setView('delivery');
+      goView('delivery');
     }
     joinHost(code, handleRemoteState, () => stateRef.current, handleSyncStatus, device);
     window.history.replaceState(null, '', window.location.pathname + window.location.hash);
@@ -481,6 +482,18 @@ export default function App() {
   const total = round2(subtotal - discAmt);
   const isAdmin = user === ADMIN_ID;
   const locked = !isAdmin && VIEWS_LOCKED_FOR_CASHIER.includes(view);
+
+  // Kapatılan bir modülün sekmesine gidilmeye çalışılırsa Satış'a düş.
+  const viewAllowed = (v: ViewId) =>
+    (v === 'imkart' ? moduleEnabled(state.settings, 'imkart') : true) &&
+    (v === 'delivery' ? moduleEnabled(state.settings, 'delivery') : true);
+  const goView = (v: ViewId) => setView(viewAllowed(v) ? v : 'sales');
+
+  // Görünüm dışarıdan kapatılmış bir modüle set edilirse (ör. geri yükleme/uzak eşleme) Satış'a çevir.
+  useEffect(() => {
+    if (!viewAllowed(view)) setView('sales');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [view, state.settings.modules?.imkart, state.settings.modules?.delivery]);
 
   const ciroToday = round2(state.sales.filter((s) => isToday(s.date)).reduce((a, s) => a + s.total, 0));
   const criticalCount = state.products.filter((p) => p.stock >= 0 && p.stock <= p.critical).length;
@@ -674,6 +687,10 @@ export default function App() {
 
   const addImkartDolum = (amount: number, via: 'nakit' | 'pos', cardNo = '') => {
     const s = stateRef.current;
+    if (!moduleEnabled(s.settings, 'imkart')) {
+      toast('Ulaşım Kartı modülü kapalı', 'err');
+      return;
+    }
     if (amount > s.imkart.limit) {
       toast(`Yetersiz dolum limiti (mevcut: ${fmt(s.imkart.limit)})`, 'err');
       return;
@@ -1190,7 +1207,7 @@ export default function App() {
           if (id === user) return;
           setSwitchUser(id);
         }}
-        go={setView}
+        go={goView}
       />
 
       {switchUser && (
@@ -1210,7 +1227,7 @@ export default function App() {
       <div className="flex min-h-0 flex-1 flex-col md:flex-row">
         <Sidebar
           view={view}
-          go={setView}
+          go={goView}
           collapsed={collapsed}
           setCollapsed={setCollapsed}
           isCashier={!isAdmin}
@@ -1345,7 +1362,7 @@ export default function App() {
           )}
           </ErrorBoundary>
         </main>
-        <MobileNav view={view} go={setView} />
+        <MobileNav view={view} go={goView} settings={state.settings} />
       </div>
 
       {imkartOpen && (
