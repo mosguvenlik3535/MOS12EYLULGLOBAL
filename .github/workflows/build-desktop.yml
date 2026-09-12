@@ -45,12 +45,28 @@ jobs:
           path: |
             mosbarkod/release/*.exe
             mosbarkod/release/*.AppImage
-          if-no-files-found: warn
+          if-no-files-found: error
 
-      - name: Create GitHub Release (tag)
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v2
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
         with:
-          files: |
-            mosbarkod/release/*.exe
-            mosbarkod/release/*.AppImage
+          pattern: MOSBARKODYAZILIM-*
+          merge-multiple: true
+          path: release-files
+
+      - name: Create or update release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            --title "MOSBARKODYAZILIM ${{ github.ref_name }}" \
+            --notes "Windows kurulum (.exe) ve Linux (AppImage) masaüstü sürümleri." \
+            release-files/* 2>/dev/null || \
+          gh release upload "${{ github.ref_name }}" release-files/* --clobber
