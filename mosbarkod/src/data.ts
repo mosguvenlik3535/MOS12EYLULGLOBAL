@@ -74,6 +74,7 @@ export const lineNet = (l: CartLine) =>
   round2(l.unitPrice * l.qty * (1 - (l.lineDiscount || 0) / 100));
 
 export interface SaleItem {
+  productId?: string;
   name: string;
   qty: number;
   unit: string;

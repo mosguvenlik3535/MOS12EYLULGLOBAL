@@ -757,7 +757,7 @@ export default function App() {
       register,
       cashier: cashier.name,
       mode: priceMode,
-      items: cart.map((l) => ({ name: l.name, qty: l.qty, unit: l.unit, unitPrice: l.unitPrice })),
+      items: cart.map((l) => ({ productId: l.productId, name: l.name, qty: l.qty, unit: l.unit, unitPrice: l.unitPrice })),
       subtotal,
       discountPct: discounts[register],
       discountAmt: discAmt,
@@ -1297,6 +1297,7 @@ export default function App() {
           ) : view === 'stock' ? (
             <Products
               products={state.products}
+              sales={state.sales}
               settings={state.settings}
               isAdmin={isAdmin}
               save={saveProduct}

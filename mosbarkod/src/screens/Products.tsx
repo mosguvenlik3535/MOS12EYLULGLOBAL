@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState, type ChangeEvent } from 'react';
 import * as XLSX from 'xlsx';
 import { cn } from '../utils/cn';
 import { Ic } from '../icons';
@@ -6,8 +6,10 @@ import { Badge, Btn, Confirm, Field, Inp, Modal, Sel, Td, Th } from '../componen
 import CameraScanner from '../components/CameraScanner';
 import LabelStudioModal from '../components/LabelStudioModal';
 import Barcode from '../components/Barcode';
-import { CATEGORIES, fmt, fmtN, uid, type Product, type Settings } from '../data';
+import { CATEGORIES, fmt, fmtN, uid, type Product, type Sale, type Settings } from '../data';
 import { fetchProductByBarcode, generateEan13, searchProductsByName, type AiProductMeta } from '../lib/productAi';
+import { fileToDataUrl } from '../lib/image';
+import { analyzeStock, ABC_META, type AbcClass } from '../lib/stockIntel';
 
 type Toast = (msg: string, type?: 'ok' | 'err') => void;
 
@@ -75,6 +77,7 @@ const isExpired = (p: Product) => Boolean(p.expiry && new Date(p.expiry) < new D
 
 export default function Products({
   products,
+  sales,
   settings,
   isAdmin = true,
   save,
@@ -83,6 +86,7 @@ export default function Products({
   toast,
 }: {
   products: Product[];
+  sales: Sale[];
   settings: Settings;
   isAdmin?: boolean;
   save: (p: Product) => void;
@@ -104,7 +108,11 @@ export default function Products({
   const [aiResults, setAiResults] = useState<AiProductMeta[]>([]);
   const [aiSearchOpen, setAiSearchOpen] = useState(false);
   const [scanOpen, setScanOpen] = useState(false);
+  const [intelOpen, setIntelOpen] = useState(false);
+  const [intelWindow, setIntelWindow] = useState<7 | 30 | 90>(30);
   const importRef = useRef<HTMLInputElement>(null);
+  const imgFileRef = useRef<HTMLInputElement>(null);
+  const imgCamRef = useRef<HTMLInputElement>(null);
 
   const list = useMemo(
     () =>
@@ -502,6 +510,30 @@ export default function Products({
     }
   };
 
+  /* ----- Yerel görsel yükleme / çekme (sıkıştırılmış dataURL) ----- */
+  const onPickImage = async (e: ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    e.target.value = '';
+    if (!f) return;
+    try {
+      const dataUrl = await fileToDataUrl(f, 512, 0.72);
+      setForm((prev) => (prev ? { ...prev, image: dataUrl } : prev));
+      toast('Ürün görseli sıkıştırılıp cihaza kaydedildi (internet gerekmez)');
+    } catch {
+      toast('Görsel okunamadı — farklı bir dosya deneyin', 'err');
+    }
+  };
+
+  /* ----- Stok zekâsı ----- */
+  const intel = useMemo(() => analyzeStock(products, sales, intelWindow), [products, sales, intelWindow]);
+  const topSellers = intel.rows.filter((r) => r.moving).slice(0, 5);
+  const slowMovers = intel.rows.filter((r) => !r.moving && r.product.stock > 0).slice(0, 8);
+  const abcCounts = (['A', 'B', 'C'] as AbcClass[]).map((c) => ({
+    cls: c,
+    count: intel.rows.filter((r) => r.cls === c).length,
+    revenue: intel.rows.filter((r) => r.cls === c).reduce((s, r) => s + r.revenue, 0),
+  }));
+
   return (
     <div className="h-full overflow-y-auto">
       {/* başlık + butonlar */}
@@ -536,6 +568,14 @@ export default function Products({
           </Btn>
           <Btn v="ghost" onClick={() => setCountOpen(true)}>
             <Ic n="reset" c="h-4 w-4" /> Stok Sayımı Yap
+          </Btn>
+          <Btn
+            v="ghost"
+            onClick={() => setIntelOpen(true)}
+            className="border-mint/40 bg-mint/5 text-mint hover:bg-mint/10"
+            title="ABC analizi, satış hızı ve stok ömrü kestirimi"
+          >
+            <Ic n="sparkles" c="h-4 w-4" /> Stok Zekâsı
           </Btn>
           <Btn v="ghost" onClick={() => setZamOpen(true)}>
             <Ic n="trend" c="h-4 w-4" /> Kategoriye Zam Yap
@@ -904,6 +944,34 @@ export default function Products({
               </div>
             </div>
 
+            {/* Yerel görsel yükleme / çekme */}
+            <div className="flex flex-wrap items-center gap-2">
+              <input
+                ref={imgFileRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={onPickImage}
+              />
+              <input
+                ref={imgCamRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className="hidden"
+                onChange={onPickImage}
+              />
+              <Btn v="ghost" className="border-blue/40 text-blue" onClick={() => imgFileRef.current?.click()}>
+                <Ic n="file" c="h-4 w-4" /> Dosyadan Yükle
+              </Btn>
+              <Btn v="ghost" className="border-blue/40 text-blue" onClick={() => imgCamRef.current?.click()}>
+                <Ic n="camera" c="h-4 w-4" /> Kamerayla Çek
+              </Btn>
+              <span className="text-[10px] text-mut2">
+                Görsel sıkıştırılıp cihazda saklanır — internet gerektirmez, URL gerekmez.
+              </span>
+            </div>
+
             {/* Resim Şablonları */}
             <div className="rounded-xl border border-line bg-ink/40 p-3">
               <div className="mb-2 font-mono text-[9px] uppercase tracking-wider text-mut2">
@@ -1123,6 +1191,159 @@ export default function Products({
           settings={settings}
           onClose={() => setLabelStudioOpen(false)}
         />
+      )}
+
+      {intelOpen && (
+        <Modal
+          title="Stok Zekâsı (ABC Analizi & Stok Ömrü)"
+          icon={<Ic n="sparkles" c="h-4.5 w-4.5 text-mint" />}
+          onClose={() => setIntelOpen(false)}
+          w="max-w-4xl"
+        >
+          {/* Dönem seçici + özet kartlar */}
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <span className="font-mono text-[10px] uppercase tracking-wider text-mut">Analiz dönemi:</span>
+            <div className="flex gap-1 rounded-lg border border-line2 bg-ink/50 p-1">
+              {([7, 30, 90] as const).map((d) => (
+                <button
+                  key={d}
+                  onClick={() => setIntelWindow(d)}
+                  className={cn(
+                    'rounded-md px-3 py-1 font-mono text-[11px] font-semibold transition-colors',
+                    intelWindow === d ? 'bg-mint text-[#04211a]' : 'text-mut hover:text-txt'
+                  )}
+                >
+                  {d} Gün
+                </button>
+              ))}
+            </div>
+            <span className="ml-auto font-mono text-[10.5px] text-mut2">
+              Dönem cirosu: <b className="text-mint">{fmt(intel.totalRevenue)}</b>
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {abcCounts.map((a) => (
+              <div
+                key={a.cls}
+                className="rounded-xl border bg-panel p-3"
+                style={{ borderColor: ABC_META[a.cls].dot + '55' }}
+              >
+                <div className="flex items-center gap-2">
+                  <span
+                    className="flex h-7 w-7 items-center justify-center rounded-lg font-mono text-sm font-black"
+                    style={{ background: ABC_META[a.cls].dot + '22', color: ABC_META[a.cls].dot }}
+                  >
+                    {a.cls}
+                  </span>
+                  <div>
+                    <div className="font-mono text-[11px] font-bold text-txt">{a.count} ürün</div>
+                    <div className="font-mono text-[10px] text-mut2">{fmt(a.revenue)} ciro</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+            <div className="rounded-xl border border-line bg-panel p-3">
+              <div className="font-mono text-[9.5px] uppercase tracking-wider text-mut2">Hareketli</div>
+              <div className="mt-1 font-mono text-lg font-bold text-txt">{intel.movingCount}</div>
+            </div>
+          </div>
+
+          <div className="mb-2 mt-3 flex flex-wrap gap-2">
+            <Badge tone="ok">Hareketli: {intel.movingCount}</Badge>
+            <Badge tone="warn">Atıl stok (hareketsiz): {intel.deadCount}</Badge>
+            <Badge tone="bad">Kritik/tükenmiş: {intel.outRiskCount}</Badge>
+          </div>
+
+          {/* Tablo */}
+          <div className="max-h-[42vh] overflow-y-auto rounded-xl border border-line bg-panel">
+            <table className="w-full min-w-[720px] border-collapse">
+              <thead className="sticky top-0 border-b border-line bg-ink/80">
+                <tr>
+                  <Th>Ürün</Th>
+                  <Th>ABC</Th>
+                  <Th className="text-right">Dönem Ciro</Th>
+                  <Th className="text-right">Satış</Th>
+                  <Th className="text-right">Hız (ad/gün)</Th>
+                  <Th className="text-right">Stok</Th>
+                  <Th className="text-right">Kalan Gün</Th>
+                </tr>
+              </thead>
+              <tbody>
+                {intel.rows.map((r) => {
+                  const m = ABC_META[r.cls];
+                  const risk = r.daysLeft !== null && r.daysLeft <= r.product.critical;
+                  return (
+                    <tr key={r.product.id} className="border-b border-line/60 last:border-0 hover:bg-panel2/40">
+                      <Td>
+                        <div className="font-semibold leading-tight">{r.product.name}</div>
+                        <div className="text-[10px] text-mut2">{r.product.category}</div>
+                      </Td>
+                      <Td>
+                        <span className={cn('inline-block rounded-md border px-1.5 py-0.5 font-mono text-[10px] font-bold', m.chip)}>
+                          {r.cls}
+                        </span>
+                      </Td>
+                      <Td className="text-right font-mono tabular-nums text-mint">{fmt(r.revenue)}</Td>
+                      <Td className="text-right font-mono tabular-nums">{fmtN(r.qty)}</Td>
+                      <Td className="text-right font-mono tabular-nums text-mut">{r.moving ? r.velocity.toFixed(1) : '—'}</Td>
+                      <Td className="text-right font-mono tabular-nums">{fmtN(r.product.stock)}</Td>
+                      <Td className="text-right">
+                        {r.daysLeft === null ? (
+                          <span className="font-mono text-[10px] text-mut2">hareketsiz</span>
+                        ) : (
+                          <span className={cn('font-mono tabular-nums font-bold', risk ? 'text-red' : 'text-txt')}>
+                            {r.daysLeft} gün
+                          </span>
+                        )}
+                      </Td>
+                    </tr>
+                  );
+                })}
+                {intel.rows.length === 0 && (
+                  <tr>
+                    <td colSpan={7} className="py-8 text-center font-mono text-[11px] text-mut2">Ürün bulunamadı.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* En çok satanlar + atıl stok */}
+          <div className="mt-3 grid gap-3 md:grid-cols-2">
+            <div className="rounded-xl border border-line bg-ink/40 p-3">
+              <div className="mb-2 font-mono text-[10px] font-bold uppercase tracking-wider text-mint">
+                🏆 En Çok Satanlar (A)
+              </div>
+              <div className="space-y-1.5">
+                {topSellers.map((r, i) => (
+                  <div key={r.product.id} className="flex items-center gap-2 text-[11.5px]">
+                    <span className="w-4 font-mono font-bold text-amber2">{i + 1}.</span>
+                    <span className="min-w-0 flex-1 truncate">{r.product.name}</span>
+                    <span className="font-mono text-mint">{fmt(r.revenue)}</span>
+                    <span className="font-mono text-mut2">{fmtN(r.qty)} ad</span>
+                  </div>
+                ))}
+                {topSellers.length === 0 && <div className="text-[11px] text-mut2">Dönemde satış kaydı yok.</div>}
+              </div>
+            </div>
+            <div className="rounded-xl border border-line bg-ink/40 p-3">
+              <div className="mb-2 font-mono text-[10px] font-bold uppercase tracking-wider text-amber2">
+                ⚠️ Atıl Stok (hareketsiz ama depoda)
+              </div>
+              <div className="space-y-1.5">
+                {slowMovers.map((r) => (
+                  <div key={r.product.id} className="flex items-center gap-2 text-[11.5px]">
+                    <span className="min-w-0 flex-1 truncate">{r.product.name}</span>
+                    <span className="font-mono text-mut2">{fmtN(r.product.stock)} {r.product.unit}</span>
+                    <span className="font-mono text-mut2">{fmt(r.product.cost * r.product.stock)} maliyet</span>
+                  </div>
+                ))}
+                {slowMovers.length === 0 && <div className="text-[11px] text-mut2">Atıl stok yok 🎉</div>}
+              </div>
+            </div>
+          </div>
+        </Modal>
       )}
 
       {aiSearchOpen && (
