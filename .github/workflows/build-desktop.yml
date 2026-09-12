@@ -14,11 +14,13 @@ jobs:
         include:
           - os: windows-latest
             args: --win nsis portable
-            artifact: win
+            glob: '*.exe'
           - os: ubuntu-latest
             args: --linux AppImage
-            artifact: linux
+            glob: '*.AppImage'
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -41,32 +43,24 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: MOSBARKODYAZILIM-${{ matrix.artifact }}
-          path: |
-            mosbarkod/release/*.exe
-            mosbarkod/release/*.AppImage
+          name: MOSBARKODYAZILIM-${{ matrix.os == 'windows-latest' && 'win' || 'linux' }}
+          path: mosbarkod/release/${{ matrix.glob }}
           if-no-files-found: error
 
-  release:
-    needs: build
-    if: startsWith(github.ref, 'refs/tags/')
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
-        with:
-          pattern: MOSBARKODYAZILIM-*
-          merge-multiple: true
-          path: release-files
-
-      - name: Create or update release
+      - name: Attach to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "${{ github.ref_name }}" \
-            --title "MOSBARKODYAZILIM ${{ github.ref_name }}" \
-            --notes "Windows kurulum (.exe) ve Linux (AppImage) masaüstü sürümleri." \
-            release-files/* 2>/dev/null || \
-          gh release upload "${{ github.ref_name }}" release-files/* --clobber
+          files=$(ls mosbarkod/release/${{ matrix.glob }} 2>/dev/null || true)
+          if [ -n "$files" ]; then
+            gh release create "${{ github.ref_name }}" \
+              --title "MOSBARKODYAZILIM ${{ github.ref_name }}" \
+              --notes "Yapay Zeka Destekli Barkod Satış Programı — masaüstü (Windows .exe) ve Linux (AppImage) sürümleri." \
+              $files 2>/dev/null || \
+            gh release upload "${{ github.ref_name }}" $files --clobber
+          else
+            echo "::warning::release dosyası bulunamadı"
+            exit 1
+          fi
