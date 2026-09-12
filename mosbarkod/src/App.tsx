@@ -496,6 +496,7 @@ export default function App() {
   }, [view, state.settings.modules?.imkart, state.settings.modules?.delivery]);
 
   const ciroToday = round2(state.sales.filter((s) => isToday(s.date)).reduce((a, s) => a + s.total, 0));
+  const todaySaleCount = state.sales.filter((s) => isToday(s.date)).length;
   const criticalCount = state.products.filter((p) => p.stock >= 0 && p.stock <= p.critical).length;
   const negCount = state.products.filter((p) => p.stock < 0).length;
   const veresiyeTotal = round2(state.customers.reduce((a, c) => a + c.balance, 0));
@@ -1192,6 +1193,7 @@ export default function App() {
       <TopBar
         settings={state.settings}
         ciroToday={ciroToday}
+        saleCount={todaySaleCount}
         customerCount={state.customers.length}
         criticalCount={criticalCount}
         negCount={negCount}

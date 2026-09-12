@@ -1056,6 +1056,8 @@ const PHRASES_B: PhraseMap = {
   'İzmirİmkart Limiti': { en: 'Transport Card Limit', ar: 'حد بطاقة النقل', ru: 'Лимит транспортной карты' },
   'dolum için tıkla →': { en: 'click to top up →', ar: 'انقر للشحن ←', ru: 'нажмите для пополнения →' },
   'Bugünkü Ciro': { en: "Today's Turnover", ar: 'إيراد اليوم', ru: 'Оборот сегодня' },
+  'Günlük Ciro': { en: 'Daily Turnover', ar: 'الإيراد اليومي', ru: 'Дневной оборот', es: 'Ventas del Día', de: 'Tagesumsatz', fr: "Chiffre d'Affaires du Jour", it: 'Fatturato Giornaliero' },
+  'Günlük İşlem': { en: 'Daily Sales', ar: 'عمليات اليوم', ru: 'Операций за день', es: 'Ventas del Día', de: 'Verkäufe heute', fr: 'Ventes du Jour', it: 'Vendite Giornaliere' },
   'Bugünkü müşteri sayısı': { en: "Today's customers", ar: 'عملاء اليوم', ru: 'Клиенты сегодня' },
   "Stok uyarıları — Ürün & Stok'a git": { en: 'Stock alerts — go to Products & Stock', ar: 'تنبيهات المخزون', ru: 'Предупреждения склада' },
   'Mobil cihaz eşzamanlı bağlı': { en: 'Mobile device synced', ar: 'الجهاز متزامن', ru: 'Устройство синхронизировано' },

@@ -193,6 +193,7 @@ function Clock() {
 export function TopBar({
   settings,
   ciroToday,
+  saleCount,
   customerCount,
   criticalCount,
   negCount,
@@ -208,6 +209,7 @@ export function TopBar({
 }: {
   settings: Settings;
   ciroToday: number;
+  saleCount: number;
   customerCount: number;
   criticalCount: number;
   negCount: number;
@@ -250,11 +252,20 @@ export function TopBar({
             <span className="font-mono text-[8.5px] text-blue/80">dolum için tıkla →</span>
           </button>
         )}
-        <div className="hidden flex-col rounded-lg border border-mint/30 bg-mint/5 px-2.5 py-1 text-left xl:flex">
+        <div className="hidden flex-col rounded-lg border border-mint/30 bg-mint/5 px-2.5 py-1 text-left md:flex">
           <span className="flex items-center gap-1 font-mono text-[8.5px] uppercase tracking-[0.14em] text-mut2">
-            <span className="blink-dot h-1.5 w-1.5 rounded-full bg-mint" /> Bugünkü Ciro
+            <span className="blink-dot h-1.5 w-1.5 rounded-full bg-mint" /> Günlük Ciro
           </span>
           <span className="font-mono text-[13px] font-bold leading-tight text-mint tabular-nums">{fmt(ciroToday)}</span>
+        </div>
+        <div
+          className="hidden flex-col rounded-lg border border-blue/30 bg-blue/5 px-2.5 py-1 text-left md:flex"
+          title="Bugünkü satış işlemi sayısı"
+        >
+          <span className="flex items-center gap-1 font-mono text-[8.5px] uppercase tracking-[0.14em] text-mut2">
+            <Ic n="cart" c="h-3 w-3 text-blue" /> Günlük İşlem
+          </span>
+          <span className="font-mono text-[13px] font-bold leading-tight text-blue tabular-nums">{saleCount}</span>
         </div>
         <div
           className="hidden flex-col items-center rounded-lg border border-line2 bg-ink/50 px-2 py-1 text-center lg:flex"
