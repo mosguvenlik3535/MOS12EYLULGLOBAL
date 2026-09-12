@@ -10,6 +10,7 @@
 
 import { PHRASES } from './phrases';
 import { EXTENDED_PHRASES } from './extendedPhrases';
+import { TIP_PHRASES } from './tooltipPhrases';
 import type { Locale } from './i18n';
 
 let observer: MutationObserver | null = null;
@@ -153,6 +154,15 @@ export const applyAutoTranslate = (locale: Locale) => {
   }
   // Yeni pazar paketleri temel ifadelerde İngilizce yedeğin üzerine yazılır.
   for (const [key, val] of Object.entries(EXTENDED_PHRASES[locale] ?? {})) {
+    const existing = list.find((item) => item.key === key);
+    if (existing) existing.val = val;
+    else list.push({ key, val });
+  }
+  // Kutu ipuçları (title) ve ek başlıklar — her dil için tam çeviri.
+  for (const [key, tx] of Object.entries(TIP_PHRASES)) {
+    const row = tx as Record<string, string | undefined>;
+    const val = row[locale] ?? row.en;
+    if (!val) continue;
     const existing = list.find((item) => item.key === key);
     if (existing) existing.val = val;
     else list.push({ key, val });
