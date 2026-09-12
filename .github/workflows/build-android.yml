@@ -42,9 +42,23 @@ jobs:
         working-directory: mosbarkod/android
         run: ./gradlew assembleDebug --no-daemon
 
-      - name: Keep full APK aside
-        working-directory: mosbarkod/android
-        run: cp app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/app-debug-full.apk
+      - name: Upload full APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MOSBARKODYAZILIM-Android-APK
+          path: mosbarkod/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+
+      - name: Attach full APK to release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            --title "MOSBARKODYAZILIM ${{ github.ref_name }}" \
+            --notes "Yapay Zeka Destekli Barkod Satış Programı — Windows (.exe + DEMO), Linux (AppImage) ve Android (APK + DEMO) sürümleri." \
+            mosbarkod/android/app/build/outputs/apk/debug/app-debug.apk 2>/dev/null || \
+          gh release upload "${{ github.ref_name }}" mosbarkod/android/app/build/outputs/apk/debug/app-debug.apk --clobber
 
       # ---- DEMO SÜRÜM APK ----
       - name: Build demo web app
@@ -59,33 +73,21 @@ jobs:
         working-directory: mosbarkod/android
         env:
           MOS_APP_ID: com.mosbarkodyazilim.pos.demo
-        run: ./gradlew assembleDebug --no-daemon
+        run: ./gradlew clean assembleDebug --no-daemon
 
-      - name: Rename demo APK and restore full APK
+      - name: Stage demo APK
         working-directory: mosbarkod/android
-        run: |
-          mv app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/app-debug-demo.apk
-          cp app/build/outputs/apk/debug/app-debug-full.apk app/build/outputs/apk/debug/app-debug.apk
+        run: cp app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/app-debug-demo.apk
 
-      - name: Upload APK artifacts
+      - name: Upload demo APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: MOSBARKODYAZILIM-Android-APK
-          path: |
-            mosbarkod/android/app/build/outputs/apk/debug/app-debug.apk
-            mosbarkod/android/app/build/outputs/apk/debug/app-debug-demo.apk
+          name: MOSBARKODYAZILIM-Android-APK-Demo
+          path: mosbarkod/android/app/build/outputs/apk/debug/app-debug-demo.apk
           if-no-files-found: error
 
-      - name: Create or update release
+      - name: Attach demo APK to release
         if: startsWith(github.ref, 'refs/tags/')
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release create "${{ github.ref_name }}" \
-            --title "MOSBARKODYAZILIM ${{ github.ref_name }}" \
-            --notes "Yapay Zeka Destekli Barkod Satış Programı — Windows (.exe + DEMO), Linux (AppImage) ve Android (APK + DEMO) sürümleri." \
-            mosbarkod/android/app/build/outputs/apk/debug/app-debug.apk \
-            mosbarkod/android/app/build/outputs/apk/debug/app-debug-demo.apk 2>/dev/null || \
-          gh release upload "${{ github.ref_name }}" \
-            mosbarkod/android/app/build/outputs/apk/debug/app-debug.apk \
-            mosbarkod/android/app/build/outputs/apk/debug/app-debug-demo.apk --clobber
+        run: gh release upload "${{ github.ref_name }}" mosbarkod/android/app/build/outputs/apk/debug/app-debug-demo.apk --clobber
