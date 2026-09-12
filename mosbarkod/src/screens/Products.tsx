@@ -6,6 +6,7 @@ import { Badge, Btn, Confirm, Field, Inp, Modal, Sel, Td, Th } from '../componen
 import CameraScanner from '../components/CameraScanner';
 import LabelStudioModal from '../components/LabelStudioModal';
 import { CATEGORIES, fmt, fmtN, uid, type Product, type Settings } from '../data';
+import { fetchProductByBarcode, generateEan13, searchProductsByName, type AiProductMeta } from '../lib/productAi';
 
 type Toast = (msg: string, type?: 'ok' | 'err') => void;
 
@@ -98,6 +99,9 @@ export default function Products({
   const [zamOpen, setZamOpen] = useState(false);
   const [labelStudioOpen, setLabelStudioOpen] = useState(false);
   const [fetching, setFetching] = useState(false);
+  const [nameFetching, setNameFetching] = useState(false);
+  const [aiResults, setAiResults] = useState<AiProductMeta[]>([]);
+  const [aiSearchOpen, setAiSearchOpen] = useState(false);
   const [scanOpen, setScanOpen] = useState(false);
   const importRef = useRef<HTMLInputElement>(null);
 
@@ -389,10 +393,28 @@ export default function Products({
     reader.readAsArrayBuffer(file);
   };
 
-  /* ----- Open Food Facts + Yerel Veri Çekme Sihirbazı ----- */
+  /* ----- Yapay Zekâ Meta Veri Sihirbazı (barkod / isim → barkod + bilgi + görsel) ----- */
+
+  const applyMeta = (m: AiProductMeta) => {
+    setForm((f) =>
+      f
+        ? {
+            ...f,
+            name: m.name || f.name,
+            brand: m.brand || f.brand,
+            gram: m.gram || f.gram,
+            barcode: m.barcode || f.barcode,
+            category: m.category ?? f.category,
+            image: m.image || f.image,
+          }
+        : f
+    );
+  };
+
+  /* Barkod ile otomatik doldur */
   const fetchMetadata = async () => {
     if (!form || !form.barcode.trim()) {
-      toast('Önce barkod alanını doldurun', 'err');
+      toast('Önce barkod alanını doldurun veya "Barkod Üret" butonunu kullanın', 'err');
       return;
     }
     const bc = form.barcode.trim();
@@ -401,44 +423,57 @@ export default function Products({
     // 1. Yerel veritabanı kontrolü
     if (LOCAL_BARCODES[bc]) {
       const match = LOCAL_BARCODES[bc];
-      setForm((f) => f && {
-        ...f,
+      applyMeta({
+        barcode: bc,
         name: match.name,
         brand: match.brand,
         gram: match.gram,
         category: match.cat,
         image: match.img,
+        source: 'local',
       });
       setFetching(false);
       toast('Ürün bilgileri yerel katalogdan getirildi');
       return;
     }
 
-    // 2. Open Food Facts API Canlı Sorgu
+    // 2. Open Food Facts canlı sorgu
     try {
-      const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${bc}.json`);
-      if (res.ok) {
-        const d = await res.json();
-        if (d.status === 1 && d.product) {
-          const p = d.product;
-          setForm((f) => f && {
-            ...f,
-            name: p.product_name_tr || p.product_name || f.name,
-            brand: p.brands || f.brand,
-            gram: p.quantity || f.gram,
-            image: p.image_url || f.image,
-          });
-          toast('Ürün bilgileri Open Food Facts global veri tabanından çekildi!');
-        } else {
-          toast('Sorgulanan barkod global veri tabanında bulunamadı. Lütfen manuel doldurun.', 'err');
-        }
+      const meta = await fetchProductByBarcode(bc);
+      if (meta) {
+        applyMeta(meta);
+        toast('Ürünün barkodu, bilgileri ve görseli Open Food Facts küresel veri tabanından çekildi!');
       } else {
-        toast('Global veri tabanı sorgulanamadı (Ağ hatası)', 'err');
+        toast('Sorgulanan barkod küresel veri tabanında bulunamadı. Lütfen manuel doldurun.', 'err');
       }
     } catch {
-      toast('Global veri tabanı sorgulanamadı', 'err');
+      toast('Küresel veri tabanı sorgulanamadı (ağ hatası)', 'err');
     }
     setFetching(false);
+  };
+
+  /* İsim ile otomatik doldur (AI simgesi) */
+  const fetchByName = async () => {
+    if (!form || !form.name.trim()) {
+      toast('Önce ürün adını yazın, ardından AI simgesine basın', 'err');
+      return;
+    }
+    setNameFetching(true);
+    try {
+      const results = await searchProductsByName(form.name.trim());
+      if (!results.length) {
+        toast('Bu isimle ürün bulunamadı. Barkod ile deneyebilir veya manuel doldurabilirsiniz.', 'err');
+        return;
+      }
+      setAiResults(results);
+      setAiSearchOpen(true);
+      applyMeta(results[0]);
+      toast(`Yapay zekâ ${results.length} ürün buldu — en iyi eşleşme forma uygulandı, diğerleri listede`);
+    } catch {
+      toast('Ürün veri tabanına ulaşılamadı (ağ hatası)', 'err');
+    } finally {
+      setNameFetching(false);
+    }
   };
 
   /* ----- Fiyat Otomatik Sihirbazı (Alış / F1 girilince diğerlerini kâr oranlarına göre doldurur) ----- */
@@ -724,6 +759,21 @@ export default function Products({
                   >
                     <Ic n="camera" c="h-5 w-5" />
                   </button>
+                  {!form.barcode.trim() && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const bc = generateEan13(form.name || form.customCode);
+                        setForm({ ...form, barcode: bc });
+                        toast(`Yeni EAN-13 barkod üretildi: ${bc}`);
+                      }}
+                      title="Barkodsuz ürün için geçerli EAN-13 barkod üret"
+                      className="flex h-[38px] shrink-0 items-center justify-center gap-1 rounded-lg border border-mint/50 bg-mint/10 px-2.5 text-mint transition-colors hover:bg-mint/20"
+                    >
+                      <Ic n="zap" c="h-4 w-4" />
+                      <span className="font-mono text-[9px] font-bold uppercase">Üret</span>
+                    </button>
+                  )}
                 </div>
               </Field>
               <Btn
@@ -749,14 +799,26 @@ export default function Products({
               Barkodsuz ürünlerde alanı boş bırakın; sistem benzersiz bir iç kod oluşturur.
             </p>
 
-            {/* Row 2: Ürün Adı + Kategori */}
+            {/* Row 2: Ürün Adı (AI) + Kategori */}
             <div className="grid gap-3 sm:grid-cols-[1fr_200px]">
               <Field label="Ürün Adı *">
-                <Inp
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  placeholder="Örn: Tuborg Gold Kutu 50cl"
-                />
+                <div className="flex gap-1.5">
+                  <Inp
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    placeholder="Örn: Tuborg Gold Kutu 50cl"
+                  />
+                  <button
+                    type="button"
+                    onClick={fetchByName}
+                    disabled={nameFetching}
+                    title="Yapay zekâ ile bu ürünün barkodunu, tüm bilgilerini ve görselini getir"
+                    className="flex h-[38px] shrink-0 items-center justify-center gap-1 rounded-lg border border-amber/50 bg-gradient-to-br from-amber/20 to-indigo-500/20 px-3 text-amber2 shadow-[0_0_14px_rgba(245,158,11,0.25)] transition-all hover:from-amber/30 hover:to-indigo-500/30 disabled:opacity-40"
+                  >
+                    <Ic n="sparkles" c={cn('h-4 w-4', nameFetching && 'animate-spin')} />
+                    <span className="font-mono text-[9px] font-bold uppercase tracking-wider">AI</span>
+                  </button>
+                </div>
               </Field>
               <Field label="Kategori *">
                 <Sel value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
@@ -1049,6 +1111,64 @@ export default function Products({
           settings={settings}
           onClose={() => setLabelStudioOpen(false)}
         />
+      )}
+
+      {aiSearchOpen && (
+        <Modal
+          title="Yapay Zekâ Ürün Eşleşmeleri"
+          icon={<Ic n="sparkles" c="h-4.5 w-4.5 text-amber" />}
+          onClose={() => setAiSearchOpen(false)}
+          w="max-w-xl"
+        >
+          <p className="mb-3 text-[11px] leading-relaxed text-mut2">
+            Adını yazdığınız ürün için küresel veri tabanında bulunan eşleşmeler. Birine tıkladığınızda barkodu,
+            markası, gramajı, kategorisi ve görseli forma aktarılır.
+          </p>
+          <div className="space-y-2">
+            {aiResults.map((m, i) => (
+              <button
+                key={`${m.barcode}-${i}`}
+                type="button"
+                onClick={() => {
+                  applyMeta(m);
+                  setAiSearchOpen(false);
+                  toast('Seçilen ürünün bilgileri forma uygulandı');
+                }}
+                className="flex w-full items-center gap-3 rounded-xl border border-line bg-panel2/60 p-3 text-left transition-colors hover:border-amber/60"
+              >
+                {m.image ? (
+                  <img
+                    src={m.image}
+                    alt=""
+                    className="h-12 w-12 shrink-0 rounded-lg border border-line2 object-cover"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                ) : (
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-line2 bg-panel3">
+                    <Ic n="box" c="h-5 w-5 text-mut" />
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-[13px] font-bold text-txt">{m.name || 'İsimsiz Ürün'}</div>
+                  <div className="truncate text-[10px] text-mut2">
+                    {m.brand}
+                    {m.brand && m.gram ? ' · ' : ''}
+                    {m.gram}
+                  </div>
+                  <div className="mt-1 flex items-center gap-1.5">
+                    {m.barcode && <span className="font-mono text-[10px] text-blue">{m.barcode}</span>}
+                    {m.category && <Badge tone="info">{m.category}</Badge>}
+                  </div>
+                </div>
+                <span className="shrink-0 rounded-lg border border-amber/40 bg-amber/10 px-2 py-1 font-mono text-[10px] font-bold text-amber2">
+                  SEÇ
+                </span>
+              </button>
+            ))}
+          </div>
+        </Modal>
       )}
 
       {scanOpen && (
