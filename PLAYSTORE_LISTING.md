@@ -139,9 +139,9 @@ Play Console'da **Data safety → Start** ile doldurun:
 - [ ] Kurumsal Play Console hesabı + D-U-N-S + kimlik doğrulama
 - [ ] Keystore üretildi, 4 GitHub Secret eklendi (bkz. PLAYSTORE_YAYIN_PLANI.md §6b)
 - [ ] `privacy-policy.html` bir adreste yayınlandı (GitHub Pages / kendi site)
-- [ ] İkon 512×512 (marka) ✓ (repo'da hazır)
-- [ ] Ekran görüntüleri: telefon ≥ 2 + 7" tablet ≥ 1 (POS ekranı, ürün listesi, rapor, ayarlar)
-- [ ] Özellik grafiği 1024×500
+- [ ] İkon 512×512 (marka) ✅ (`playstore/icon-512.png` hazır)
+- [ ] Özellik grafiği 1024×500 ✅ (`playstore/feature-graphic.png` hazır)
+- [ ] Ekran görüntüleri: telefon ≥ 2 + 7" tablet ≥ 1 (çekim kılavuzu: `playstore/SCREENSHOTS.md`)
 - [ ] `mos_pro_aylik` abonelik ürünü Play Console'da tanımlandı (299 TL/ay)
 - [ ] Play Billing test kullanıcıları (lisans testi) eklendi
 - [ ] AAB imzalı üretildi ve Play'e yüklendi (secret eklenince otomatik)
