@@ -5,6 +5,7 @@ import { Btn, Field, Inp, Sel } from '../components/ui';
 import ReportModal from '../components/ReportModal';
 import { buildReport, waLink } from '../lib/report';
 import { sendEmail } from '../lib/email';
+import { printTest } from '../lib/printReceipt';
 import { useLocale } from '../locales/i18n';
 import {
   DEFAULT_ENABLED_DEVICES,
@@ -786,12 +787,29 @@ export function HardwareCard({
   const { locale } = useLocale();
   const enabled = settings.hardware?.enabledDevices ?? DEFAULT_ENABLED_DEVICES;
   const country = hardwareCountryName(locale);
+  const printer = settings.printer;
+  const [testing, setTesting] = useState(false);
 
   const toggle = (id: string) => {
     const next = enabled.includes(id) ? enabled.filter((x) => x !== id) : [...enabled, id];
     onPatch({ hardware: { enabledDevices: next } });
     const d = HARDWARE_DEVICES.find((x) => x.id === id);
     toast(next.includes(id) ? `${d?.name} eklendi` : `${d?.name} çıkarıldı`);
+  };
+
+  const patchPrinter = (p: Partial<Settings['printer']>) => onPatch({ printer: { ...printer, ...p } });
+
+  const testPrint = async () => {
+    setTesting(true);
+    const r = await printTest(settings);
+    setTesting(false);
+    if (r.ok) {
+      toast('Fiş yazıcıya gönderildi');
+      patchPrinter({ lastTestAt: new Date().toISOString(), lastTestResult: 'success', lastTestError: undefined });
+    } else {
+      toast(r.error || 'Yazdırma başarısız', 'err');
+      patchPrinter({ lastTestAt: new Date().toISOString(), lastTestResult: 'failed', lastTestError: r.error });
+    }
   };
 
   return (
@@ -872,10 +890,113 @@ export function HardwareCard({
         })}
       </div>
 
+      {/* ---- Fiş Yazıcı (ESC/POS) Ayarı ---- */}
+      <div className="mt-4 rounded-xl border border-mint/25 bg-panel2/50 p-4">
+        <div className="mb-3 flex items-center justify-between gap-2">
+          <div>
+            <div className="font-mono text-[12px] font-bold uppercase tracking-widest text-mint">🧾 Fiş Yazıcı (ESC/POS)</div>
+            <div className="mt-0.5 text-[10.5px] text-mut2">
+              80mm/58mm termal yazıcı · Ağ (TCP 9100) veya USB. Ayar kaydettikten sonra satışta fiş otomatik basılır.
+            </div>
+          </div>
+          <button
+            onClick={() => patchPrinter({ enabled: !printer.enabled })}
+            className={cn(
+              'relative h-5 w-9 shrink-0 rounded-full border transition-colors',
+              printer.enabled ? 'border-mint bg-mint/80' : 'border-line2 bg-ink/60'
+            )}
+            title={printer.enabled ? 'Fiş yazıcıyı kapat' : 'Fiş yazıcıyı aç'}
+          >
+            <span
+              className={cn(
+                'absolute top-0.5 h-3.5 w-3.5 rounded-full bg-[#0a0e13] transition-all',
+                printer.enabled ? 'left-[18px]' : 'left-0.5'
+              )}
+            />
+          </button>
+        </div>
+
+        {printer.enabled && (
+          <div className="space-y-3">
+            <div className="grid gap-3 sm:grid-cols-3">
+              <Field label="Bağlantı Türü">
+                <Sel value={printer.connection} onChange={(e) => patchPrinter({ connection: e.target.value as 'tcp' | 'usb' })}>
+                  <option value="tcp">Ağ (TCP/IP)</option>
+                  <option value="usb">USB (Sistem Yazıcısı)</option>
+                </Sel>
+              </Field>
+              <Field label="Kağıt Genişliği">
+                <Sel value={String(printer.paperWidth)} onChange={(e) => patchPrinter({ paperWidth: Number(e.target.value) as 80 | 58 })}>
+                  <option value="80">80 mm</option>
+                  <option value="58">58 mm</option>
+                </Sel>
+              </Field>
+              {printer.connection === 'tcp' ? (
+                <>
+                  <Field label="Yazıcı IP Adresi">
+                    <Inp
+                      placeholder="192.168.1.100"
+                      value={printer.ip}
+                      onChange={(e) => patchPrinter({ ip: e.target.value })}
+                    />
+                  </Field>
+                  <Field label="Port">
+                    <Inp
+                      type="number"
+                      value={printer.port}
+                      onChange={(e) => patchPrinter({ port: Number(e.target.value) || 9100 })}
+                    />
+                  </Field>
+                </>
+              ) : (
+                <Field label="Yazıcı Adı (Sistem)">
+                  <Inp
+                    placeholder="EPSON TM-T20II"
+                    value={printer.usbName}
+                    onChange={(e) => patchPrinter({ usbName: e.target.value })}
+                  />
+                </Field>
+              )}
+            </div>
+            <div className="flex flex-wrap items-center gap-4">
+              <label className="flex items-center gap-2 text-[12px] text-txt">
+                <input
+                  type="checkbox"
+                  checked={printer.cutPaper}
+                  onChange={(e) => patchPrinter({ cutPaper: e.target.checked })}
+                  className="accent-[#2fd6a5]"
+                />
+                Kağıt kes
+              </label>
+              <label className="flex items-center gap-2 text-[12px] text-txt">
+                <input
+                  type="checkbox"
+                  checked={printer.openDrawer}
+                  onChange={(e) => patchPrinter({ openDrawer: e.target.checked })}
+                  className="accent-[#2fd6a5]"
+                />
+                Para çekmecesini aç
+              </label>
+              <div className="ml-auto flex items-center gap-2">
+                {printer.lastTestResult && (
+                  <span className={cn('font-mono text-[10px]', printer.lastTestResult === 'success' ? 'text-mint' : 'text-red')}>
+                    {printer.lastTestResult === 'success' ? '✓ Son test başarılı' : '✗ Son test başarısız'}
+                  </span>
+                )}
+                <Btn v="mint" onClick={testPrint} disabled={testing || printer.connection !== 'tcp'}>
+                  <Ic n="print" c="h-4 w-4" /> {testing ? 'Gönderiliyor...' : 'Test Fişi Yazdır'}
+                </Btn>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
       <p className="mt-3 text-[10px] leading-relaxed text-mut2">
         💡 Barkod okuyucular klavye gibi çalışır (sürücü gerekmez). Fiş yazıcılar ESC/POS, etiket yazıcıları ZPL/TSPL
         protokolüyle yazdırır. Para çekmecesi fiş yazıcısının RJ11 çıkışından, terazi RS232/USB üzerinden bağlanır.
-        Dil seçimi değiştiğinde ülkeye özel model önerileri otomatik güncellenir.
+        Dil seçimi değiştiğinde ülkeye özel model önerileri otomatik güncellenir. Ağ fiş yazıcıları varsayılan olarak
+        <b> 9100</b> portundan dinler; USB yazıcı işletim sistemine kurulduktan sonra sistem yazdırma penceresiyle basılır.
       </p>
     </Card>
   );

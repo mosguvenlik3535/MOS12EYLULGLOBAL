@@ -13,6 +13,7 @@ const path = require('path');
 const fs = require('fs');
 const http = require('http');
 const os = require('os');
+const net = require('net');
 
 const HTTP_PORT = Number(process.env.MOSBARKOD_PORT) || 8787;
 const ROOT = path.join(__dirname, '..', 'dist');
@@ -333,6 +334,36 @@ ipcMain.handle('mos-cloud-http', async (_evt, req) => {
 });
 
 ipcMain.handle('mos-host-info', () => ({ ips: lanIPs(), port: HTTP_PORT }));
+
+/* ---------- ESC/POS termal yazıcı (TCP 9100) ---------- */
+
+function sendRawTcp(ip, port, base64) {
+  return new Promise((resolve) => {
+    let data;
+    try {
+      data = Buffer.from(base64, 'base64');
+    } catch (e) {
+      resolve({ ok: false, error: 'Geçersiz veri: ' + String(e) });
+      return;
+    }
+    const sock = net.createConnection({ host: ip, port: Number(port) || 9100, timeout: 5000 });
+    let settled = false;
+    const done = (r) => {
+      if (settled) return;
+      settled = true;
+      try { sock.destroy(); } catch { /* yoksay */ }
+      resolve(r);
+    };
+    sock.on('connect', () => sock.write(data, () => done({ ok: true })));
+    sock.on('error', (e) => done({ ok: false, error: String(e && e.message ? e.message : e) }));
+    sock.on('timeout', () => done({ ok: false, error: 'Yazıcıya bağlanılamadı (zaman aşımı)' }));
+  });
+}
+
+ipcMain.handle('mos-print-tcp', async (_evt, { ip, port, data } = {}) => {
+  if (!ip || !data) return { ok: false, error: 'Yazıcı adresi veya veri eksik' };
+  return await sendRawTcp(ip, port, data);
+});
 
 /* ---------- pencere ---------- */
 

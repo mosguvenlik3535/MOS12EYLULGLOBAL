@@ -546,6 +546,22 @@ export interface Settings {
     lastTestResult?: 'success' | 'failed';
     lastTestError?: string;
   };
+  /** Fiş yazıcı (ESC/POS termal — ağ TCP 9100 veya USB) */
+  printer: {
+    enabled: boolean;
+    /** Bağlantı türü: ağ (TCP 9100) veya USB (işletim sistemine kurulu yazıcı) */
+    connection: 'tcp' | 'usb';
+    ip: string;
+    port: number;
+    paperWidth: 80 | 58;
+    cutPaper: boolean;
+    openDrawer: boolean;
+    /** USB: sistem yazıcısının adı (Windows'da "EPSON TM-T20II" gibi) */
+    usbName: string;
+    lastTestAt?: string;
+    lastTestResult?: 'success' | 'failed';
+    lastTestError?: string;
+  };
   /** Bulut yedekleme — Google Drive / Dropbox */
   cloud: {
     enabled: boolean;           // otomatik yükleme (her yedeklemede buluta da gönder)
@@ -1106,6 +1122,16 @@ export const defaultSettings = (): Settings => ({
     beepOnPrint: true,
     openDrawer: false,
   },
+  printer: {
+    enabled: false,
+    connection: 'tcp',
+    ip: '',
+    port: 9100,
+    paperWidth: 80,
+    cutPaper: true,
+    openDrawer: false,
+    usbName: '',
+  },
   cloud: {
     enabled: false,
     provider: 'none',
@@ -1167,6 +1193,8 @@ export function loadState(): AppState {
             currency: { ...d.currency, ...(s.settings.currency || {}) },
             cfd: { ...d.cfd, ...(s.settings.cfd || {}) },
             hardware: { ...d.hardware, ...(s.settings.hardware || {}) },
+            printer: { ...d.printer, ...(s.settings.printer || {}) },
+            pos: { ...d.pos, ...(s.settings.pos || {}) },
             cloud: { ...d.cloud, ...(s.settings.cloud || {}) },
           },
         };

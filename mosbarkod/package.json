@@ -11,6 +11,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "electron:start": "npm run build && electron .",
     "dist": "npm run build && electron-builder",
     "dist:win": "npm run build && electron-builder --win",
@@ -46,6 +48,7 @@
     "tailwindcss": "4.1.17",
     "typescript": "5.9.3",
     "vite": "7.3.2",
-    "vite-plugin-singlefile": "2.3.0"
+    "vite-plugin-singlefile": "2.3.0",
+    "vitest": "^5.0.0"
   }
 }

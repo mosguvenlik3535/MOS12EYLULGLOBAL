@@ -40,6 +40,8 @@ import { translations } from './locales';
 import { applyAutoTranslate } from './locales/autoTranslate';
 import { createSnapshot } from './lib/backup';
 import { cloudUpload } from './lib/cloudBackup';
+import { applyDiscount } from './lib/pricing';
+import { addCredit, collectPayment, needsPosAuth, reduceStock, restock } from './lib/sale';
 import {
   ADMIN_ID,
   USERS,
@@ -478,8 +480,7 @@ export default function App() {
 
   const cart = carts[register];
   const subtotal = round2(cart.reduce((s, l) => s + lineNet(l), 0));
-  const discAmt = round2((subtotal * discounts[register]) / 100);
-  const total = round2(subtotal - discAmt);
+  const { discAmt, total } = applyDiscount(subtotal, discounts[register]);
   const isAdmin = user === ADMIN_ID;
   const locked = !isAdmin && VIEWS_LOCKED_FOR_CASHIER.includes(view);
 
@@ -737,7 +738,7 @@ export default function App() {
 
   const confirmPayment = (p: PayPayload) => {
     // TAM ENTEGRE MOD: kart/POS tutarı varsa provizyon onayı beklenir.
-    if (state.settings.pos.enabled && p.pos > 0) {
+    if (needsPosAuth(state.settings.pos.enabled, p.pos)) {
       setPayOpen(false);
       setPosAuthPending(p);
       return;
@@ -773,26 +774,18 @@ export default function App() {
     setState((s) => {
       let customers = s.customers;
       if (p.method === 'veresiye') {
-        const entry = { date: now, type: 'satış' as const, amount: total, note: `Satış ${sale.no}` };
-        if (p.customerId) {
-          customers = customers.map((c) =>
-            c.id === p.customerId
-              ? { ...c, balance: round2(c.balance + total), entries: [...c.entries, entry] }
-              : c
-          );
-        } else {
-          customers = [
-            ...customers,
-            { id: uid(), name: p.newCustomerName!, phone: '', balance: total, entries: [entry] },
-          ];
-        }
+        customers = addCredit(customers, {
+          amount: total,
+          date: now,
+          note: `Satış ${sale.no}`,
+          customerId: p.customerId,
+          newCustomerId: p.newCustomerName ? uid() : undefined,
+          newCustomerName: p.newCustomerName,
+        });
       }
       return {
         ...s,
-        products: s.products.map((pr) => {
-          const line = cart.find((l) => l.productId === pr.id);
-          return line ? { ...pr, stock: round2(pr.stock - line.qty) } : pr;
-        }),
+        products: reduceStock(s.products, cart),
         customers,
         sales: [sale, ...s.sales],
       };
@@ -919,10 +912,7 @@ export default function App() {
       }
       return {
         ...s,
-        products: s.products.map((pr) => {
-          const line = refundItems.find((l) => l.name === pr.name);
-          return line ? { ...pr, stock: round2(pr.stock + line.qty) } : pr;
-        }),
+        products: restock(s.products, refundItems),
         sales: [
           refundSale,
           ...s.sales.map((x) =>
@@ -1047,18 +1037,7 @@ export default function App() {
   const addPayment = (id: string, amount: number, note: string) =>
     setState((s) => ({
       ...s,
-      customers: s.customers.map((c) =>
-        c.id === id
-          ? {
-              ...c,
-              balance: round2(c.balance - amount),
-              entries: [
-                ...c.entries,
-                { date: new Date().toISOString(), type: 'tahsilat' as const, amount, note: note || undefined },
-              ],
-            }
-          : c
-      ),
+      customers: collectPayment(s.customers, id, amount, new Date().toISOString(), note),
     }));
 
   const addExpense = (e: Expense) => setState((s) => ({ ...s, expenses: [e, ...s.expenses] }));

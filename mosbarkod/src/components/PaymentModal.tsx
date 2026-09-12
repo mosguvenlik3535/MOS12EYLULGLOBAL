@@ -13,6 +13,7 @@ import {
   type Sale,
   type Settings,
 } from '../data';
+import { printSale } from '../lib/printReceipt';
 
 export interface PayPayload {
   method: PayMethod;
@@ -297,9 +298,25 @@ export function ReceiptModal({
   settings: Settings;
   onDone: () => void;
 }) {
+  const [printState, setPrintState] = useState<'idle' | 'printing' | 'done' | 'error'>('idle');
+  const [printMsg, setPrintMsg] = useState('');
+
+  const doPrint = async () => {
+    setPrintState('printing');
+    setPrintMsg('');
+    const r = await printSale(sale, settings);
+    if (r.ok) {
+      setPrintState('done');
+      setPrintMsg(r.via === 'escpos' ? 'Fiş yazıcıya gönderildi' : 'Sistem yazdırma penceresi açıldı');
+    } else {
+      setPrintState('error');
+      setPrintMsg(r.error || 'Yazdırma başarısız');
+    }
+  };
+
   useEffect(() => {
     if (opt === 'print') {
-      const t = setTimeout(() => window.print(), 400);
+      const t = setTimeout(doPrint, 400);
       return () => clearTimeout(t);
     }
   }, [opt]);
@@ -395,13 +412,25 @@ export function ReceiptModal({
             </div>
           </div>
         </div>
-        <div className="flex gap-2 border-t border-line p-3">
-          <Btn v="ghost" className="flex-1" onClick={() => window.print()}>
-            <Ic n="print" c="h-4 w-4" /> Yazdır
-          </Btn>
-          <Btn v="mint" className="flex-1 gap-2" onClick={onDone}>
-            Yeni Satış <Ic n="arrowR" c="h-4 w-4" />
-          </Btn>
+        <div className="border-t border-line p-3">
+          {printState !== 'idle' && (
+            <div
+              className={cn(
+                'mb-2 rounded-md px-3 py-1.5 font-mono text-[11px]',
+                printState === 'error' ? 'bg-red-500/15 text-red-400' : 'bg-mint/10 text-mint'
+              )}
+            >
+              {printState === 'printing' ? 'Yazdırılıyor...' : printMsg}
+            </div>
+          )}
+          <div className="flex gap-2">
+            <Btn v="ghost" className="flex-1" onClick={doPrint} disabled={printState === 'printing'}>
+              <Ic n="print" c="h-4 w-4" /> Yazdır
+            </Btn>
+            <Btn v="mint" className="flex-1 gap-2" onClick={onDone}>
+              Yeni Satış <Ic n="arrowR" c="h-4 w-4" />
+            </Btn>
+          </div>
         </div>
       </div>
     </div>

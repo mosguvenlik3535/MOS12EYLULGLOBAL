@@ -27,3 +27,7 @@ contextBridge.exposeInMainWorld('mosLicense', {
   read: () => ipcRenderer.invoke('mos-license', { action: 'read' }),
   write: (patch) => ipcRenderer.invoke('mos-license', { action: 'write', patch }),
 });
+
+contextBridge.exposeInMainWorld('mosPrint', {
+  sendTcp: (payload) => ipcRenderer.invoke('mos-print-tcp', payload),
+});
