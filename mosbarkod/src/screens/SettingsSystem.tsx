@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { cn } from '../utils/cn';
 import { Ic } from '../icons';
 import { Btn, Confirm, Field, Inp, Sel } from '../components/ui';
@@ -271,6 +271,22 @@ export function SoundCard({
 
 /* ---------------- OTOMATİK YEDEKLEME ---------------- */
 
+/* Klasör seçici (webkitdirectory) Android'de çalışmıyor: seçim ekranı açılıp
+   klasör onaylanamıyor, kullanıcı klasörler arasında takılı kalıyor.
+   Ayrıca bu ayar yalnızca Windows .exe sürümünde anlamlı. Dar ekranda veya
+   Capacitor uygulamasında seçici gizlenip açıklama gösterilir. */
+function useNoFolderPick() {
+  const [narrow, setNarrow] = useState(() => window.matchMedia('(max-width: 767px)').matches);
+  useEffect(() => {
+    const q = window.matchMedia('(max-width: 767px)');
+    const h = () => setNarrow(q.matches);
+    q.addEventListener('change', h);
+    return () => q.removeEventListener('change', h);
+  }, []);
+  const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor;
+  return narrow || (cap?.isNativePlatform?.() ?? false);
+}
+
 export function AutoBackupCard({
   cfg,
   state,
@@ -289,6 +305,7 @@ export function AutoBackupCard({
   const [backups, setBackups] = useState<BackupMeta[]>(() => listBackups());
   const [restoreId, setRestoreId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const noFolderPick = useNoFolderPick();
 
   const refresh = () => setBackups(listBackups());
   const usage = backupStorageUsage();
@@ -399,14 +416,23 @@ export function AutoBackupCard({
         <Field label="Arşiv Durumu">
           <Inp readOnly value={`${usage.count} arşiv · ${humanBytes(usage.bytes)}`} className="font-mono text-[11.5px]" />
         </Field>
-        <Field label="Yedek Klasörü (.exe)" className="sm:col-span-2">
-          <div className="flex gap-1.5">
-            <Inp value={cfg.folder} onChange={(e) => onPatch({ autobackup: { ...cfg, folder: e.target.value } })} className="font-mono text-[11.5px]" placeholder="Örn: C:\MOSBARKOD_Yedekler" />
-            <Btn v="subtle" className="flex-none px-2.5" onClick={() => dirRef.current?.click()} title="Klasör seç">
-              <Ic n="folder" c="h-3.5 w-3.5" />
-            </Btn>
+        {noFolderPick ? (
+          <div className="rounded-lg border border-line bg-ink/40 p-3 text-[11px] leading-relaxed text-mut sm:col-span-2">
+            <span className="font-bold text-txt">Yedek Klasörü</span> seçimi yalnızca Windows .exe sürümünde kullanılır;
+            Android bu seçiciyi desteklemediği için mobilde gizlidir. Yedekleriniz uygulamanın{' '}
+            <span className="font-bold text-txt">Yedek Arşivi</span>'nde saklanır;{' '}
+            <span className="font-bold text-txt">“Tam Yedek İndir”</span> ile dosya olarak kaydedip paylaşabilirsiniz.
           </div>
-        </Field>
+        ) : (
+          <Field label="Yedek Klasörü (.exe)" className="sm:col-span-2">
+            <div className="flex gap-1.5">
+              <Inp value={cfg.folder} onChange={(e) => onPatch({ autobackup: { ...cfg, folder: e.target.value } })} className="font-mono text-[11.5px]" placeholder="Örn: C:\MOSBARKOD_Yedekler" />
+              <Btn v="subtle" className="flex-none px-2.5" onClick={() => dirRef.current?.click()} title="Klasör seç">
+                <Ic n="folder" c="h-3.5 w-3.5" />
+              </Btn>
+            </div>
+          </Field>
+        )}
       </div>
       <input
         ref={dirRef}

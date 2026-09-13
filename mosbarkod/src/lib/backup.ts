@@ -302,6 +302,29 @@ export function parseBackupFile(text: string, current: AppState): ParseResult {
 
 export function downloadText(filename: string, text: string) {
   const blob = new Blob([text], { type: 'application/json' });
+  /* Mobil (özellikle Android uygulaması): <a download> WebView'da çalışmayabilir.
+     Web Share destekleniyorsa paylaşım penceresi açılır — kullanıcı dosyayı
+     Dosyalar/Drive/WhatsApp'a kaydedebilir. Başarısız olursa klasik indirmeye düşülür. */
+  try {
+    const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor;
+    const native = cap?.isNativePlatform?.() ?? false;
+    const coarse = typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches;
+    const nav = navigator as Navigator & {
+      canShare?: (data: { files?: File[] }) => boolean;
+      share?: (data: { files?: File[]; title?: string }) => Promise<void>;
+    };
+    if ((native || coarse) && typeof nav.canShare === 'function' && typeof nav.share === 'function') {
+      const file = new File([blob], filename, { type: 'application/json' });
+      if (nav.canShare({ files: [file] })) {
+        nav.share({ files: [file], title: filename }).catch(() => {
+          /* kullanıcı vazgeçti — sessiz çık */
+        });
+        return;
+      }
+    }
+  } catch {
+    /* desteklenmiyorsa klasik indirmeye düş */
+  }
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
