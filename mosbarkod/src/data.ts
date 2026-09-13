@@ -1258,6 +1258,21 @@ export function loadState(): AppState {
         if (merged.settings.pins?.u1 === '1588') {
           merged.settings.pins.u1 = '0000';
         }
+        /* v1.8.5 göçü: eski sürümlerin örnek/kişisel varsayılanlarıyla kaydolmuş
+           ayarlar varsa temizlenir. Yalnızca birebir eski değere eşitse dokunulur;
+           kullanıcının kendi girdiği bilgilere asla karışılmaz. */
+        {
+          const st = merged.settings;
+          if (st.phone === '0312 555 07 07') st.phone = '';
+          if (st.address === 'MOSB Sanayi Mah. 7502 Sk. No:41 Sincan / Ankara') st.address = '';
+          if (st.taxOffice === 'Sincan Vergi Dairesi') st.taxOffice = '';
+          if (st.taxNo === '3880456123') st.taxNo = '';
+          if (st.waPhone === '00 90 555 406 61 43') st.waPhone = '';
+          if (st.cfd && st.cfd.qrData === 'https://wa.me/905554066143') st.cfd.qrData = '';
+          if (st.report && st.report.ownerPhone === '00 90 555 406 61 43') st.report.ownerPhone = '';
+          if (st.autobackup && st.autobackup.folder && st.autobackup.folder.includes('mosgu')) st.autobackup.folder = '';
+          if (st.update && st.update.currentVersion === 'v1.5.0-PRO') st.update.currentVersion = appVersionLabel();
+        }
         if (!merged.imkart) merged.imkart = { limit: 3000, txns: [] };
         if (!Array.isArray(merged.imkart.txns)) merged.imkart.txns = [];
         if (!Array.isArray(merged.cashMoves)) merged.cashMoves = [];
