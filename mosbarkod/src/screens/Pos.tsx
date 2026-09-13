@@ -16,6 +16,9 @@ import {
   lineNet,
   priceOf,
   round2,
+  toTRY,
+  fromTRY,
+  activeSymbol,
   type CartLine,
   type Product,
   type PriceMode,
@@ -190,7 +193,7 @@ function CartRow({
       toast?.('Fiyat elle değiştirme yetkisi yalnızca yöneticiye (Admin) aittir', 'err');
       return;
     }
-    setPriceVal(String(l.unitPrice));
+    setPriceVal(String(fromTRY(l.unitPrice)));
     setEditPrice(true);
   };
   const applyPrice = () => {
@@ -199,12 +202,12 @@ function CartRow({
       setEditPrice(false);
       return;
     }
-    if (minCost > 0 && p < minCost) {
+    if (minCost > 0 && toTRY(p) < minCost) {
       toast?.(`Maliyet altında satış yapılamaz — minimum ${fmt(minCost)} olmalı`, 'err');
-      setPriceVal(String(minCost));
+      setPriceVal(String(fromTRY(minCost)));
       return;
     }
-    onPriceChange(p);
+    onPriceChange(toTRY(p));
     setEditPrice(false);
   };
 
@@ -1091,7 +1094,7 @@ function ExtrasPanel(
   const addMuh = () => {
     const price = Number(mPrice.replace(',', '.'));
     if (!mName.trim() || !price || price <= 0) return;
-    props.addCustom(mName.trim(), price);
+    props.addCustom(mName.trim(), toTRY(price));
     setMName('');
     setMPrice('');
   };
@@ -1175,7 +1178,7 @@ function ExtrasPanel(
           <div className="relative">
             <Inp
               type="number"
-              placeholder="Fiyat ₺"
+              placeholder={`Fiyat ${activeSymbol()}`}
               value={mPrice}
               onChange={(e) => setMPrice(e.target.value)}
               className="pr-16"

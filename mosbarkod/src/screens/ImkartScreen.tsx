@@ -8,6 +8,7 @@ import {
   fmt,
   isToday,
   round2,
+  toTRY,
   tstr,
   type Imkart,
   type ImkartTxn,
@@ -48,7 +49,7 @@ export default function ImkartScreen({
   }, [list]);
 
   const submitDolum = () => {
-    const a = Number(amount.replace(',', '.'));
+    const a = toTRY(Number(amount.replace(',', '.')));
     if (!a || a <= 0) return toast('Geçerli bir tutar girin', 'err');
     if (a > imkart.limit) return toast('Yetersiz dolum limiti', 'err');
     onDolum(a, via, cardNo.trim());
@@ -57,7 +58,7 @@ export default function ImkartScreen({
   };
 
   const submitDeposit = () => {
-    const a = Number(depositAmt.replace(',', '.'));
+    const a = toTRY(Number(depositAmt.replace(',', '.')));
     if (!a || a <= 0) return toast('Geçerli bir tutar girin', 'err');
     onDeposit(a);
     setDepositAmt('');

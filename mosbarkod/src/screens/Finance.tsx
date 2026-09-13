@@ -25,8 +25,10 @@ import {
   dstr,
   EXPENSE_CATS,
   fmt,
+  fromTRY,
   invoiceVatSummary,
   round2,
+  toTRY,
   tstr,
   todayKey,
   uid,
@@ -35,6 +37,7 @@ import {
   type Expense,
   type Invoice,
   type InvoicePayment,
+  activeSymbol,
   type Product,
   type Settings,
 } from '../data';
@@ -78,24 +81,25 @@ function PayInvoiceModal({
 }) {
   const paid = round2((inv.payments ?? []).reduce((a, p) => a + p.amount, 0));
   const remaining = round2(inv.total - paid);
-  const [amt, setAmt] = useState(remaining > 0 ? String(remaining) : '');
+  const [amt, setAmt] = useState(remaining > 0 ? String(fromTRY(remaining)) : '');
   const [method, setMethod] = useState<'nakit' | 'pos'>('nakit');
   const [note, setNote] = useState('');
 
   const a = Number(amt.replace(',', '.')) || 0;
-  const valid = a > 0 && a <= remaining + 1e-9;
+  const aTRY = toTRY(a);
+  const valid = a > 0 && aTRY <= remaining + 1e-9;
 
   const submit = () => {
     if (!valid) return;
     const now = new Date().toISOString();
-    const payments = [...(inv.payments ?? []), { id: uid(), date: now, amount: a, method, note: note.trim() || 'Kısmi ödeme' }];
-    const done = paid + a >= inv.total - 1e-9;
+    const payments = [...(inv.payments ?? []), { id: uid(), date: now, amount: aTRY, method, note: note.trim() || 'Kısmi ödeme' }];
+    const done = paid + aTRY >= inv.total - 1e-9;
     onPatch(inv.id, {
       payments,
       status: done ? 'odendi' : 'bekliyor',
       paidDate: done ? now : inv.paidDate,
     });
-    toast(done ? `Fatura tamamen ödendi — ${fmt(a)}` : `Kısmi ödeme kaydedildi — kalan: ${fmt(remaining - a)}`);
+    toast(done ? `Fatura tamamen ödendi — ${fmt(aTRY)}` : `Kısmi ödeme kaydedildi — kalan: ${fmt(round2(remaining - aTRY))}`);
     onClose();
   };
 
@@ -484,7 +488,7 @@ export function PurchaseScreen({
         next[idx] = { ...next[idx], qty: next[idx].qty + 1 };
         return next;
       }
-      return [...x, { productId: p.id, name: p.name, qty: 1, cost: p.cost || 0, sale: p.p1, vatRate: suggestCountryVat(p.category, locale) }];
+      return [...x, { productId: p.id, name: p.name, qty: 1, cost: fromTRY(p.cost || 0), sale: fromTRY(p.p1), vatRate: suggestCountryVat(p.category, locale) }];
     });
   };
 
@@ -514,8 +518,8 @@ export function PurchaseScreen({
       name: l.name,
       qty: l.qty,
       // Stok maliyeti her zaman KDV HARİÇ tutulur (KDV indirilecek vergidir, gider değil)
-      cost: vatIncluded ? round2(l.cost / (1 + (l.vatRate ?? 0) / 100)) : l.cost,
-      sale: l.sale,
+      cost: toTRY(vatIncluded ? round2(l.cost / (1 + (l.vatRate ?? 0) / 100)) : l.cost),
+      sale: toTRY(l.sale),
       vatRate: l.vatRate,
     }));
     const finalSupplier = isOther ? otherSupplier.trim() : supplier.trim();
@@ -534,16 +538,16 @@ export function PurchaseScreen({
         dueDate: payType === 'veresiye' ? dueDate : undefined,
         vatIncluded: false, // kalem maliyetleri KDV hariç normalize edildi
         lines,
-        subtotal: vatCalc.base,
-        vatTotal: vatCalc.vat,
-        total: vatCalc.gross,
+        subtotal: toTRY(vatCalc.base),
+        vatTotal: toTRY(vatCalc.vat),
+        total: toTRY(vatCalc.gross),
         status: payType === 'veresiye' ? 'bekliyor' : 'odendi',
         payments: [],
       },
       toStock
     );
     if (img) saveInvImg(newId, img);
-    toast(`Fatura kaydedildi — Matrah ${fmt(vatCalc.base)} + KDV ${fmt(vatCalc.vat)} = ${fmt(vatCalc.gross)}${toStock ? ' · stoklara işlendi' : ''}`);
+    toast(`Fatura kaydedildi — Matrah ${fmt(toTRY(vatCalc.base))} + KDV ${fmt(toTRY(vatCalc.vat))} = ${fmt(toTRY(vatCalc.gross))}${toStock ? ' · stoklara işlendi' : ''}`);
     setSupplier('');
     setOtherSupplier('');
     setPayType('nakit');
@@ -614,8 +618,8 @@ export function PurchaseScreen({
           if (!name || !qtyS) { skipped++; continue; }
           const prod = products.find((p) => p.name.toLowerCase() === name.toLowerCase());
           const qty = Number(String(qtyS).replace(',', '.')) || 1;
-          const cost = Number(String(costS ?? '0').replace(',', '.')) || (prod?.cost ?? 0);
-          const sale = Number(String(saleS ?? '0').replace(',', '.')) || (prod?.p1 ?? 0);
+          const cost = fromTRY(Number(String(costS ?? '0').replace(',', '.')) || (prod?.cost ?? 0));
+          const sale = fromTRY(Number(String(saleS ?? '0').replace(',', '.')) || (prod?.p1 ?? 0));
           const vatCell = cells[4];
           const vr = vatCell != null && vatCell !== '' ? Number(String(vatCell).replace(/[^\d.]/g, '')) : NaN;
           const vatRate = vatRates.includes(vr) ? vr : suggestCountryVat(prod?.category ?? '', locale);
@@ -879,8 +883,8 @@ export function PurchaseScreen({
                 </div>
               ) : items.map((l, i) => {
                 const hist = productHistory.get(l.name.toLowerCase());
-                const costUp = hist && l.cost > 0 && hist.last > 0 && l.cost > hist.last * 1.09;
-                const costDown = hist && l.cost > 0 && hist.last > 0 && l.cost < hist.last * 0.91;
+                const costUp = hist && l.cost > 0 && hist.last > 0 && l.cost > fromTRY(hist.last) * 1.09;
+                const costDown = hist && l.cost > 0 && hist.last > 0 && l.cost < fromTRY(hist.last) * 0.91;
                 const sugg = hist ? round2((hist.last || hist.avg) * 1.4) : 0;
                 const lineGross = l.qty * l.cost;
                 const lineBase = vatIncluded ? lineGross / (1 + l.vatRate / 100) : lineGross;
@@ -916,7 +920,7 @@ export function PurchaseScreen({
                       </div>
                       <div className="relative">
                         <Inp type="number" value={String(l.sale)} onChange={(e) => setItem(i, { sale: Number(e.target.value) || 0 })} className="h-8 text-center font-mono text-mint" />
-                        {sugg > 0 && l.sale <= 0 && <button onClick={() => setItem(i, { sale: sugg })} title="Önerilen: maliyetin %40 üstü" className="absolute -top-1.5 right-1 rounded bg-mint/20 px-1.5 py-0.5 font-mono text-[8px] font-bold text-mint">+{fmt(sugg)}</button>}
+                        {sugg > 0 && l.sale <= 0 && <button onClick={() => setItem(i, { sale: fromTRY(sugg) })} title="Önerilen: maliyetin %40 üstü" className="absolute -top-1.5 right-1 rounded bg-mint/20 px-1.5 py-0.5 font-mono text-[8px] font-bold text-mint">+{fmt(sugg)}</button>}
                       </div>
                     </div>
                     {/* Satır matrah / KDV / toplam */}
@@ -1010,10 +1014,11 @@ export function PurchaseScreen({
             {budgetOver && <span className="font-mono text-[11px] font-bold text-red">AŞIM +{fmt(todayPurchases - dailyBudget)}</span>}
             <button
               onClick={() => {
-                const next = Number(window.prompt('Günlük alış bütçesi (₺):', String(dailyBudget || '')) || '');
-                setDailyBudget(next || 0);
-                localStorage.setItem(DAILY_BUDGET_KEY, String(next || 0));
-                toast(next > 0 ? `Günlük bütçe ${fmt(next)} olarak kaydedildi` : 'Günlük bütçe kaldırıldı');
+                const next = Number(window.prompt(`Günlük alış bütçesi (${activeSymbol()}):`, String(dailyBudget > 0 ? fromTRY(dailyBudget) : '')) || '');
+                const nextTRY = toTRY(next || 0);
+                setDailyBudget(nextTRY);
+                localStorage.setItem(DAILY_BUDGET_KEY, String(nextTRY));
+                toast(next > 0 ? `Günlük bütçe ${fmt(nextTRY)} olarak kaydedildi` : 'Günlük bütçe kaldırıldı');
               }}
               className="ml-auto rounded-md border border-line2 bg-ink/50 px-2.5 py-1.5 font-mono text-[10.5px] text-mut hover:text-amber2"
             >
@@ -1559,10 +1564,10 @@ export function CreditScreen({
       toast('Geçerli bir tahsilat tutarı girin', 'err');
       return;
     }
-    addPayment(sel.id, amt, payNote.trim());
+    addPayment(sel.id, toTRY(amt), payNote.trim());
     setPayAmt('');
     setPayNote('');
-    toast(`${fmt(amt)} tahsilat kaydedildi`);
+    toast(`${fmt(toTRY(amt))} tahsilat kaydedildi`);
   };
 
   const doNew = () => {
@@ -1660,7 +1665,7 @@ export function CreditScreen({
             <div className="border-b border-line bg-ink/30 p-4">
               <div className="mb-1.5 font-mono text-[10px] uppercase tracking-widest text-mut">Tahsilat Kaydet</div>
               <div className="flex gap-1.5">
-                <Inp type="number" placeholder="Tutar ₺" value={payAmt} onChange={(e) => setPayAmt(e.target.value)} />
+                <Inp type="number" placeholder={`Tutar ${activeSymbol()}`} value={payAmt} onChange={(e) => setPayAmt(e.target.value)} />
                 <Inp placeholder="Not (ops.)" value={payNote} onChange={(e) => setPayNote(e.target.value)} />
                 <Btn v="mint" onClick={doPay} className="flex-none px-3">
                   <Ic n="check" c="h-4 w-4" />
@@ -1783,7 +1788,7 @@ export function ExpenseScreen({
       id: uid(),
       date: new Date(date + 'T12:00:00').toISOString(),
       category: cat,
-      amount: amt,
+      amount: toTRY(amt),
       note: note.trim(),
       vatRate: exHasInvoice ? exVat : 0,
       vatIncluded: exVatIncluded,
@@ -1791,7 +1796,7 @@ export function ExpenseScreen({
     });
     setAmount('');
     setNote('');
-    toast(exHasInvoice && exVat > 0 ? `Masraf kaydedildi — indirilecek ${vatName}: ${fmt(exVatAmt)}` : `Masraf kaydedildi (${vatName} indirimi yok)`);
+    toast(exHasInvoice && exVat > 0 ? `Masraf kaydedildi — indirilecek ${vatName}: ${fmt(toTRY(exVatAmt))}` : `Masraf kaydedildi (${vatName} indirimi yok)`);
   };
 
   return (
@@ -1890,8 +1895,8 @@ export function ExpenseScreen({
                     </div>
                     {amtNum > 0 && (
                       <div className="flex justify-between rounded-md border border-line bg-ink/50 px-2.5 py-1.5 font-mono text-[10px]">
-                        <span className="text-mut2">Matrah: <b className="text-txt">{fmt(exBase)}</b></span>
-                        <span className="text-mut2">İnd. KDV: <b className="text-blue">{fmt(exVatAmt)}</b></span>
+                        <span className="text-mut2">Matrah: <b className="text-txt">{fmt(toTRY(exBase))}</b></span>
+                        <span className="text-mut2">İnd. KDV: <b className="text-blue">{fmt(toTRY(exVatAmt))}</b></span>
                       </div>
                     )}
                   </>

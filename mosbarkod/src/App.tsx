@@ -78,6 +78,7 @@ import {
   type StockCountSession,
   type ViewId,
 } from './data';
+import { fxUpdatedAt, refreshFxIfStale, subscribeFx } from './lib/fx';
 
 interface ToastItem {
   id: string;
@@ -229,6 +230,22 @@ export default function App() {
         if (v) setLicensed(true);
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Döviz kurları: açılışta bayatsa arka planda güncelle, değişince ekranı tazele.
+  const [, setFxTick] = useState(0);
+  useEffect(() => {
+    void refreshFxIfStale().then((r) => {
+      if (r === 'updated') {
+        setFxTick((t) => t + 1);
+        toast('Günlük döviz kurları güncellendi');
+      } else if (r === 'offline' && !fxUpdatedAt()) {
+        toast('Kurlar alınamadı (çevrimdışı) — tahmini kurlar kullanılıyor', 'err');
+      }
+    });
+    const unsub = subscribeFx(() => setFxTick((t) => t + 1));
+    return unsub;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

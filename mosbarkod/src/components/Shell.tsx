@@ -4,6 +4,7 @@ import { Ic } from '../icons';
 import { useLocale } from '../locales/i18n';
 import { LOCALES } from '../locales/i18n';
 import Flag from './Flag';
+import { refreshFxIfStale } from '../lib/fx';
 import BrandLogo from './BrandLogo';
 import {
   USERS,
@@ -346,6 +347,7 @@ export function TopBar({
         {/* Para Birimi seçici — TopBar */}
         <CurrencySwitcher currentCurrency={settings.currency?.active || 'TRY'} onSelect={(code) => {
           setActiveCurrencyCode(code);
+          void refreshFxIfStale();
           settings.currency = { active: code, currencies: DEFAULT_CURRENCIES };
           try {
             const raw = localStorage.getItem('mosbarkod_v15_state');

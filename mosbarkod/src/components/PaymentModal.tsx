@@ -6,7 +6,9 @@ import {
   dstr,
   fmt,
   METHOD_META,
+  fromTRY,
   round2,
+  toTRY,
   tstr,
   type Customer,
   type PayMethod,
@@ -40,7 +42,7 @@ export function PaymentModal({
   onConfirm: (p: PayPayload) => void;
 }) {
   const [method, setMethod] = useState<PayMethod>('nakit');
-  const [received, setReceived] = useState(total.toFixed(2));
+  const [received, setReceived] = useState(fromTRY(total).toFixed(2));
   const [cash, setCash] = useState('');
   const [pos, setPos] = useState('');
   const [customerId, setCustomerId] = useState(customers[0]?.id ?? '');
@@ -53,11 +55,12 @@ export function PaymentModal({
 
   let valid = true;
   let change = 0;
+  const totalD = fromTRY(total);
   if (method === 'nakit') {
-    valid = rec >= total - 1e-9;
-    change = round2(rec - total);
+    valid = rec >= totalD - 1e-9;
+    change = toTRY(round2(rec - totalD));
   } else if (method === 'nakit+pos') {
-    valid = csh + ps >= total - 1e-9 && csh >= 0 && ps >= 0;
+    valid = csh + ps >= totalD - 1e-9 && csh >= 0 && ps >= 0;
     change = 0;
   } else if (method === 'kart') {
     valid = true;
@@ -69,10 +72,10 @@ export function PaymentModal({
     if (!valid) return;
     onConfirm({
       method,
-      received: method === 'nakit' ? rec : method === 'nakit+pos' ? round2(csh + ps) : total,
+      received: method === 'nakit' ? toTRY(rec) : method === 'nakit+pos' ? toTRY(round2(csh + ps)) : total,
       change,
-      cash: method === 'nakit' ? total : method === 'nakit+pos' ? csh : 0,
-      pos: method === 'kart' ? total : method === 'nakit+pos' ? ps : 0,
+      cash: method === 'nakit' ? total : method === 'nakit+pos' ? toTRY(csh) : 0,
+      pos: method === 'kart' ? total : method === 'nakit+pos' ? toTRY(ps) : 0,
       customerId: method === 'veresiye' && !newName.trim() ? customerId || undefined : undefined,
       newCustomerName: method === 'veresiye' ? newName.trim() || undefined : undefined,
       receiptOpt: opt,
@@ -148,7 +151,7 @@ export function PaymentModal({
                 </button>
               ))}
               <button
-                onClick={() => setReceived(total.toFixed(2))}
+                onClick={() => setReceived(fromTRY(total).toFixed(2))}
                 className="rounded-md border border-mint/40 bg-mint/10 px-2.5 py-1.5 font-mono text-[11.5px] font-bold text-mint transition-colors hover:bg-mint/20"
               >
                 Tam Tutar
@@ -162,7 +165,7 @@ export function PaymentModal({
                   rec >= total ? 'text-mint' : 'text-red'
                 )}
               >
-                {rec >= total ? fmt(rec - total) : `Eksik: ${fmt(total - rec)}`}
+                {rec >= totalD ? fmt(toTRY(round2(rec - totalD))) : `Eksik: ${fmt(toTRY(round2(totalD - rec)))}`}
               </span>
             </div>
           </div>
@@ -208,13 +211,13 @@ export function PaymentModal({
             </div>
             <div className="flex flex-wrap items-center gap-1.5">
               <button
-                onClick={() => setCash(total.toFixed(2))}
+                onClick={() => setCash(fromTRY(total).toFixed(2))}
                 className="rounded-md border border-line2 bg-panel3 px-2.5 py-1.5 font-mono text-[11px] font-semibold text-mut hover:text-amber2"
               >
                 Nakit = Tam
               </button>
               <button
-                onClick={() => setPos(Math.max(0, round2(total - csh)).toFixed(2))}
+                onClick={() => setPos(Math.max(0, round2(totalD - csh)).toFixed(2))}
                 className="rounded-md border border-line2 bg-panel3 px-2.5 py-1.5 font-mono text-[11px] font-semibold text-mut hover:text-amber2"
               >
                 Kalanı Karta
@@ -225,7 +228,7 @@ export function PaymentModal({
                   csh + ps >= total ? 'text-mint' : 'text-red'
                 )}
               >
-                {csh + ps >= total ? `Toplam: ${fmt(csh + ps)}` : `Eksik: ${fmt(total - csh - ps)}`}
+                {csh + ps >= totalD ? `Toplam: ${fmt(toTRY(round2(csh + ps)))}` : `Eksik: ${fmt(toTRY(round2(totalD - csh - ps)))}`}
               </span>
             </div>
           </div>

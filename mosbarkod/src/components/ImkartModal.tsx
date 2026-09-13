@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { cn } from '../utils/cn';
 import { Ic } from '../icons';
 import { Modal } from './ui';
-import { fmt } from '../data';
+import { fmt, toTRY } from '../data';
 
 export default function ImkartModal({
   limit,
@@ -81,7 +81,7 @@ export default function ImkartModal({
           İptal
         </button>
         <button
-          onClick={() => valid && onConfirm(amt, via, cardNo.trim())}
+          onClick={() => valid && onConfirm(toTRY(amt), via, cardNo.trim())}
           disabled={!valid}
           className="rounded-xl bg-blue px-3 py-3 text-[13px] font-bold text-[#04121f] transition-all hover:brightness-110 disabled:pointer-events-none disabled:opacity-40"
         >

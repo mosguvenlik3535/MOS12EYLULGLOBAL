@@ -3,7 +3,7 @@ import { cn } from '../utils/cn';
 import { Ic } from '../icons';
 import { Badge, Btn, Confirm, Field, Inp, Modal, Sel, Stat } from '../components/ui';
 import { ProLockedPanel } from '../components/ProGate';
-import { USERS, USER_THEMES, dstr, fmt, round2, tstr, uid, type Staff } from '../data';
+import { USERS, USER_THEMES, dstr, fmt, fromTRY, round2, toTRY, tstr, uid, type Staff } from '../data';
 
 type Toast = (msg: string, type?: 'ok' | 'err') => void;
 
@@ -215,7 +215,7 @@ export default function StaffScreen({
   const avansThisMonth = staff.reduce((a, s) => a + monthPaid(s, 'avans'), 0);
 
   const doAdd = () => {
-    const sal = Number(form.salary.replace(',', '.'));
+    const sal = toTRY(Number(form.salary.replace(',', '.')));
     if (!form.name.trim() || !sal || sal <= 0) {
       toast('Ad ve geçerli maaş zorunludur', 'err');
       return;
@@ -298,7 +298,7 @@ export default function StaffScreen({
                   <button
                     onClick={() => {
                       setEditing(s);
-                      setEditForm({ name: s.name, role: s.role, phone: s.phone, salary: String(s.salary) });
+                      setEditForm({ name: s.name, role: s.role, phone: s.phone, salary: String(fromTRY(s.salary)) });
                     }}
                     className="ml-auto rounded-md border border-line2 p-1.5 text-mut2 transition-colors hover:border-amber/50 hover:text-amber2"
                     title="Personeli / maaşı düzenle"
@@ -401,7 +401,7 @@ export default function StaffScreen({
               <Btn
                 v="primary"
                 onClick={() => {
-                  const sal = Number(editForm.salary.replace(',', '.'));
+                  const sal = toTRY(Number(editForm.salary.replace(',', '.')));
                   if (!editForm.name.trim() || !sal || sal <= 0) {
                     toast('Ad ve geçerli maaş zorunludur', 'err');
                     return;
@@ -497,19 +497,19 @@ function PayModal({
   const avans = monthPaid(s, 'avans');
   const kalan = round2(s.salary - round2(maas + avans));
   const [tab, setTab] = useState<'tam' | 'kismi' | 'avans'>('tam');
-  const [amt, setAmt] = useState(kalan > 0 ? String(kalan) : '');
+  const [amt, setAmt] = useState(kalan > 0 ? String(fromTRY(kalan)) : '');
   const [note, setNote] = useState('');
 
   const pick = (t: 'tam' | 'kismi' | 'avans') => {
     setTab(t);
-    if (t === 'tam') setAmt(String(Math.max(0, kalan)));
-    else if (t === 'kismi') setAmt(kalan > 0 ? String(Math.round(kalan / 2 * 100) / 100) : '');
+    if (t === 'tam') setAmt(String(fromTRY(Math.max(0, kalan))));
+    else if (t === 'kismi') setAmt(kalan > 0 ? String(fromTRY(kalan / 2)) : '');
     else setAmt('');
   };
 
   const a = Number(amt.replace(',', '.')) || 0;
   const maxA = tab === 'avans' ? s.salary : kalan;
-  const valid = a > 0 && a <= maxA + 0.009;
+  const valid = a > 0 && toTRY(a) <= maxA + 0.009;
 
   return (
     <Modal
@@ -522,7 +522,7 @@ function PayModal({
           <Btn v="ghost" onClick={onClose}>
             Vazgeç
           </Btn>
-          <Btn v="mint" disabled={!valid} onClick={() => onPay(a, tab === 'avans' ? 'avans' : 'maas', note.trim())}>
+          <Btn v="mint" disabled={!valid} onClick={() => onPay(toTRY(a), tab === 'avans' ? 'avans' : 'maas', note.trim())}>
             <Ic n="check" c="h-4 w-4" /> Ödemeyi Kaydet
           </Btn>
         </>

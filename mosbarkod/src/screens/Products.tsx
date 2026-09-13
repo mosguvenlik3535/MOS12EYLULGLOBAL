@@ -7,7 +7,7 @@ import CameraScanner from '../components/CameraScanner';
 import LabelStudioModal from '../components/LabelStudioModal';
 import StockImportModal from '../components/StockImportModal';
 import Barcode from '../components/Barcode';
-import { CATEGORIES, dstr, fmt, fmtN, tstr, uid, type Product, type Sale, type Settings, type StockCountSession } from '../data';
+import { CATEGORIES, dstr, fmt, fmtN, fromTRY, toTRY, tstr, uid, type Product, type Sale, type Settings, type StockCountSession } from '../data';
 import { fetchProductByBarcode, generateEan13, searchProductsByName, type AiProductMeta } from '../lib/productAi';
 import { fileToDataUrl } from '../lib/image';
 import { analyzeStock, ABC_META, type AbcClass } from '../lib/stockIntel';
@@ -161,11 +161,11 @@ export default function Products({
       category: form.category,
       unit: form.isWeight ? 'kg' : form.unit,
       stock: Number(form.stock) || 0,
-      cost: Number(form.cost) || 0,
-      p1,
-      p2: Number(form.p2) || 0,
-      p3: Number(form.p3) || 0,
-      installment: Number(form.installment) > 0 ? Number(form.installment) : undefined,
+      cost: toTRY(Number(form.cost) || 0),
+      p1: toTRY(p1),
+      p2: toTRY(Number(form.p2) || 0),
+      p3: toTRY(Number(form.p3) || 0),
+      installment: toTRY(Number(form.installment)) > 0 ? toTRY(Number(form.installment)) : undefined,
       expiry: form.expiry || undefined,
       critical: Number(form.critical) || 0,
       image: form.image.trim() || undefined,
@@ -188,11 +188,11 @@ export default function Products({
       category: p.category,
       unit: p.unit,
       stock: String(p.stock),
-      cost: String(p.cost || 0),
-      p1: String(p.p1),
-      p2: String(p.p2),
-      p3: String(p.p3),
-      installment: p.installment ? String(p.installment) : '',
+      cost: String(fromTRY(p.cost || 0)),
+      p1: String(fromTRY(p.p1)),
+      p2: String(fromTRY(p.p2)),
+      p3: String(fromTRY(p.p3)),
+      installment: p.installment ? String(fromTRY(p.installment)) : '',
       expiry: p.expiry ?? '',
       critical: String(p.critical),
       image: p.image ?? '',

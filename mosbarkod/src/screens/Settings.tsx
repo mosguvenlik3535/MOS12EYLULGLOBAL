@@ -14,6 +14,10 @@ import { useLocale } from '../locales/i18n';
 import { LOCALES } from '../locales/i18n';
 import Flag from '../components/Flag';
 import { IS_DEMO, IS_PLAY, appVersionLabel } from '../lib/buildMode';
+import { fxRate, fxUpdatedAt, isFxStale, refreshFxForce, refreshFxIfStale } from '../lib/fx';
+
+/** Kur gösterim biçimi: 1'in üstü 2, altı 4 ondalık. */
+const fmtFxRate = (r: number) => (r >= 1 ? r.toFixed(2) : r.toFixed(4));
 
 
 type Toast = (msg: string, type?: 'ok' | 'err') => void;
@@ -933,6 +937,7 @@ export default function SettingsScreen({
                     onClick={() => {
                       onPatch({ currency: { active: cur.code, currencies: DEFAULT_CURRENCIES } });
                       setActiveCurrencyCode(cur.code);
+                      void refreshFxIfStale();
                       toast(`Aktif para birimi güncellendi: ${cur.name}`);
                     }}
                     className={cn(
@@ -948,6 +953,9 @@ export default function SettingsScreen({
                       <div className="text-[10px] text-mut2 font-mono">
                         Konum: {cur.position === 'left' ? 'Sol ($10)' : 'Sağ (10 ₺)'}
                       </div>
+                      {cur.code !== 'TRY' && (
+                        <div className="font-mono text-[10px] font-bold text-mint">1 ₺ = {fmtFxRate(fxRate(cur.code))} {cur.symbol}</div>
+                      )}
                     </div>
                     {isActive && <Ic n="check" c="h-4 w-4 text-amber2 shrink-0" />}
                   </button>
@@ -958,8 +966,38 @@ export default function SettingsScreen({
             <div className="mt-4 rounded-xl border border-line bg-ink/40 p-3.5 space-y-2 text-xs text-mut2 leading-relaxed">
               <div className="font-bold text-txt">💡 Global Para Birimi Özelliği:</div>
               <p>
-                Para birimi değiştiğinde tüm satış ekranı, müşteri ekranı (CFD), raf etiketleri, fatura hesaplamaları ve Z raporları anında yeni para birimi sembolüyle biçimlendirilir.
+                Para birimi değiştiğinde tüm satış ekranı, müşteri ekranı (CFD), raf etiketleri, fatura hesaplamaları ve Z raporları anında yeni para birimiyle gösterilir.
+                Tutarlar TL bazında saklanır, ekranda günlük kurla çevrilir; tutar girişleri seçili birimden yapılır.
               </p>
+            </div>
+          </Panel>
+          <Panel icon="globe" title="Günlük Döviz Kurları" color="text-mint" desc="Kurlar günde bir otomatik alınır; çevrimdışıyken son alınan kurlar kullanılır.">
+            <div className="grid gap-1.5 sm:grid-cols-2">
+              {DEFAULT_CURRENCIES.filter((c) => c.code !== 'TRY').map((c) => (
+                <div key={c.code} className="flex items-center justify-between rounded-lg border border-line2 bg-panel2/50 px-3 py-2">
+                  <span className="font-mono text-[11px] font-bold text-txt">
+                    {c.code} <span className="text-mut2">{c.symbol}</span>
+                  </span>
+                  <span className="font-mono text-[11px] text-mint">1 ₺ = {fmtFxRate(fxRate(c.code))}</span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-2.5 flex flex-wrap items-center gap-2">
+              <span className="font-mono text-[10.5px] text-mut2">
+                Son güncelleme: {fxUpdatedAt() ? new Date(fxUpdatedAt()).toLocaleString('tr-TR') : 'henüz alınmadı'}
+                {fxUpdatedAt() && isFxStale() ? ' (eski)' : ''}
+              </span>
+              <Btn
+                v="ghost"
+                className="ml-auto"
+                onClick={() => {
+                  void refreshFxForce().then((r) =>
+                    toast(r === 'updated' ? 'Döviz kurları güncellendi' : 'Kurlar alınamadı — çevrimdışı, son kurlar kullanılıyor')
+                  );
+                }}
+              >
+                <Ic n="reset" c="h-4 w-4" /> Kurları Güncelle
+              </Btn>
             </div>
           </Panel>
         </SettingsModal>

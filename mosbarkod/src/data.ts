@@ -1,4 +1,5 @@
 import { appVersionLabel } from './lib/buildMode';
+import { fxRate as _fxRate, initFx } from './lib/fx';
 
 export type PriceMode = 'f1' | 'f2' | 'f3' | 'kkart' | 'taksit';
 export type PayMethod = 'nakit' | 'kart' | 'nakit+pos' | 'veresiye';
@@ -694,10 +695,25 @@ export const round2 = (n: number) => Math.round(n * 100) / 100;
 export const fmt = (n: number, currencyCodeOverride?: string) => {
   const code = currencyCodeOverride || _activeCurrencyCode || 'TRY';
   const cur = DEFAULT_CURRENCIES.find((c) => c.code === code) ?? DEFAULT_CURRENCIES[0];
+  // Tüm tutarlar TL bazında saklanır; gösterim aktif birime çevrilir (tutar × kur).
+  const converted = n * _fxRate(code);
   const dec = cur.decimals ?? 2;
-  const numStr = n.toLocaleString('tr-TR', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+  const numStr = converted.toLocaleString('tr-TR', { minimumFractionDigits: dec, maximumFractionDigits: dec });
   return cur.position === 'left' ? `${cur.symbol} ${numStr}` : `${numStr} ${cur.symbol}`;
 };
+
+/** Kullanıcının yazdığı tutarı (aktif birim) kayıt birimine (TL) çevirir. */
+export const toTRY = (n: number, code: string = _activeCurrencyCode) => {
+  const r = _fxRate(code);
+  return round2(r > 0 ? n / r : n);
+};
+
+/** Kayıtlı TL tutarı aktif birimde gösterir (girdi ön-doldurmaları için). */
+export const fromTRY = (n: number, code: string = _activeCurrencyCode) => round2(n * _fxRate(code));
+
+/** Aktif para biriminin sembolü (girdi yer tutucuları için). */
+export const activeSymbol = (code: string = _activeCurrencyCode) =>
+  DEFAULT_CURRENCIES.find((c) => c.code === code)?.symbol ?? '₺';
 
 export const fmtN = (n: number) =>
   n.toLocaleString('tr-TR', { minimumFractionDigits: 0, maximumFractionDigits: 1 });
@@ -1255,6 +1271,7 @@ export function loadState(): AppState {
         if (merged.settings.currency?.active) {
           setActiveCurrencyCode(merged.settings.currency.active);
         }
+        initFx();
         if (merged.settings.pins?.u1 === '1588') {
           merged.settings.pins.u1 = '0000';
         }

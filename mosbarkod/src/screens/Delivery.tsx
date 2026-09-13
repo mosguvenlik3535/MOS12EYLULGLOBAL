@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { cn } from '../utils/cn';
 import { Ic } from '../icons';
 import { Btn, Empty, Field, Inp, ScreenHead, Sel } from '../components/ui';
-import { fmt, lineNet, uid, type CartLine, type DeliveryOrder, type Product, type Settings, type Staff } from '../data';
+import { fmt, lineNet, toTRY, uid, type CartLine, type DeliveryOrder, type Product, type Settings, type Staff } from '../data';
 import { waLink } from '../lib/report';
 
 type Toast = (msg: string, type?: 'ok' | 'err') => void;
@@ -101,9 +101,9 @@ export default function DeliveryScreen({
   }));
 
   const subtotal = useMemo(() => items.reduce((a, i) => a + lineNet(i), 0), [items]);
-  const fee = Number(deliveryFee.replace(',', '.')) || 0;
+  const fee = toTRY(Number(deliveryFee.replace(',', '.')) || 0);
   const total = subtotal + fee;
-  const cash = payMethod === 'nakit' ? total : payMethod === 'kart' ? 0 : Number(cashPart.replace(',', '.')) || 0;
+  const cash = payMethod === 'nakit' ? total : payMethod === 'kart' ? 0 : toTRY(Number(cashPart.replace(',', '.')) || 0);
   const pos = payMethod === 'kart' ? total : payMethod === 'nakit' ? 0 : Math.max(0, total - cash);
 
   const create = () => {

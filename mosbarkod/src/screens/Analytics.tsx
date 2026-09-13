@@ -14,10 +14,13 @@ import {
   fmt,
   fmtN,
   isToday,
+  fromTRY,
   moduleEnabled,
   round2,
+  toTRY,
   todayKey,
   tstr,
+  activeSymbol,
   type AppState,
   type Settings,
 } from '../data';
@@ -318,7 +321,7 @@ export default function AnalyticsScreen({
   const [imBulk, setImBulk] = useState('');
   const [imVia, setImVia] = useState<'nakit' | 'pos'>('nakit');
   const [bills, setBills] = useState<Record<number, string>>({});
-  const [opening, setOpening] = useState(String(state.settings.openingCash));
+  const [opening, setOpening] = useState(String(fromTRY(state.settings.openingCash)));
   const [kpi, setKpi] = useState(loadKpi);
   const [cfgOpen, setCfgOpen] = useState<CardId | null>(null);
   const [refundSale, setRefundSale] = useState<AppState['sales'][number] | null>(null);
@@ -688,7 +691,7 @@ export default function AnalyticsScreen({
                     <Inp type="number" value={opening} onChange={(e) => setOpening(e.target.value)} className="pr-7 text-center font-mono font-bold" />
                     <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 font-mono text-[11px] text-mut2">₺</span>
                   </div>
-                  <Btn v="mint" className="shrink-0 px-2.5 py-2" onClick={() => { onPatch({ openingCash: Number(opening) || 0 }); toast('Açılış nakdi kaydedildi'); }}>
+                  <Btn v="mint" className="shrink-0 px-2.5 py-2" onClick={() => { onPatch({ openingCash: toTRY(Number(opening) || 0) }); toast('Açılış nakdi kaydedildi'); }}>
                     <Ic n="check" c="h-4 w-4" />
                   </Btn>
                 </div>
@@ -760,7 +763,7 @@ export default function AnalyticsScreen({
                 onClick={() => {
                   const a = Number(d.v.replace(',', '.'));
                   if (!a || a <= 0) return toast('Slip tutarı girin', 'err');
-                  onPosClose(d.n as 1 | 2, a);
+                  onPosClose(d.n as 1 | 2, toTRY(a));
                   d.set('');
                 }}
               >
@@ -787,7 +790,7 @@ export default function AnalyticsScreen({
           </p>
           <div className="flex flex-wrap items-end gap-2">
             <Field label="Günlük Toplam Satılan Dolum Tutarı (₺)" className="min-w-[180px] flex-1">
-              <Inp type="number" value={imBulk} onChange={(e) => setImBulk(e.target.value)} placeholder="₺ 0,00" className="font-mono" />
+              <Inp type="number" value={imBulk} onChange={(e) => setImBulk(e.target.value)} placeholder={`${activeSymbol()} 0,00`} className="font-mono" />
             </Field>
             <div className="flex gap-1 rounded-lg border border-line2 bg-ink/50 p-1">
               {(['nakit', 'pos'] as const).map((m) => (
@@ -806,7 +809,7 @@ export default function AnalyticsScreen({
               onClick={() => {
                 const a = Number(imBulk.replace(',', '.'));
                 if (!a || a <= 0) return toast('Dolum tutarı girin', 'err');
-                onImkartBulk(a, imVia);
+                onImkartBulk(toTRY(a), imVia);
                 setImBulk('');
               }}
             >
@@ -1340,7 +1343,7 @@ function CashMoveModal({
             onClick={() => {
               const a = Number(amount.replace(',', '.'));
               if (!a || a <= 0) return toast('Tutar girin', 'err');
-              onSubmit(dir, a, label.trim() || (dir === 'in' ? 'Kasaya nakit girişi' : 'Kasadan nakit çıkışı'));
+              onSubmit(dir, toTRY(a), label.trim() || (dir === 'in' ? 'Kasaya nakit girişi' : 'Kasadan nakit çıkışı'));
               onClose();
             }}
           >
