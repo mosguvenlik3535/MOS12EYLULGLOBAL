@@ -548,7 +548,7 @@ export default function AiVisionModal({
             )}
 
             {error && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/85 p-6 text-center text-red">
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 overflow-y-auto bg-black/85 p-4 text-center text-red sm:p-6">
                 <Ic n="alert" c="mb-2 h-10 w-10" />
                 <p className="max-w-sm text-xs">{error}</p>
                 <CameraPermissionHint />

@@ -1318,48 +1318,11 @@ export default function Pos(props: PosProps) {
 
   const cartCount = props.cart.length;
 
-  if (isMobile) {
-    const tabs: { id: PanelId; label: string; icon: string }[] = [
-      { id: 'browser', label: 'Ürünler', icon: 'box' },
-      { id: 'cart', label: cartCount > 0 ? `Kasa (${cartCount})` : 'Kasa', icon: 'cart' },
-      { id: 'extras', label: 'Yan Panel', icon: 'plus' },
-    ];
-    return (
-      <div className="flex h-full flex-col gap-2">
-        <div className="flex shrink-0 gap-1 rounded-xl border border-line bg-panel p-1">
-          {tabs.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => setMTab(t.id)}
-              className={cn(
-                'flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-[12px] font-semibold transition-colors',
-                mTab === t.id ? 'bg-amber text-[#1a1102]' : 'text-mut active:bg-panel3'
-              )}
-            >
-              <Ic n={t.icon} c="h-4 w-4" />
-              {t.label}
-            </button>
-          ))}
-        </div>
-        <div className="min-h-0 flex-1">{render(mTab, { mobile: true })}</div>
-        {wSel && (
-          <WeightModal
-            p={wSel}
-            price={priceOf(wSel, props.priceMode, props.settings)}
-            onClose={() => setWSel(null)}
-            onConfirm={(wt) => {
-              props.addWeight(wSel, wt);
-              setWSel(null);
-            }}
-          />
-        )}
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex h-full gap-3">
-      {order.map((id) => render(id))}
+  /* Ortak modallar: hem mobil hem masaüstü dalında render edilir.
+     (Daha önce AI Vision ve CFD yalnızca masaüstünde render ediliyordu;
+     mobilde butonlara basınca hiçbir şey açılmıyordu.) */
+  const sharedModals = (
+    <>
       {wSel && (
         <WeightModal
           p={wSel}
@@ -1389,6 +1352,43 @@ export default function Pos(props: PosProps) {
           </div>
         </div>
       )}
+    </>
+  );
+
+  if (isMobile) {
+    const tabs: { id: PanelId; label: string; icon: string }[] = [
+      { id: 'browser', label: 'Ürünler', icon: 'box' },
+      { id: 'cart', label: cartCount > 0 ? `Kasa (${cartCount})` : 'Kasa', icon: 'cart' },
+      { id: 'extras', label: 'Yan Panel', icon: 'plus' },
+    ];
+    return (
+      <div className="flex h-full flex-col gap-2">
+        <div className="flex shrink-0 gap-1 rounded-xl border border-line bg-panel p-1">
+          {tabs.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setMTab(t.id)}
+              className={cn(
+                'flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-[12px] font-semibold transition-colors',
+                mTab === t.id ? 'bg-amber text-[#1a1102]' : 'text-mut active:bg-panel3'
+              )}
+            >
+              <Ic n={t.icon} c="h-4 w-4" />
+              {t.label}
+            </button>
+          ))}
+        </div>
+        <div className="min-h-0 flex-1">{render(mTab, { mobile: true })}</div>
+        {/* Tartı + AI Vision + müşteri ekranı: mobil ve masaüstünde ortak (drift önlenir) */}
+        {sharedModals}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-full gap-3">
+      {order.map((id) => render(id))}
+      {sharedModals}
     </div>
   );
 }
