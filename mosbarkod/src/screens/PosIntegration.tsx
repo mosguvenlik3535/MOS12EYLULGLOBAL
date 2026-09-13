@@ -199,24 +199,18 @@ export default function PosIntegrationScreen({
 
           <div className="mt-4 rounded-lg border border-amber/30 bg-amber/10 p-3 space-y-2">
             <div className="flex items-center justify-center gap-2 text-amber2">
-              <Ic n="phone" c="h-4 w-4" />
+              <Ic n="mail" c="h-4 w-4" />
               <span className="font-mono text-[11px] font-bold uppercase tracking-widest">Lisans Anahtarı & Destek</span>
             </div>
             <div>
               <a
-                href="tel:+905554066143"
-                className="block text-center font-mono text-[17px] font-extrabold tracking-[0.12em] text-amber2 transition-colors hover:text-amber"
-              >
-                00 90 555 406 61 43
-              </a>
-              <a
                 href="mailto:m.ortayayla@gmail.com"
-                className="mt-1 block text-center font-mono text-[13px] font-bold text-blue hover:underline"
+                className="block text-center font-mono text-[15px] font-extrabold tracking-[0.06em] text-amber2 transition-colors hover:text-amber hover:underline"
               >
                 m.ortayayla@gmail.com
               </a>
             </div>
-            <div className="text-center text-[9.5px] text-mut2">Lisans anahtarı ve destek için arayınız veya e-posta gönderiniz</div>
+            <div className="text-center text-[9.5px] text-mut2">Lisans anahtarı ve destek için e-posta gönderiniz</div>
           </div>
 
           <p className="mt-3 text-[9px] italic leading-relaxed text-mut2">

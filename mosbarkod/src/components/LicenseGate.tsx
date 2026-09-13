@@ -158,12 +158,6 @@ export default function LicenseGate({
             </span>
           </div>
           <div className="flex justify-between gap-3">
-            <span className="text-mut2">Destek Hattı:</span>
-            <a href="tel:+905554066143" className="font-bold text-amber2 hover:underline">
-              00 90 555 406 61 43
-            </a>
-          </div>
-          <div className="flex justify-between gap-3">
             <span className="text-mut2">Destek E-Posta:</span>
             <a href="mailto:m.ortayayla@gmail.com" className="font-bold text-amber2 hover:underline">
               m.ortayayla@gmail.com
