@@ -130,8 +130,8 @@ export default function LicenseGate({
         {/* Logo */}
         <div className="amber-license-glow mx-auto flex h-36 w-40 flex-col items-center justify-center rounded-2xl border border-amber/40 bg-ink/90">
           <div className="w-[112px] rounded-b-[34px] border-2 border-amber/80 px-2 pb-4 pt-3">
-            <div className="font-mono text-[17px] font-extrabold tracking-[0.12em] text-amber2">MEHMET</div>
-            <div className="mt-1 font-mono text-[6px] tracking-[0.35em] text-white/65">ORTAYAYLA</div>
+            <div className="font-mono text-[17px] font-extrabold tracking-[0.12em] text-amber2">MOS</div>
+            <div className="mt-1 font-mono text-[6px] tracking-[0.35em] text-white/65">BARKOD</div>
           </div>
           <div className="mt-4 font-mono text-[9px] tracking-[0.24em] text-white/60">
             {demo ? 'DEMO SÜRÜM' : 'LİSANSLI YAZILIM'}

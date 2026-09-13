@@ -1049,18 +1049,19 @@ export const defaultUI = () => ({
 });
 
 export const defaultSettings = (): Settings => ({
+  /* Taze kurulumda kişisel/örnek bilgi yer almaz — işletme Ayarlar'dan kendi bilgilerini girer. */
   storeName: 'MOSBARKODYAZILIM',
-  address: 'MOSB Sanayi Mah. 7502 Sk. No:41 Sincan / Ankara',
-  phone: '0312 555 07 07',
-  taxOffice: 'Sincan Vergi Dairesi',
-  taxNo: '3880456123',
+  address: '',
+  phone: '',
+  taxOffice: '',
+  taxNo: '',
   brandTitle: 'MOSBARKODYAZILIM',
   logoIcon: 'flame',
   customerLogo: '',
   receiptHeader: 'MOSBARKODYAZILIM - HOŞGELDİNİZ',
   receiptFooter: 'Bizi Tercih Ettiğiniz İçin Teşekkür Ederiz!',
   autoShowReceipt: true,
-  waPhone: '00 90 555 406 61 43',
+  waPhone: '',
   waDebtTemplate:
     'Merhaba [MUSTERI_ADI], MOSBARKODYAZILIM veresiye defterindeki güncel borç bakiyeniz [BORC_TUTARI] dir. İyi çalışmalar dileriz.',
   openingCash: 0,
@@ -1073,20 +1074,20 @@ export const defaultSettings = (): Settings => ({
     enabled: true,
     promoText: 'MOSBARKODYAZILIM POS — Hoş Geldiniz! / Günün Fırsatı: Tüm Atıştırmalıklarda %10 İndirim',
     showQr: true,
-    qrData: 'https://wa.me/905554066143',
+    qrData: '',
   },
   sound: { enabled: true, volume: 70, preset: 'posOnay' },
   autobackup: {
     enabled: true,
     interval: 5,
-    folder: 'C:\\Users\\mosgu\\Documents\\MOSBARKOD_Yedekler',
+    folder: '',
     keepDays: 7,
     lastRun: null,
   },
   modules: { imkart: true, delivery: true },
   report: {
     enabled: false,
-    ownerPhone: '00 90 555 406 61 43',
+    ownerPhone: '',
     closeTime: '22:00',
     sendTime: '22:10',
     provider: 'meta',

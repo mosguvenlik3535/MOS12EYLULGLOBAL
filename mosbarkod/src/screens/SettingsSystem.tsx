@@ -401,7 +401,7 @@ export function AutoBackupCard({
         </Field>
         <Field label="Yedek Klasörü (.exe)" className="sm:col-span-2">
           <div className="flex gap-1.5">
-            <Inp value={cfg.folder} onChange={(e) => onPatch({ autobackup: { ...cfg, folder: e.target.value } })} className="font-mono text-[11.5px]" />
+            <Inp value={cfg.folder} onChange={(e) => onPatch({ autobackup: { ...cfg, folder: e.target.value } })} className="font-mono text-[11.5px]" placeholder="Örn: C:\MOSBARKOD_Yedekler" />
             <Btn v="subtle" className="flex-none px-2.5" onClick={() => dirRef.current?.click()} title="Klasör seç">
               <Ic n="folder" c="h-3.5 w-3.5" />
             </Btn>

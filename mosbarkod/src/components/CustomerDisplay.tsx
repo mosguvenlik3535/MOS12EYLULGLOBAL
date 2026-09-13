@@ -68,7 +68,7 @@ export function CustomerDisplay({
       total: 0,
       promoText: 'MOSBARKODYAZILIM — Hoş Geldiniz! Kaliteli Hizmet, Güvenli Alışveriş.',
       showQr: true,
-      qrData: 'https://wa.me/905554066143',
+      qrData: '',
     };
   });
 
