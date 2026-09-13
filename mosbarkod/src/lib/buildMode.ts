@@ -14,7 +14,7 @@ export const IS_DEMO = (import.meta.env.VITE_DEMO ?? '') === '1';
 export const IS_PLAY = (import.meta.env.VITE_PLAY ?? '') === '1';
 
 /** Demo sürümde izin verilen azami tamamlanmış satış sayısı. */
-export const DEMO_MAX_SALES = 50;
+export const DEMO_MAX_SALES = 25;
 
 export const DEMO_LABEL = 'DEMO SÜRÜM';
 

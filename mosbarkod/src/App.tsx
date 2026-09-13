@@ -172,6 +172,7 @@ export default function App() {
   const [pro, setPro] = useState(false);
   const [proOpen, setProOpen] = useState(false);
   const [demo, setDemo] = useState(IS_DEMO);
+  const [demoBaseline, setDemoBaseline] = useState(0);
   const [demoExpired, setDemoExpired] = useState(false);
   const [locale, setLocaleState] = useState<Locale>(() => loadLocale());
 
@@ -267,6 +268,7 @@ export default function App() {
         /* yoksay */
       }
     }
+    setDemoBaseline(baseline);
     if (state.sales.length - baseline >= DEMO_MAX_SALES) {
       setDemoExpired(true);
     }
@@ -1503,7 +1505,7 @@ export default function App() {
 
       {demo && !demoExpired && (
         <div className="pointer-events-none fixed left-1/2 top-[70px] z-[80] -translate-x-1/2 rounded-full border border-amber/50 bg-amber/90 px-3 py-1 font-mono text-[10px] font-black tracking-[0.2em] text-black shadow-lg">
-          DEMO SÜRÜM
+          DEMO SÜRÜM · {Math.max(0, DEMO_MAX_SALES - Math.max(0, state.sales.length - demoBaseline))} SATIŞ KALDI
         </div>
       )}
       {IS_PLAY && !licensed && !pro && (
