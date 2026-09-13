@@ -88,6 +88,8 @@ export default function Products({
   stockCounts,
   onApplyCount,
   toast,
+  proLocked = false,
+  onRequirePro,
 }: {
   products: Product[];
   sales: Sale[];
@@ -99,6 +101,8 @@ export default function Products({
   stockCounts: StockCountSession[];
   onApplyCount: (counts: Record<string, string>) => void;
   toast: Toast;
+  proLocked?: boolean;
+  onRequirePro?: () => void;
 }) {
   const [query, setQuery] = useState('');
   const [cat, setCat] = useState('Tüm Kategoriler');
@@ -391,28 +395,28 @@ export default function Products({
         <div className="ml-auto grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
           <Btn
             v="ghost"
-            onClick={() => setLabelStudioOpen(true)}
+            onClick={() => (proLocked ? onRequirePro?.() : setLabelStudioOpen(true))}
             className="border-amber/40 bg-amber/10 text-amber2 hover:bg-amber/20"
-            title="Raf Etiketleri ve Barkod Basım Stüdyosu"
+            title={proLocked ? 'PRO — Raf Etiketleri ve Barkod Basım Stüdyosu' : 'Raf Etiketleri ve Barkod Basım Stüdyosu'}
           >
-            <Ic n="print" c="h-4 w-4" /> Raf Etiketi & Barkod
+            <Ic n="print" c="h-4 w-4" /> Raf Etiketi & Barkod{proLocked && <Ic n="lock" c="h-3 w-3" />}
           </Btn>
           <Btn v="ghost" onClick={exportXlsx} title="Gerçek .xlsx dosyası indirir">
             <Ic n="download" c="h-4 w-4" /> Excel Dışarı Aktar
           </Btn>
-          <Btn v="ghost" onClick={() => setImportOpen(true)} title="Desteklenenler: .xlsx, .xls, .csv, .txt — farklı program formatlarını eşler">
-            <Ic n="file" c="h-4 w-4" /> Excel İçe Aktar
+          <Btn v="ghost" onClick={() => (proLocked ? onRequirePro?.() : setImportOpen(true))} title={proLocked ? 'PRO — Excel ile toplu ürün içe aktarma' : 'Desteklenenler: .xlsx, .xls, .csv, .txt — farklı program formatlarını eşler'}>
+            <Ic n="file" c="h-4 w-4" /> Excel İçe Aktar{proLocked && <Ic n="lock" c="h-3 w-3" />}
           </Btn>
           <Btn v="ghost" onClick={() => setCountOpen(true)}>
             <Ic n="reset" c="h-4 w-4" /> Stok Sayımı Yap
           </Btn>
           <Btn
             v="ghost"
-            onClick={() => setIntelOpen(true)}
+            onClick={() => (proLocked ? onRequirePro?.() : setIntelOpen(true))}
             className="border-mint/40 bg-mint/5 text-mint hover:bg-mint/10"
-            title="ABC analizi, satış hızı ve stok ömrü kestirimi"
+            title={proLocked ? 'PRO — Stok Zekâsı (ABC analizi)' : 'ABC analizi, satış hızı ve stok ömrü kestirimi'}
           >
-            <Ic n="sparkles" c="h-4 w-4" /> Stok Zekâsı
+            <Ic n="sparkles" c="h-4 w-4" /> Stok Zekâsı{proLocked && <Ic n="lock" c="h-3 w-3" />}
           </Btn>
           <Btn v="ghost" onClick={() => setZamOpen(true)}>
             <Ic n="trend" c="h-4 w-4" /> Kategoriye Zam Yap

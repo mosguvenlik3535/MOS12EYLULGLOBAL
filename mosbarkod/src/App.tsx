@@ -171,6 +171,9 @@ export default function App() {
   const [licensed, setLicensed] = useState(() => IS_DEMO || Boolean(getStoredLicense()));
   const [pro, setPro] = useState(false);
   const [proOpen, setProOpen] = useState(false);
+  // Play ücretsiz katman kilidi: yalnızca Play derlemesinde, lisanssız ve PRO'suzken true.
+  const proLocked = IS_PLAY && !licensed && !pro;
+  const requirePro = () => setProOpen(true);
   const [demo, setDemo] = useState(IS_DEMO);
   const [demoBaseline, setDemoBaseline] = useState(0);
   const [demoExpired, setDemoExpired] = useState(false);
@@ -1271,6 +1274,8 @@ export default function App() {
         syncCode={sync.code}
         register={register}
         setRegister={setRegister}
+        proLocked={proLocked}
+        onRequirePro={requirePro}
         currentUser={user}
         setUser={(id) => {
           if (id === user) return;
@@ -1335,6 +1340,8 @@ export default function App() {
               scanFx={scanFx}
               fireScan={fireScan}
               sales={state.sales}
+              proLocked={proLocked}
+              onRequirePro={requirePro}
             />
           ) : view === 'delivery' ? (
             <DeliveryScreen
@@ -1373,6 +1380,8 @@ export default function App() {
               stockCounts={state.stockCounts}
               onApplyCount={applyStockCount}
               toast={toast}
+              proLocked={proLocked}
+              onRequirePro={requirePro}
             />
           ) : view === 'purchase' ? (
             <PurchaseScreen
@@ -1405,6 +1414,8 @@ export default function App() {
               onPinsChange={(pins) => patchSettings({ pins })}
               isAdmin={isAdmin}
               toast={toast}
+              proLocked={proLocked}
+              onRequirePro={requirePro}
             />
           ) : view === 'cash' ? (
             <AnalyticsScreen
@@ -1416,6 +1427,8 @@ export default function App() {
               onRefund={applyRefund}
               isAdmin={isAdmin}
               toast={toast}
+              proLocked={proLocked}
+              onRequirePro={requirePro}
             />
           ) : (
             <SettingsScreen
@@ -1430,6 +1443,8 @@ export default function App() {
               onJoinHostSync={joinHostSync}
               onStopSync={stopSyncNow}
               toast={toast}
+              proLocked={proLocked}
+              onRequirePro={requirePro}
             />
           )}
           </ErrorBoundary>

@@ -11,6 +11,7 @@ const FEATURES = [
   'Tüm raporlar, analizler ve stok zekâsı',
   'Çoklu kasa ve personel yönetimi',
   'Raf etiketi ve barkod yazdırma',
+  'Excel ile toplu ürün içe aktarma',
 ];
 
 export default function ProUpsellModal({

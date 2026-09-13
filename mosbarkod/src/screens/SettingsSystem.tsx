@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { cn } from '../utils/cn';
 import { Ic } from '../icons';
 import { Btn, Confirm, Field, Inp, Sel } from '../components/ui';
+import { ProLockedMini } from '../components/ProGate';
 import { THEMES } from '../lib/themes';
 import { BEEP_PRESETS, playBeep } from '../lib/sounds';
 import { dstr, todayKey, tstr, type AppState, type Settings } from '../data';
@@ -578,17 +579,39 @@ export function CloudBackupCard({
   onPatch,
   onRestore,
   toast,
+  proLocked = false,
+  onRequirePro,
 }: {
   cfg: Settings['cloud'];
   state: AppState;
   onPatch: (p: Partial<Settings>) => void;
   onRestore: (data: AppState) => void;
   toast: Toast;
+  proLocked?: boolean;
+  onRequirePro?: () => void;
 }) {
   const [busy, setBusy] = useState(false);
   const [listing, setListing] = useState(false);
   const [files, setFiles] = useState<CloudFile[]>([]);
   const [restoreFile, setRestoreFile] = useState<CloudFile | null>(null);
+
+  if (proLocked) {
+    return (
+      <Card
+        icon="globe"
+        title="Bulut Yedekleme (Google Drive & Dropbox)"
+        color="text-mint"
+        desc="PRO'ya özeldir — ücretsiz sürümde yerel yedekleme sınırsız çalışır."
+        right={<span className="rounded bg-amber/20 px-2 py-0.5 font-mono text-[9px] font-black text-amber2">PRO</span>}
+      >
+        <ProLockedMini
+          title="Bulut Yedekleme"
+          desc="Yedeklerinizi Google Drive veya Dropbox'a otomatik göndermek için PRO'ya yükseltin."
+          onUpgrade={() => onRequirePro?.()}
+        />
+      </Card>
+    );
+  }
 
   const patch = (p: Partial<Settings['cloud']>) => onPatch({ cloud: { ...cfg, ...p } });
   const provider = cfg.provider ?? 'none';

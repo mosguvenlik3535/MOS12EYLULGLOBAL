@@ -201,6 +201,8 @@ export function TopBar({
   onImkartClick,
   register,
   setRegister,
+  proLocked = false,
+  onRequirePro,
   currentUser,
   setUser,
   go,
@@ -218,6 +220,8 @@ export function TopBar({
   onImkartClick: () => void;
   register: number;
   setRegister: (n: number) => void;
+  proLocked?: boolean;
+  onRequirePro?: () => void;
   currentUser: string;
   setUser: (id: string) => void;
   go: (v: ViewId) => void;
@@ -301,10 +305,15 @@ export function TopBar({
           {[1, 2, 3].map((r) => (
             <button
               key={r}
-              onClick={() => setRegister(r)}
+              onClick={() => (r !== 1 && proLocked ? onRequirePro?.() : setRegister(r))}
+              title={r !== 1 && proLocked ? 'PRO — 2. ve 3. kasa PRO abonelik gerektirir' : `Kasa ${r}`}
               className={cn(
                 'h-7 w-7 rounded-md font-mono text-[12px] font-bold transition-colors',
-                register === r ? 'bg-amber text-[#1a1102]' : 'text-mut hover:bg-panel3 hover:text-txt'
+                r !== 1 && proLocked
+                  ? 'border border-dashed border-amber/60 text-amber2 hover:bg-amber/10'
+                  : register === r
+                    ? 'bg-amber text-[#1a1102]'
+                    : 'text-mut hover:bg-panel3 hover:text-txt'
               )}
             >
               {r}

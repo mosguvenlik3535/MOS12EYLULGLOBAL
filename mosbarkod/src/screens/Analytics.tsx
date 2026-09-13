@@ -4,6 +4,7 @@ import { cn } from '../utils/cn';
 import { Ic } from '../icons';
 import { Btn, Field, Inp, Modal, Td, Th } from '../components/ui';
 import ReportModal from '../components/ReportModal';
+import { ProLockedMini } from '../components/ProGate';
 import DailyBreakdown from './DailyBreakdown';
 import { buildReport } from '../lib/report';
 import {
@@ -292,6 +293,8 @@ export default function AnalyticsScreen({
   onRefund,
   isAdmin = true,
   toast,
+  proLocked = false,
+  onRequirePro,
 }: {
   state: AppState;
   onCashMove: (dir: 'in' | 'out', amount: number, label: string) => void;
@@ -301,6 +304,8 @@ export default function AnalyticsScreen({
   onRefund: (saleId: string, itemsToRefund: Record<string, number>, reason: string, method: 'nakit' | 'kart' | 'veresiye') => void;
   isAdmin?: boolean;
   toast: Toast;
+  proLocked?: boolean;
+  onRequirePro?: () => void;
 }) {
   const [range, setRange] = useState<Range>('today');
   const [cashOpen, setCashOpen] = useState(false);
@@ -611,7 +616,15 @@ export default function AnalyticsScreen({
         </div>
       </div>
 
-      {/* stat cards */}
+            {proLocked ? (
+        <ProLockedMini
+          title="Detaylı Analiz"
+          desc="KPI kartları ile kâr-zarar dökümü PRO'ya özeldir. Kasa işlemleri, satış logları ve gün sonu raporu ücretsizdir."
+          onUpgrade={() => onRequirePro?.()}
+        />
+      ) : (
+        <>
+{/* stat cards */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {kpi.order.map((id, idx) => {
           const ADMIN_ONLY_CARDS: CardId[] = ['netkar', 'anaKasaNakit', 'anaKasaPos', 'aylikNet', 'genelKasa'];
@@ -720,6 +733,8 @@ export default function AnalyticsScreen({
           </div>
         </Modal>
       )}
+        </>
+      )}
 
       {/* POS gün sonu */}
       <section className="mt-3 rounded-xl border border-[#a855f7]/25 bg-panel p-4">
@@ -801,7 +816,15 @@ export default function AnalyticsScreen({
         </section>
       )}
 
-      {/* charts row */}
+            {proLocked ? (
+        <ProLockedMini
+          title="Satış Grafikleri"
+          desc="Ciro ve kâr grafikleri PRO'ya özeldir. Günlük özet için gün sonu raporunu ücretsiz alabilirsiniz."
+          onUpgrade={() => onRequirePro?.()}
+        />
+      ) : (
+        <>
+{/* charts row */}
       <div className="mt-3 grid gap-3 xl:grid-cols-[1.4fr_1fr_1fr]">
         <section className="rounded-xl border border-line bg-panel p-4">
           <h3 className="mb-3 flex items-center gap-1.5 font-mono text-[12px] font-bold uppercase tracking-widest text-mut">
@@ -886,6 +909,8 @@ export default function AnalyticsScreen({
           </div>
         </section>
       </div>
+        </>
+      )}
 
       {/* movements + register/staff */}
       <div className="mt-3 grid gap-3 xl:grid-cols-[1.3fr_1fr]">
@@ -919,7 +944,14 @@ export default function AnalyticsScreen({
           </div>
         </section>
 
-        <section className="rounded-xl border border-line bg-panel p-4">
+        {proLocked ? (
+          <ProLockedMini
+            title="Kasa & Personel Dağılımı"
+            desc="Kasa ve personel bazında satış dağılımı PRO'ya özeldir."
+            onUpgrade={() => onRequirePro?.()}
+          />
+        ) : (
+<section className="rounded-xl border border-line bg-panel p-4">
           <h3 className="mb-3 flex items-center gap-1.5 font-mono text-[12px] font-bold uppercase tracking-widest text-mut">
             <Ic n="users" c="h-3.5 w-3.5 text-amber" /> Kasa & Personel Satış Dağılımı
           </h3>
@@ -938,6 +970,7 @@ export default function AnalyticsScreen({
             ))}
           </div>
         </section>
+        )}
       </div>
 
       {/* günlük satış logları */}

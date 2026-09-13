@@ -700,6 +700,8 @@ export default function SettingsScreen({
   onJoinHostSync,
   onStopSync,
   toast,
+  proLocked = false,
+  onRequirePro,
 }: {
   state: AppState;
   onPatch: (p: Partial<Settings>) => void;
@@ -720,6 +722,8 @@ export default function SettingsScreen({
   onJoinHostSync: (role?: 'admin' | 'order', codeOverride?: string) => void;
   onStopSync: () => void;
   toast: Toast;
+  proLocked?: boolean;
+  onRequirePro?: () => void;
 }) {
   const s = state.settings;
   const { locale, setLocale, t } = useLocale();
@@ -1267,7 +1271,7 @@ export default function SettingsScreen({
       {open === 'backup' && (
         <SettingsModal title="Yedekleme & Sistem Sağlık" icon="download" color="text-blue" onClose={() => setOpen(null)}>
           <AutoBackupCard cfg={s.autobackup} state={state} onPatch={onPatch} onRestore={onRestore} toast={toast} />
-          <CloudBackupCard cfg={s.cloud} state={state} onPatch={onPatch} onRestore={onRestore} toast={toast} />
+          <CloudBackupCard cfg={s.cloud} state={state} onPatch={onPatch} onRestore={onRestore} toast={toast} proLocked={proLocked} onRequirePro={onRequirePro} />
           <HealthCheckCard state={state} toast={toast} />
         </SettingsModal>
       )}

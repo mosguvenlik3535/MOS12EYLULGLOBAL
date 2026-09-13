@@ -56,6 +56,8 @@ interface PosProps {
   scanFx: ScanFx | null;
   fireScan: (p: Product) => void;
   sales: Sale[];
+  proLocked?: boolean;
+  onRequirePro?: () => void;
 }
 
 /* ---------- reorder handle ---------- */
@@ -839,6 +841,7 @@ function ProductBrowser(props: PosProps & { handle: React.ReactNode; onOpenWeigh
             className="flex shrink-0 items-center justify-center gap-1.5 rounded-lg border border-indigo-500/50 bg-indigo-500/15 px-3 text-indigo-300 transition-colors hover:bg-indigo-500/25 shadow-[0_0_12px_rgba(99,102,241,0.25)]"
           >
             <Ic n="sparkles" c="h-4.5 w-4.5 text-indigo-400 animate-pulse" />
+            {props.proLocked && <Ic n="lock" c="h-3.5 w-3.5 text-indigo-300" />}
             <span className="hidden xl:inline font-mono text-xs font-bold">AI TANI</span>
           </button>
         </div>
@@ -1311,7 +1314,7 @@ export default function Pos(props: PosProps) {
     );
     if (id === 'cart') return <CartPanel key="cart" {...props} handle={handle!} fullWidth={opts?.mobile} onOpenCfd={handleOpenCfdWindow} />;
     if (id === 'browser')
-      return <ProductBrowser key="browser" {...props} handle={handle!} onOpenWeight={setWSel} onOpenAiVision={() => setAiVisionOpen(true)} />;
+      return <ProductBrowser key="browser" {...props} handle={handle!} onOpenWeight={setWSel} onOpenAiVision={() => (props.proLocked ? props.onRequirePro?.() : setAiVisionOpen(true))} />;
     return (
       <ExtrasPanel key="extras" {...props} handle={handle!} side={i === 0 ? 'left' : 'right'} onOpenWeight={setWSel} mobile={opts?.mobile} />
     );

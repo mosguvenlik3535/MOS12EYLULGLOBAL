@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { cn } from '../utils/cn';
 import { Ic } from '../icons';
 import { Badge, Btn, Confirm, Field, Inp, Modal, Sel, Stat } from '../components/ui';
+import { ProLockedPanel } from '../components/ProGate';
 import { USERS, USER_THEMES, dstr, fmt, round2, tstr, uid, type Staff } from '../data';
 
 type Toast = (msg: string, type?: 'ok' | 'err') => void;
@@ -175,12 +176,16 @@ export default function StaffScreen({
   onPinsChange,
   isAdmin,
   toast,
+  proLocked = false,
+  onRequirePro,
 }: {
   staff: Staff[];
   save: (s: Staff) => void;
   pay: (s: Staff, amount: number, type: 'maas' | 'avans', note: string) => void;
   remove: (id: string) => void;
   pins: Record<string, string>;
+  proLocked?: boolean;
+  onRequirePro?: () => void;
   onPinsChange: (pins: Record<string, string>) => void;
   isAdmin: boolean;
   toast: Toast;
@@ -192,6 +197,18 @@ export default function StaffScreen({
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ name: '', role: 'Kasiyer', phone: '', salary: '' });
   const [editForm, setEditForm] = useState({ name: '', role: 'Kasiyer', phone: '', salary: '' });
+
+  if (proLocked) {
+    return (
+      <ProLockedPanel
+        icon="users"
+        title="Personel Yönetimi"
+        desc="Personel kayıtları ile maaş ve avans takibi PRO abonelik gerektirir. Satış, kasa ve stok işlemleriniz ücretsiz sürümde çalışmaya devam eder."
+        features={['Sınırsız personel kaydı', 'Maaş & avans takibi', 'Personel bazında satış dağılımı']}
+        onUpgrade={() => onRequirePro?.()}
+      />
+    );
+  }
 
   const totalSalary = staff.reduce((s, x) => s + x.salary, 0);
   const paidThisMonth = staff.reduce((a, s) => a + monthPaid(s, 'maas'), 0);
