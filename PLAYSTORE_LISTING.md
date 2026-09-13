@@ -124,9 +124,31 @@ Play Console'da **Data safety → Start** ile doldurun:
 
 > Önemli: Veri **bizim sunucularımızda toplanmıyor**; yalnızca kullanıcı kendi Drive/Dropbox'a yedeklerse ve Open Food Facts sorgusu yaparsa dışarı çıkar. Formda "yerel öncelikli, sunucu yok" şeklinde açıklayın.
 
+**Kamera satırı (v1.8.2+):** uygulama `CAMERA` iznini kullanıyor. Formda:
+- "Kamera fotoğrafları ve videoları" → **Toplanmıyor / Paylaşılmıyor** (görüntü yalnız cihaz üzerinde işlenir, hiçbir sunucuya gitmez; barkod kareleri anlık çözülüp bırakılır).
+- Açıklama alanına: "Camera is used only for real-time barcode/QR decoding on-device; frames are never stored or transmitted."
+
 ---
 
-## 5. İçerik derecelendirmesi (IARC)
+## 5. Duyarlı izin beyanı (Sensitive permissions declaration)
+
+v1.8.2 ile AndroidManifest'e `android.permission.CAMERA` eklendi (kamera ile barkod okuma + AI görsel tanıma). Play Console, `CAMERA` izni bulunan AAB'lerde **izin gerekçesi (permission justification)** doldurmanızı ister:
+
+**App permissions declaration form — CAMERA için önerilen metin:**
+
+> The app uses the camera to scan product barcodes/QR codes with the device camera (ZXing decoder running inside the Capacitor WebView) so shopkeepers can add and sell products without a separate USB/Bluetooth scanner. Camera frames are processed in real time on the device, are never recorded, never stored and never uploaded. The permission is requested only when the user taps the "Scan with camera" button.
+
+Kontrol listesi:
+- [ ] Manifest'te `<uses-feature android:name="android.hardware.camera" android:required="false"/>` tanımlı (kamerayı olmayan cihazları filtrelememesi için) — v1.8.2'de eklendi ✅
+- [ ] Play Console → Advanced settings → **App permissions** → CAMERA gerekçesi girildi
+- [ ] `RECORD_AUDIO` **istendi mi?** Hayır — mikrofon izni manifest'te yok (`MODIFY_AUDIO_SETTINGS` zararsız, duyarlı izin listesinde değil). Sesli kayıt hiçbir özelliğimiz için kullanılmıyor.
+- [ ] Data Safety formunda "Kamera fotoğrafları ve videoları" satırı "toplanmıyor" olarak işaretlendi
+
+> Not: İzin reddedilirse uygulama kamera dışındaki tüm özelliklerle çalışmaya devam eder; POS'ta elle barkod girişi ve USB/Bluetooth okuyucu her zaman geçerlidir. Kamera izni gerektirmeyen işlevleri engellemediğimiz için "kullanılabilirlik" politika ihlali oluşmaz.
+
+---
+
+## 6. İçerik derecelendirmesi (IARC)
 
 - Kategori: Business/Productivity
 - Tahmin: **Herkes (Everyone)** — şiddet, cinsellik, kumar, yasa dışı içerik yok.
@@ -134,7 +156,7 @@ Play Console'da **Data safety → Start** ile doldurun:
 
 ---
 
-## 6. Başvuru öncesi kontrol listesi
+## 7. Başvuru öncesi kontrol listesi
 
 - [ ] Kurumsal Play Console hesabı + D-U-N-S + kimlik doğrulama
 - [ ] Keystore üretildi, 4 GitHub Secret eklendi (bkz. PLAYSTORE_YAYIN_PLANI.md §6b)
@@ -145,5 +167,6 @@ Play Console'da **Data safety → Start** ile doldurun:
 - [ ] `mos_pro_aylik` abonelik ürünü Play Console'da tanımlandı (299 TL/ay)
 - [ ] Play Billing test kullanıcıları (lisans testi) eklendi
 - [ ] AAB imzalı üretildi ve Play'e yüklendi (secret eklenince otomatik)
-- [ ] Data Safety formu dolduruldu
+- [ ] Data Safety formu dolduruldu (kamera satırı: toplanmıyor/paylaşılmıyor)
 - [ ] İçerik derecelendirme anketi tamamlandı
+- [ ] CAMERA izni gerekçe formu dolduruldu (bkz. §5)

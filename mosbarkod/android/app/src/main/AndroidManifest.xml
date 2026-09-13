@@ -38,4 +38,16 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Barkod/QR kamera taraması (CameraScanner) ve yapay zeka görüntü analizi (AiVisionModal)
+         WebView içinde getUserMedia kullanır. Capacitor'un BridgeWebChromeClient'ı bu izni
+         Manifest'te gördüğü anda sistemi kullanıcıya sorup WebView'a aktarıyor; Manifest'te
+         tanımlı olmadığında ise istek otomatik olarak "reddedildi" ile sonuçlanıyor.
+         (Capacitor 8 kaynak: BridgeWebChromeClient.onPermissionRequest + isMediaCaptureSupported) -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <!-- required="false": kamerayı olmayan cihazları Play Store'da filtrelemesin (POS'ta USB/Bluetooth okuyucu da var). -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.flash" android:required="false" />
 </manifest>

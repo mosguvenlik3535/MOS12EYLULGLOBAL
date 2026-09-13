@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { cn } from '../utils/cn';
 import { Ic } from '../icons';
 import { Btn, Field, Modal, Sel } from './ui';
+import CameraPermissionHint from './CameraPermissionHint';
 import { fmt, type Product } from '../data';
 import { playBeep } from '../lib/sounds';
 
@@ -334,6 +335,8 @@ export default function AiVisionModal({
   const [trainProductId, setTrainProductId] = useState(products[0]?.id || '');
   const [capturedThumb, setCapturedThumb] = useState<string | null>(null);
   const [signatures, setSignatures] = useState<Record<string, VisualSignature>>(loadSignatures);
+  const camRef = useRef<{ stop: () => void } | null>(null);
+  const camGenRef = useRef(0);
 
   const persist = (next: Record<string, VisualSignature>) => {
     setSignatures(next);
@@ -348,8 +351,17 @@ export default function AiVisionModal({
   useEffect(() => {
     let stream: MediaStream | null = null;
     let isMounted = true;
+    const gen = ++camGenRef.current;
+
+    const stopStream = () => {
+      stream?.getTracks().forEach((t) => t.stop());
+      stream = null;
+    };
+    camRef.current = { stop: stopStream };
 
     async function initCam() {
+      setError('');
+      setStreamActive(false);
       try {
         if (!navigator.mediaDevices?.getUserMedia) {
           setError('Kamera erişimi desteklenmiyor veya güvenli bağlantı (HTTPS) gerekiyor.');
@@ -359,8 +371,8 @@ export default function AiVisionModal({
           video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
           audio: false,
         });
-        if (!isMounted) {
-          stream.getTracks().forEach((t) => t.stop());
+        if (!isMounted || gen !== camGenRef.current) {
+          stopStream();
           return;
         }
         if (videoRef.current) {
@@ -368,8 +380,13 @@ export default function AiVisionModal({
           void videoRef.current.play();
           setStreamActive(true);
         }
-      } catch {
-        setError('Kamera açılamadı. Lütfen kamera izinlerini kontrol edin.');
+      } catch (e) {
+        const name = (e as { name?: string }).name ?? '';
+        setError(
+          name === 'NotAllowedError'
+            ? 'Kamera izni verilmedi. İzin istemi çıkmasına rağmen reddettiyseniz uygulamaya izin vermeniz gerekir.'
+            : 'Kamera açılamadı. Başka bir uygulamanın kamerayı kullanmadığını kontrol edin.'
+        );
       }
     }
 
@@ -377,9 +394,39 @@ export default function AiVisionModal({
 
     return () => {
       isMounted = false;
-      if (stream) stream.getTracks().forEach((t) => t.stop());
+      if (gen === camGenRef.current) {
+        camRef.current = null;
+        stopStream();
+      }
     };
   }, []);
+
+  const retryCam = () => {
+    camRef.current?.stop();
+    camGenRef.current += 1;
+    // Kamera efektini yeniden çalıştırmak için modalı kapatıp açmak yerine stream'i yenileriz.
+    void (async () => {
+      try {
+        const st = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+          audio: false,
+        });
+        camRef.current = { stop: () => st.getTracks().forEach((t) => t.stop()) };
+        if (!videoRef.current) {
+          st.getTracks().forEach((t) => t.stop());
+          return;
+        }
+        if (videoRef.current) {
+          videoRef.current.srcObject = st;
+          void videoRef.current.play();
+        }
+        setError('');
+        setStreamActive(true);
+      } catch {
+        setError('Kamera izni hâlâ verilmedi. Android: Ayarlar → Uygulamalar → MOSBARKODYAZILIM → İzinler → Kamera.');
+      }
+    })();
+  };
 
   /* Gerçek zamanlı öznitelik çıkarımı + skorlama */
   useEffect(() => {
@@ -501,9 +548,13 @@ export default function AiVisionModal({
             )}
 
             {error && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/85 p-6 text-center text-red">
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/85 p-6 text-center text-red">
                 <Ic n="alert" c="mb-2 h-10 w-10" />
                 <p className="max-w-sm text-xs">{error}</p>
+                <CameraPermissionHint />
+                <Btn v="ghost" onClick={retryCam} className="text-xs">
+                  <Ic n="reset" c="h-3.5 w-3.5" /> Kamerayı Tekrar Aç
+                </Btn>
               </div>
             )}
           </div>

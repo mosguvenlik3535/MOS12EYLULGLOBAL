@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { BrowserMultiFormatReader, type IScannerControls } from '@zxing/browser';
 import { cn } from '../utils/cn';
 import { Ic } from '../icons';
+import CameraPermissionHint from './CameraPermissionHint';
 
 export default function CameraScanner({
   onDetected,
@@ -17,6 +18,8 @@ export default function CameraScanner({
   const [error, setError] = useState('');
   const [torch, setTorch] = useState(false);
   const [torchReady, setTorchReady] = useState(false);
+  const startRef = useRef<(() => void) | null>(null);
+  const [attempt, setAttempt] = useState(0);
 
   const stop = () => {
     try {
@@ -38,6 +41,7 @@ export default function CameraScanner({
     });
 
     const start = async () => {
+      setError('');
       if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
         setError('Kamera için güvenli bağlantı (HTTPS) gerekir. Uygulamayı HTTPS adresinden veya kurulu PWA/APK içinden açın.');
         setStatus('Kamera kullanılamıyor');
@@ -82,23 +86,27 @@ export default function CameraScanner({
         const name = (e as { name?: string }).name ?? '';
         const msg =
           name === 'NotAllowedError'
-            ? 'Kamera izni reddedildi. Tarayıcı ayarlarından bu site için kamera iznini açın.'
+            ? 'Kamera izni verilmedi. İzin istemi çıkmasına rağmen reddettiyseniz uygulamaya izin vermeniz gerekir.'
             : name === 'NotFoundError'
               ? 'Bu cihazda kullanılabilir kamera bulunamadı.'
               : 'Kamera başlatılamadı. Başka bir uygulamanın kamerayı kullanmadığını kontrol edin.';
-        setError(msg);
-        setStatus('Kamera açılamadı');
+        if (mounted) {
+          setError(msg);
+          setStatus('Kamera açılamadı');
+        }
       }
     };
 
+    startRef.current = () => void start();
     void start();
     return () => {
       mounted = false;
+      startRef.current = null;
       stop();
     };
-    // Scanner açıldığı anda bir kez başlatılır.
+    // Scanner açıldığı anda bir kez başlatılır; "Tekrar dene" attempt'ı artırır.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [attempt]);
 
   const switchTorch = async () => {
     if (!controlsRef.current?.switchTorch) return;
@@ -153,7 +161,23 @@ export default function CameraScanner({
           <div className={cn('rounded-lg border px-3 py-2 text-center font-mono text-[11px]', error ? 'border-red/30 bg-red/5 text-red' : 'border-blue/25 bg-blue/5 text-blue')}>
             {status}
           </div>
+          {error && (
+            <div className="mt-2 flex flex-col items-center">
+              <CameraPermissionHint compact />
+            </div>
+          )}
           <div className="mt-3 flex gap-2">
+            {error && (
+              <button
+                onClick={() => {
+                  doneRef.current = false;
+                  setAttempt((a) => a + 1);
+                }}
+                className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-blue/45 bg-blue/10 px-3 py-2.5 text-[12px] font-semibold text-blue hover:bg-blue/20"
+              >
+                <Ic n="reset" c="h-4 w-4" /> Tekrar Dene
+              </button>
+            )}
             {torchReady && (
               <button
                 onClick={switchTorch}
