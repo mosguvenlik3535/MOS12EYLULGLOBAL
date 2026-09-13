@@ -3,6 +3,7 @@ import { cn } from '../utils/cn';
 import { Ic } from '../icons';
 import { Btn, Inp, Modal } from '../components/ui';
 import { playBeep } from '../lib/sounds';
+import { APP_VERSION } from '../lib/buildMode';
 import CameraScanner from '../components/CameraScanner';
 import { useLocale } from '../locales/i18n';
 import AiVisionModal from '../components/AiVisionModal';
@@ -747,7 +748,7 @@ function CartPanel(props: PosProps & { handle: React.ReactNode; fullWidth?: bool
             </button>
             {t('pos.allowNegative')}
           </label>
-          <span className="font-mono text-[9.5px] tracking-wider text-mut2">MOSBARKOD v1.5</span>
+          <span className="font-mono text-[9.5px] tracking-wider text-mut2">MOSBARKOD v{APP_VERSION}</span>
         </div>
       </div>
     </section>

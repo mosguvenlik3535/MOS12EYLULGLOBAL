@@ -13,7 +13,7 @@ import { CustomerDisplay } from '../components/CustomerDisplay';
 import { useLocale } from '../locales/i18n';
 import { LOCALES } from '../locales/i18n';
 import Flag from '../components/Flag';
-import { IS_DEMO, IS_PLAY } from '../lib/buildMode';
+import { APP_VERSION, IS_DEMO, IS_PLAY, appVersionLabel } from '../lib/buildMode';
 
 type Toast = (msg: string, type?: 'ok' | 'err') => void;
 
@@ -308,7 +308,7 @@ function LicenseCard() {
 
       <div className="mt-5 space-y-2 rounded-xl border border-white/70 bg-black/20 p-3 font-mono text-[9.5px]">
         <div className="flex justify-between gap-3"><span className="text-mut2">Yazılım Sahibi:</span><span className="font-bold text-txt">MOSBARKODYAZILIM</span></div>
-        <div className="flex justify-between gap-3"><span className="text-mut2">Sürüm:</span><span className="font-bold text-txt">v1.5.0-PRO</span></div>
+        <div className="flex justify-between gap-3"><span className="text-mut2">Sürüm:</span><span className="font-bold text-txt">{appVersionLabel()}</span></div>
         <div className="flex justify-between gap-3"><span className="text-mut2">Lisans Tipi:</span><span className={cn('font-bold', IS_PLAY || IS_DEMO ? 'text-amber2' : 'text-mint')}>{IS_PLAY ? '★ AYLIK ABONELİK' : IS_DEMO ? '★ DENEME' : '✓ ÖMÜR BOYU'}</span></div>
         <div className="flex justify-between gap-3">
           <span className="text-mut2">Destek E-Posta:</span>
@@ -484,7 +484,7 @@ function UpdateCard({
         {
           app: 'MOSBARKODYAZILIM',
           type: 'program',
-          version: 'v1.5.1-PRO',
+          version: appVersionLabel(),
           minVersion: state.settings.update.currentVersion,
           date: new Date().toISOString(),
           title: 'Örnek Update Paketi',
@@ -644,7 +644,7 @@ async function makeWindowsPackage(state: AppState) {
     '          Copy-Item public\\icons\\icon-512.png release-app\\icon.png -Force',
     "          @'{",
     "            \"name\": \"mosbarkodyazilim-desktop\",",
-    "            \"version\": \"1.5.0\",",
+    `            \"version\": \"${APP_VERSION}\",`,
     "            \"main\": \"main.cjs\",",
     "            \"private\": true,",
     "            \"scripts\": { \"dist\": \"electron-builder --win nsis --x64\" },",
@@ -678,7 +678,7 @@ async function makeWindowsPackage(state: AppState) {
 
   zip.file('package.json', JSON.stringify({
     name: 'mosbarkodyazilim-desktop',
-    version: '1.5.0',
+    version: APP_VERSION,
     description: 'MOSBARKODYAZILIM - Yapay Zeka Destekli Barkod Satış Programı',
     main: 'main.cjs',
     private: true,

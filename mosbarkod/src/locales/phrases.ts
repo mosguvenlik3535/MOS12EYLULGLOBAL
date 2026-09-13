@@ -1527,7 +1527,7 @@ const PHRASES_B: PhraseMap = {
   'Hesaplanan KDV − İndirilecek KDV =': { en: 'Output VAT − Input VAT =' },
   'Ödenecek KDV (vergi dairesine)': { en: 'VAT payable (to tax office)' },
   'Devreden KDV (sonraki döneme aktarılır)': { en: 'Carried VAT (to next period)' },
-  'MOSBARKODYAZILIM v1.5 · Otomatik KDV beyanname özeti · Bu belge bilgilendirme amaçlıdır, resmi beyanname yerine geçmez.': { en: 'MOSBARKODYAZILIM v1.5 · Automatic VAT summary · For information only, not an official declaration.' },
+  'Otomatik KDV beyanname özeti · Bu belge bilgilendirme amaçlıdır, resmi beyanname yerine geçmez.': { en: 'Automatic VAT summary · For information only, not an official declaration.' },
   'PDF Olarak Kaydet / Yazdır': { en: 'Save as PDF / Print', ar: 'حفظ PDF / طباعة', ru: 'Сохранить PDF / Печать' },
   'Muhasebeci:': { en: 'Accountant:', ar: 'المحاسب:', ru: 'Бухгалтер:' },
   'Değiştir': { en: 'Change', ar: 'تغيير', ru: 'Изменить' },

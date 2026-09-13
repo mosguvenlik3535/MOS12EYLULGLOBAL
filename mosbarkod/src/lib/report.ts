@@ -1,4 +1,5 @@
 import { fmt, isToday, round2, type AppState } from '../data';
+import { APP_VERSION } from './buildMode';
 
 export function buildReport(s: AppState, itemIds?: string[]): string {
   const sel = itemIds ?? [];
@@ -89,7 +90,7 @@ export function buildReport(s: AppState, itemIds?: string[]): string {
     '────────────────────',
     ...L,
     '────────────────────',
-    'Otomatik rapor — MOSBARKOD v1.5',
+    `Otomatik rapor — MOSBARKOD v${APP_VERSION}`,
   ].join('\n');
 }
 

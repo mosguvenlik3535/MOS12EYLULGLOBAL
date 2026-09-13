@@ -14,6 +14,7 @@ import {
   Th,
 } from '../components/ui';
 import { waLink } from '../lib/report';
+import { APP_VERSION } from '../lib/buildMode';
 import { useLocale } from '../locales/i18n';
 import {
   getCountryVatProfile,
@@ -1299,7 +1300,7 @@ export function PurchaseScreen({
                 </div>
 
                 <div className="mt-4 border-t border-[#d0d5dd] pt-2 text-[10px] text-[#667085]">
-                  MOSBARKODYAZILIM v1.5 · Otomatik {vatName} beyanname özeti ({countryVat.countryName}) · Bu belge bilgilendirme amaçlıdır, resmi beyanname yerine geçmez.
+                  MOSBARKODYAZILIM v{APP_VERSION} · Otomatik {vatName} beyanname özeti ({countryVat.countryName}) · Bu belge bilgilendirme amaçlıdır, resmi beyanname yerine geçmez.
                 </div>
               </div>
 

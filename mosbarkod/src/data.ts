@@ -1,3 +1,5 @@
+import { appVersionLabel } from './lib/buildMode';
+
 export type PriceMode = 'f1' | 'f2' | 'f3' | 'kkart' | 'taksit';
 export type PayMethod = 'nakit' | 'kart' | 'nakit+pos' | 'veresiye';
 export type ViewId =
@@ -1122,7 +1124,7 @@ export const defaultSettings = (): Settings => ({
     lastSlots: {},
   },
   update: {
-    currentVersion: 'v1.5.0-PRO',
+    currentVersion: appVersionLabel(),
     lastPackageVersion: null,
     lastPackageDate: null,
     lastPackageName: null,

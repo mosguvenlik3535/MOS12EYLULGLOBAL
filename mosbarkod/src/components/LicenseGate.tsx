@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { cn } from '../utils/cn';
 import { Ic } from '../icons';
 import { isValidLicenseKey, normalizeLicenseKey } from '../lib/licenseCore';
+import { appVersionLabel } from '../lib/buildMode';
 
 /** Anahtarın kendisi değil, yalnızca "etkin" işareti saklanır. */
 const LICENSE_MARKER = 'mosbarkod_licensed';
@@ -149,7 +150,7 @@ export default function LicenseGate({
           </div>
           <div className="flex justify-between gap-3">
             <span className="text-mut2">Sürüm:</span>
-            <span className="font-bold text-txt">{demo ? 'v1.5-DEMO' : 'v1.5.0-PRO'}</span>
+            <span className="font-bold text-txt">{appVersionLabel(demo)}</span>
           </div>
           <div className="flex justify-between gap-3">
             <span className="text-mut2">Lisans Tipi:</span>
