@@ -13,7 +13,8 @@ import { CustomerDisplay } from '../components/CustomerDisplay';
 import { useLocale } from '../locales/i18n';
 import { LOCALES } from '../locales/i18n';
 import Flag from '../components/Flag';
-import { APP_VERSION, IS_DEMO, IS_PLAY, appVersionLabel } from '../lib/buildMode';
+import { IS_DEMO, IS_PLAY, appVersionLabel } from '../lib/buildMode';
+
 
 type Toast = (msg: string, type?: 'ok' | 'err') => void;
 
@@ -339,8 +340,6 @@ type TileId =
   | 'hardware'
   | 'backup'
   | 'update'
-  | 'downloads'
-  | 'mobileSetup'
   | 'modules'
   | 'reset'
   | 'profile';
@@ -584,472 +583,9 @@ function UpdateCard({
   );
 }
 
-async function makeWindowsPackage(state: AppState) {
-  const zip = new JSZip();
-  const html = '<!doctype html>\n' + document.documentElement.outerHTML;
-  const now = new Date().toISOString();
-
-  zip.file('README.md', [
-    '# MOSBARKODYAZILIM Windows EXE Otomatik Build Paketi',
-    '',
-    'Bu paket GitHub Actions Windows runner üzerinde otomatik .EXE kurulum dosyası üretmek için hazırlanmıştır.',
-    '',
-    '## İdeal Akış',
-    '1. Bu paket içindeki .github/workflows/windows-exe.yml dosyası repoya eklenir.',
-    '2. GitHub Actions sekmesinden "Windows EXE Build" workflowu çalıştırılır.',
-    '3. İşlem sonunda MOSBARKODYAZILIM-Setup.exe artifact olarak oluşur.',
-    '4. Oluşan .exe dosyası public/downloads/MOSBARKODYAZILIM-Setup.exe olarak yayınlanırsa uygulama içinden direkt indirilebilir.',
-    '',
-    '## Manuel Yedek Akış',
-    'Komut istemi kullanmak istemiyorsanız bu bölümü dikkate almayın. build-exe.bat yalnızca yedek amaçlıdır.',
-    '',
-    '## Not',
-    'Tarayıcı güvenliği nedeniyle gerçek .EXE dosyası doğrudan uygulama içinde derlenemez.',
-    'Bu paket .EXE üretimini otomatik Windows build ortamına taşır.',
-    '',
-    `Oluşturulma: ${now}`,
-  ].join('\n'));
-
-  zip.file('.github/workflows/windows-exe.yml', [
-    'name: Windows EXE Build',
-    '',
-    'on:',
-    '  workflow_dispatch:',
-    '  push:',
-    '    tags:',
-    "      - 'v*'",
-    '',
-    'jobs:',
-    '  build-windows-exe:',
-    '    runs-on: windows-latest',
-    '    permissions:',
-    '      contents: write',
-    '    steps:',
-    '      - uses: actions/checkout@v4',
-    '      - uses: actions/setup-node@v4',
-    '        with:',
-    "          node-version: '22'",
-    '      - run: npm install',
-    '      - run: npm run build',
-    '      - name: Prepare Electron package',
-    '        shell: pwsh',
-    '        run: |',
-    '          New-Item -ItemType Directory -Force -Path release-app | Out-Null',
-    '          Copy-Item dist\\index.html release-app\\index.html -Force',
-    '          if (Test-Path dist\\sw.js) { Copy-Item dist\\sw.js release-app\\sw.js -Force }',
-    '          if (Test-Path dist\\manifest.webmanifest) { Copy-Item dist\\manifest.webmanifest release-app\\manifest.webmanifest -Force }',
-    '          if (Test-Path dist\\icons) { Copy-Item dist\\icons release-app\\icons -Recurse -Force }',
-    '          Copy-Item desktop\\main.cjs release-app\\main.cjs -Force',
-    '          Copy-Item desktop\\preload.cjs release-app\\preload.cjs -Force',
-    '          Copy-Item public\\icons\\icon-512.png release-app\\icon.png -Force',
-    "          @'{",
-    "            \"name\": \"mosbarkodyazilim-desktop\",",
-    `            \"version\": \"${APP_VERSION}\",`,
-    "            \"main\": \"main.cjs\",",
-    "            \"private\": true,",
-    "            \"scripts\": { \"dist\": \"electron-builder --win nsis --x64\" },",
-    "            \"build\": {",
-    "              \"appId\": \"com.mosbarkodyazilim.pos\",",
-    "              \"productName\": \"MOSBARKODYAZILIM\",",
-    "              \"files\": [\"index.html\", \"main.cjs\", \"preload.cjs\", \"manifest.webmanifest\", \"sw.js\", \"icons/**\", \"icon.png\"],",
-    "              \"directories\": { \"output\": \"installer\" },",
-    "              \"win\": { \"target\": \"nsis\", \"icon\": \"icon.png\" },",
-    "              \"nsis\": { \"oneClick\": false, \"allowToChangeInstallationDirectory\": true, \"createDesktopShortcut\": true, \"createStartMenuShortcut\": true, \"shortcutName\": \"MOSBARKODYAZILIM\" }",
-    "            },",
-    "            \"dependencies\": { \"nodemailer\": \"^6.9.14\" },",
-    "            \"devDependencies\": { \"electron\": \"^31.7.7\", \"electron-builder\": \"^24.13.3\" }",
-    "          }'@ | Set-Content -Encoding UTF8 release-app\\package.json",
-    '      - run: npm install',
-    '        working-directory: release-app',
-    '      - run: npm run dist',
-    '        working-directory: release-app',
-    '      - name: Normalize installer name',
-    '        shell: pwsh',
-    '        run: |',
-    '          $exe = Get-ChildItem release-app\\installer -Filter "*.exe" | Select-Object -First 1',
-    '          if (-not $exe) { throw "EXE installer not found" }',
-    '          New-Item -ItemType Directory -Force -Path artifact | Out-Null',
-    '          Copy-Item $exe.FullName artifact\\MOSBARKODYAZILIM-Setup.exe -Force',
-    '      - uses: actions/upload-artifact@v4',
-    '        with:',
-    '          name: MOSBARKODYAZILIM-Setup',
-    '          path: artifact/MOSBARKODYAZILIM-Setup.exe',
-  ].join('\n'));
-
-  zip.file('package.json', JSON.stringify({
-    name: 'mosbarkodyazilim-desktop',
-    version: APP_VERSION,
-    description: 'MOSBARKODYAZILIM - Yapay Zeka Destekli Barkod Satış Programı',
-    main: 'main.cjs',
-    private: true,
-    scripts: {
-      start: 'electron .',
-      dist: 'electron-builder --win nsis --x64',
-    },
-    dependencies: {
-      nodemailer: '^6.9.14',
-    },
-    build: {
-      appId: 'com.mosbarkodyazilim.pos',
-      productName: 'MOSBARKODYAZILIM',
-      files: ['index.html', 'main.cjs', 'preload.cjs', 'manifest.webmanifest', 'sw.js', 'icons/**', 'data/**', 'node_modules/nodemailer/**'],
-      directories: { output: 'dist' },
-      win: { target: 'nsis', icon: 'icon.png' },
-      nsis: {
-        oneClick: false,
-        allowToChangeInstallationDirectory: true,
-        createDesktopShortcut: true,
-        createStartMenuShortcut: true,
-        shortcutName: 'MOSBARKODYAZILIM',
-      },
-    },
-    devDependencies: {
-      electron: '^31.0.0',
-      'electron-builder': '^24.13.3',
-    },
-  }, null, 2));
-
-  zip.file('main.cjs', [
-    "const { app, BrowserWindow, ipcMain } = require('electron');",
-    "const path = require('path');",
-    "const fs = require('fs');",
-    "const http = require('http');",
-    "const os = require('os');",
-    '',
-    'function logCrash(err) {',
-    '  try {',
-    "    const dir = app.getPath('userData');",
-    "    fs.mkdirSync(dir, { recursive: true });",
-    '    fs.appendFileSync(path.join(dir, \'startup-error.log\'), `\\n[${new Date().toISOString()}]\\n${err?.stack || err}\\n`, \'utf8\');',
-    '  } catch { /* yoksay */ }',
-    '}',
-    "process.on('uncaughtException', logCrash);",
-    "process.on('unhandledRejection', logCrash);",
-    '',
-    "const INDEX = path.join(__dirname, 'index.html');",
-    "const PRELOAD = path.join(__dirname, 'preload.cjs');",
-    '',
-    "const HTTP_PORT = Number(process.env.MOSBARKOD_PORT) || 8787;",
-    'let httpServer = null;',
-    '',
-    'function lanIPs() {',
-    '  const out = [];',
-    '  const nets = os.networkInterfaces();',
-    '  for (const list of Object.values(nets)) {',
-    '    for (const iface of list || []) {',
-    "      if (iface.family === 'IPv4' && !iface.internal) out.push(iface.address);",
-    '    }',
-    '  }',
-    '  return out;',
-    '}',
-    '',
-    'function startServer() {',
-    '  if (httpServer) return;',
-    '  const html = fs.readFileSync(INDEX);',
-    '  httpServer = http.createServer((req, res) => {',
-    "    if (req.url === '/host-info') {",
-    "      res.setHeader('Content-Type', 'application/json');",
-    '      res.end(JSON.stringify({ ips: lanIPs(), port: HTTP_PORT }));',
-    '      return;',
-    '    }',
-    "    if (req.url === '/sw.js' || req.url === '/manifest.webmanifest' || (req.url && req.url.startsWith('/icons/'))) {",
-    '      try {',
-    "        const p = path.join(__dirname, req.url.split('?')[0]);",
-    '        if (fs.existsSync(p)) { res.end(fs.readFileSync(p)); return; }',
-    '      } catch { /* yoksay */ }',
-    '      res.statusCode = 404; res.end(); return;',
-    '    }',
-    "    res.setHeader('Content-Type', 'text/html; charset=utf-8');",
-    '    res.end(html);',
-    '  });',
-    "  httpServer.on('error', () => { /* port doluysa sessiz geç */ });",
-    "  httpServer.listen(HTTP_PORT, '0.0.0.0');",
-    '}',
-    '',
-    "ipcMain.handle('mos-email-send', async (_evt, payload) => {",
-    '  try {',
-    '    const { provider, serviceId, templateId, publicKey, privateKey, subject, message, fromName, toEmail } = payload || {};',
-    "    if (provider === 'resend') {",
-    "      if (!privateKey) return { ok: false, error: 'Resend privateKey gereklidir' };",
-    "      const res = await global.fetch('https://api.resend.com/emails', {",
-    "        method: 'POST',",
-    '        headers: { Authorization: `Bearer ${privateKey}`, \'Content-Type\': \'application/json\' },',
-    '        body: JSON.stringify({',
-    "          from: fromName ? `${fromName} <onboarding@resend.dev>` : 'MOSBARKODYAZILIM <onboarding@resend.dev>',",
-    '          to: [toEmail], subject, text: message,',
-    '        }),',
-    '      });',
-    '      if (res.ok) return { ok: true };',
-    "      const txt = await res.text().catch(() => '');",
-    '      return { ok: false, error: `HTTP ${res.status}: ${txt.slice(0, 160) || res.statusText}` };',
-    '    }',
-    "    const headers = { 'Content-Type': 'application/json' };",
-    "    if (privateKey) headers.Authorization = `Bearer ${privateKey}`;",
-    '    const res = await global.fetch(\'https://api.emailjs.com/api/v1.0/email/send\', {',
-    "      method: 'POST',",
-    '      headers,',
-    '      body: JSON.stringify({',
-    '        service_id: serviceId, template_id: templateId, user_id: publicKey,',
-    '        template_params: { subject, message, from_name: fromName ?? \'MOSBARKODYAZILIM\', to_email: toEmail },',
-    '      }),',
-    '    });',
-    '    if (res.ok) return { ok: true };',
-    "    const txt = await res.text().catch(() => '');",
-    '    return { ok: false, error: `HTTP ${res.status}: ${txt.slice(0, 160) || res.statusText}` };',
-    '  } catch (e) { return { ok: false, error: String(e) }; }',
-    '});',
-    '',
-    "ipcMain.handle('mos-host-info', () => ({ ips: lanIPs(), port: HTTP_PORT }));",
-    '',
-    "function storeFile() { return path.join(app.getPath('userData'), 'mosbarkod-store.json'); }",
-    'function readStore() { try { return JSON.parse(fs.readFileSync(storeFile(), \'utf8\')); } catch { return {}; } }',
-    'function writeStore(obj) { try { fs.writeFileSync(storeFile(), JSON.stringify(obj), \'utf8\'); } catch { /* yoksay */ } }',
-    "ipcMain.handle('mos-store', (_evt, { action, key, value } = {}) => {",
-    '  const store = readStore();',
-    "  if (action === 'get') return store[key] ?? null;",
-    "  if (action === 'set') { store[key] = value; writeStore(store); return { ok: true }; }",
-    "  if (action === 'del') { delete store[key]; writeStore(store); return { ok: true }; }",
-    "  return { ok: false, error: 'unknown action' };",
-    '});',
-    '',
-    'function createWindow() {',
-    '  const win = new BrowserWindow({',
-    '    width: 1366, height: 768, minWidth: 1024, minHeight: 650,',
-    "    title: 'MOSBARKODYAZILIM - Yapay Zeka Destekli Barkod Satış Programı',",
-    "    backgroundColor: '#0a0e13', autoHideMenuBar: true,",
-    '    webPreferences: { nodeIntegration: false, contextIsolation: true, sandbox: true, preload: PRELOAD },',
-    '  });',
-    '  win.on(\'close\', () => { app.quit(); });',
-    '  win.loadFile(INDEX);',
-    '}',
-    "app.whenReady().then(() => { startServer(); createWindow(); });",
-    "app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });",
-    "app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createWindow(); });",
-    "app.on('before-quit', () => { try { httpServer?.close(); } catch { /* yoksay */ } });",
-  ].join('\n'));
-
-  zip.file('preload.cjs', [
-    "const { contextBridge, ipcRenderer } = require('electron');",
-    '',
-    "contextBridge.exposeInMainWorld('mosEmail', {",
-    '  send: (payload) => ipcRenderer.invoke(\'mos-email-send\', payload),',
-    '  hostInfo: () => ipcRenderer.invoke(\'mos-host-info\'),',
-    '});',
-    '',
-    "contextBridge.exposeInMainWorld('mosStore', {",
-    "  get: (key) => ipcRenderer.invoke('mos-store', { action: 'get', key }),",
-    "  set: (key, value) => ipcRenderer.invoke('mos-store', { action: 'set', key, value }),",
-    "  del: (key) => ipcRenderer.invoke('mos-store', { action: 'del', key }),",
-    '});',
-  ].join('\n'));
-
-  zip.file('index.html', html);
-  zip.file('data/mosbarkod-yedek.json', JSON.stringify(state, null, 2));
-  zip.file('build-exe.bat', [
-    '@echo off',
-    'title MOSBARKODYAZILIM Windows EXE Derleyici',
-    'echo MOSBARKODYAZILIM Windows kurulum dosyasi hazirlaniyor...',
-    'echo.',
-    'where node >nul 2>nul',
-    'if errorlevel 1 (',
-    '  echo Node.js bulunamadi. Lutfen https://nodejs.org adresinden Node.js LTS kurun.',
-    '  pause',
-    '  exit /b 1',
-    ')',
-    'npm install',
-    'if errorlevel 1 (',
-    '  echo npm install basarisiz oldu.',
-    '  pause',
-    '  exit /b 1',
-    ')',
-    'npm run dist',
-    'echo.',
-    'echo Bitti. Kurulum dosyasi dist klasorunde olusturuldu.',
-    'pause',
-  ].join('\r\n'));
-  zip.file('calistir-dev.bat', ['@echo off', 'npm install', 'npm start', 'pause'].join('\r\n'));
-
-  try {
-    const icon = await fetch('/icons/icon-512.png').then((r) => r.arrayBuffer());
-    zip.file('icon.png', icon);
-  } catch {
-    // İkon alınamazsa paket yine oluşturulur.
-  }
-
-  return zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } });
-}
-
-async function readyExeExists() {
-  try {
-    const res = await fetch('/downloads/MOSBARKODYAZILIM-Setup.exe', { method: 'HEAD', cache: 'no-store' });
-    return res.ok;
-  } catch {
-    return false;
-  }
-}
-
-async function makeLinuxMintPackage(state: AppState) {
-  const zip = new JSZip();
-  const html = '<!doctype html>\n' + document.documentElement.outerHTML;
-  const today = new Date().toISOString().slice(0, 10);
-
-  zip.file('README-LINUX-MINT.md', [
-    '# MOSBARKODYAZILIM Linux Mint Kurulum Paketi',
-    '',
-    'Bu paket Linux Mint / Ubuntu üzerinde MOSBARKODYAZILIM programını masaüstü uygulaması gibi kullanmak için hazırlanmıştır.',
-    '',
-    '## Kurulum',
-    '',
-    '1. ZIP dosyasını çıkarın.',
-    '2. install-linux-mint.sh dosyasına sağ tıklayın.',
-    '3. Özellikler > İzinler bölümünden "Program olarak çalıştırmaya izin ver" seçeneğini açın.',
-    '4. Dosyaya çift tıklayın ve "Terminalde Çalıştır" seçin.',
-    '',
-    'Alternatif olarak terminalde:',
-    '',
-    '```bash',
-    'bash install-linux-mint.sh',
-    '```',
-    '',
-    'Kurulumdan sonra:',
-    '- Menüde MOSBARKODYAZILIM görünür.',
-    '- Masaüstünde MOSBARKODYAZILIM kısayolu oluşur.',
-    '- Program tarayıcı penceresi gibi değil, uygulama penceresi gibi açılır.',
-    '',
-    '## Mobil Telefon Bağlantısı',
-    '',
-    'Program yerel sunucuyu 8787 portunda açar.',
-    'Aynı Wi-Fi ağındaki telefon şu adresten bağlanabilir:',
-    '',
-    '```text',
-    'http://BILGISAYAR_IP_ADRESI:8787',
-    '```',
-    '',
-    'IP adresini öğrenmek için terminalde:',
-    '',
-    '```bash',
-    'hostname -I',
-    '```',
-    '',
-    '## Kaldırma',
-    '',
-    'uninstall-linux-mint.sh dosyasını çalıştırın.',
-    '',
-    `Paket tarihi: ${today}`,
-  ].join('\n'));
-
-  zip.file('app/index.html', html);
-  zip.file('app/data/mosbarkod-yedek.json', JSON.stringify(state, null, 2));
-
-  try {
-    const manifest = await fetch('/manifest.webmanifest').then((r) => r.text());
-    zip.file('app/manifest.webmanifest', manifest);
-  } catch {
-    zip.file('app/manifest.webmanifest', '{}');
-  }
-  try {
-    const sw = await fetch('/sw.js').then((r) => r.text());
-    zip.file('app/sw.js', sw);
-  } catch {
-    zip.file('app/sw.js', '');
-  }
-  try {
-    const icon = await fetch('/icons/icon-512.png').then((r) => r.arrayBuffer());
-    zip.file('app/icons/icon-512.png', icon);
-  } catch {
-    // ikon alınamazsa paket yine indirilir
-  }
-
-  zip.file('mosbarkodyazilim', [
-    '#!/usr/bin/env bash',
-    'set -e',
-    'APP_DIR="$HOME/.local/share/mosbarkodyazilim/app"',
-    'LOG_DIR="$HOME/.local/share/mosbarkodyazilim"',
-    'PORT="${MOSBARKOD_PORT:-8787}"',
-    'BIND="${MOSBARKOD_BIND:-0.0.0.0}"',
-    'mkdir -p "$LOG_DIR"',
-    '',
-    'if ! command -v python3 >/dev/null 2>&1; then',
-    '  zenity --error --text="python3 bulunamadı. Linux Mint üzerinde python3 kurulu olmalıdır." 2>/dev/null || echo "python3 bulunamadı"',
-    '  exit 1',
-    'fi',
-    '',
-    '# Sunucu çalışmıyorsa başlat. Port açıksa mevcut sunucuyu kullan.',
-    'if ! (timeout 1 bash -c "cat < /dev/null > /dev/tcp/127.0.0.1/$PORT") >/dev/null 2>&1; then',
-    '  (cd "$APP_DIR" && nohup python3 -m http.server "$PORT" --bind "$BIND" > "$LOG_DIR/server.log" 2>&1 &)',
-    '  sleep 1',
-    'fi',
-    '',
-    'URL="http://127.0.0.1:$PORT/index.html"',
-    'if command -v google-chrome >/dev/null 2>&1; then',
-    '  exec google-chrome --app="$URL" --class=MOSBARKODYAZILIM',
-    'elif command -v chromium-browser >/dev/null 2>&1; then',
-    '  exec chromium-browser --app="$URL" --class=MOSBARKODYAZILIM',
-    'elif command -v chromium >/dev/null 2>&1; then',
-    '  exec chromium --app="$URL" --class=MOSBARKODYAZILIM',
-    'elif command -v microsoft-edge >/dev/null 2>&1; then',
-    '  exec microsoft-edge --app="$URL" --class=MOSBARKODYAZILIM',
-    'else',
-    '  exec xdg-open "$URL"',
-    'fi',
-  ].join('\n'));
-
-  zip.file('mosbarkodyazilim.desktop', [
-    '[Desktop Entry]',
-    'Name=MOSBARKODYAZILIM',
-    'Comment=Yapay Zeka Destekli Barkod Satış Programı',
-    'Exec=__HOME__/.local/bin/mosbarkodyazilim',
-    'Icon=__HOME__/.local/share/mosbarkodyazilim/app/icons/icon-512.png',
-    'Terminal=false',
-    'Type=Application',
-    'Categories=Office;Utility;',
-    'StartupWMClass=MOSBARKODYAZILIM',
-  ].join('\n'));
-
-  zip.file('install-linux-mint.sh', [
-    '#!/usr/bin/env bash',
-    'set -e',
-    'ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"',
-    'APP_DIR="$HOME/.local/share/mosbarkodyazilim"',
-    'BIN_DIR="$HOME/.local/bin"',
-    'DESKTOP_DIR="$HOME/.local/share/applications"',
-    'mkdir -p "$APP_DIR" "$BIN_DIR" "$DESKTOP_DIR"',
-    'rm -rf "$APP_DIR/app"',
-    'cp -r "$ROOT_DIR/app" "$APP_DIR/app"',
-    'cp "$ROOT_DIR/mosbarkodyazilim" "$BIN_DIR/mosbarkodyazilim"',
-    'chmod +x "$BIN_DIR/mosbarkodyazilim"',
-    'sed "s|__HOME__|$HOME|g" "$ROOT_DIR/mosbarkodyazilim.desktop" > "$DESKTOP_DIR/mosbarkodyazilim.desktop"',
-    'chmod +x "$DESKTOP_DIR/mosbarkodyazilim.desktop"',
-    'if [ -d "$HOME/Desktop" ]; then',
-    '  cp "$DESKTOP_DIR/mosbarkodyazilim.desktop" "$HOME/Desktop/MOSBARKODYAZILIM.desktop"',
-    '  chmod +x "$HOME/Desktop/MOSBARKODYAZILIM.desktop"',
-    '  gio set "$HOME/Desktop/MOSBARKODYAZILIM.desktop" metadata::trusted true 2>/dev/null || true',
-    'fi',
-    'xdg-desktop-menu forceupdate 2>/dev/null || true',
-    'echo "Kurulum tamamlandı."',
-    'echo "Menüden veya masaüstünden MOSBARKODYAZILIM uygulamasını açabilirsiniz."',
-    'echo "Telefon bağlantısı için Linux bilgisayar IP adresi: $(hostname -I | awk \'{print $1}\'):8787"',
-    'read -p "Devam etmek için Enter..."',
-  ].join('\n'));
-
-  zip.file('uninstall-linux-mint.sh', [
-    '#!/usr/bin/env bash',
-    'rm -rf "$HOME/.local/share/mosbarkodyazilim"',
-    'rm -f "$HOME/.local/bin/mosbarkodyazilim"',
-    'rm -f "$HOME/.local/share/applications/mosbarkodyazilim.desktop"',
-    'rm -f "$HOME/Desktop/MOSBARKODYAZILIM.desktop"',
-    'xdg-desktop-menu forceupdate 2>/dev/null || true',
-    'echo "MOSBARKODYAZILIM kaldırıldı."',
-    'read -p "Devam etmek için Enter..."',
-  ].join('\n'));
-
-  return zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } });
-}
-
 /**
  * Korumalı bölümlerin ortak güvenlik şifresi.
- * Kasa & ciro sıfırlama ve Kurulum & Sürüm Dosyaları gibi kritik bölümler
- * yalnızca bu 8 haneli şifreyle açılır.
+ * Kasa & ciro sıfırlama gibi kritik bölümler yalnızca bu 8 haneli şifreyle açılır.
  */
 const SECURITY_PASS = '12345678';
 
@@ -1189,12 +725,8 @@ export default function SettingsScreen({
   const { locale, setLocale, t } = useLocale();
   const visibleConnected = sync.connected;
   const [resetGateOpen, setResetGateOpen] = useState(false);
-  const [dlPassOpen, setDlPassOpen] = useState(false);
   const [open, setOpen] = useState<TileId | null>(null);
-  const [winBusy, setWinBusy] = useState(false);
-  const [linuxBusy, setLinuxBusy] = useState(false);
   const [qrScanOpen, setQrScanOpen] = useState(false);
-  const [updates, setUpdates] = useState<any[]>([]);
   const [shareBaseUrl, setShareBaseUrl] = useState(() => {
     const saved = localStorage.getItem('mosbarkod_share_base_url');
     if (saved) return saved;
@@ -1244,14 +776,6 @@ export default function SettingsScreen({
     reader.readAsDataURL(file);
   };
 
-  // updates.json'dan update listesini yükle
-  useEffect(() => {
-    fetch('/downloads/updates.json')
-      .then(res => res.json())
-      .then(data => setUpdates(data.updates || []))
-      .catch(() => setUpdates([]));
-  }, []);
-
   // Electron çalışırken LAN servis IP'sini otomatik doldur (telefon 127.0.0.1'e gidemez)
   useEffect(() => {
     const me = window.mosEmail;
@@ -1268,25 +792,6 @@ export default function SettingsScreen({
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const downloadWindowsPackage = async () => {
-    setWinBusy(true);
-    try {
-      const blob = await makeWindowsPackage(state);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `MOSBARKODYAZILIM-Windows-EXE-Paketi-${new Date().toISOString().slice(0, 10)}.zip`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-      toast('Windows kurulum paketi indirildi. ZIP içindeki build-exe.bat ile .EXE oluşturabilirsiniz.');
-    } catch {
-      toast('Windows kurulum paketi oluşturulamadı', 'err');
-    }
-    setWinBusy(false);
-  };
 
   const qrBase = shareBaseUrl.replace(/[?#].*$/, '').replace(/\/$/, '');
   const adminQr = `${qrBase}?sync=1588&device=admin`;
@@ -1316,39 +821,6 @@ export default function SettingsScreen({
     return false;
   };
 
-  const downloadReadyExe = async () => {
-    const ok = await readyExeExists();
-    if (!ok) {
-      toast('Hazır .EXE dosyası henüz sunucuya eklenmemiş. Önce GitHub Actions ile MOSBARKODYAZILIM-Setup.exe üretip public/downloads klasörüne koyun.', 'err');
-      return;
-    }
-    const a = document.createElement('a');
-    a.href = '/downloads/MOSBARKODYAZILIM-Setup.exe';
-    a.download = 'MOSBARKODYAZILIM-Setup.exe';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-  };
-
-  const downloadLinuxMintPackage = async () => {
-    setLinuxBusy(true);
-    try {
-      const blob = await makeLinuxMintPackage(state);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `MOSBARKODYAZILIM-Linux-Mint-Kurulum-${new Date().toISOString().slice(0, 10)}.zip`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-      toast('Linux Mint kurulum paketi indirildi. ZIP içindeki install-linux-mint.sh ile kurulum yapabilirsiniz.');
-    } catch {
-      toast('Linux Mint kurulum paketi oluşturulamadı', 'err');
-    }
-    setLinuxBusy(false);
-  };
-
   const syncBadge = visibleConnected ? (
     <Badge tone="ok">BAĞLI</Badge>
   ) : sync.role === 'host' ? (
@@ -1374,8 +846,6 @@ export default function SettingsScreen({
     { id: 'hardware', icon: 'barcode', color: 'text-mint', title: 'Donanım Entegrasyonu', desc: 'Barkod okuyucu, terminal fiş yazıcı ve elektronik terazi uyumluluğu.' },
     { id: 'backup', icon: 'download', color: 'text-blue', title: 'Yedekleme & Sistem Sağlık', desc: 'Otomatik tam yedekleme, manuel yedek/yükleme ve sistem taraması.' },
     { id: 'update', icon: 'reset', color: 'text-blue', title: 'Program Güncelleme', desc: 'Yeni sürüm paketlerini (.mosbupdate / .zip / .json) yükleyip doğrulayın.' },
-    { id: 'downloads', icon: 'monitor', color: 'text-amber2', title: 'Kurulum & Sürüm Dosyaları', desc: 'Windows EXE build paketi, Linux Mint kurulumu ve hazır EXE indirme.' },
-    { id: 'mobileSetup', icon: 'camera', color: 'text-mint', title: 'Mobil Kurulum (APK & iOS)', desc: 'Uygulamayı telefon ve tabletlere PWA olarak kurma adımları.' },
     { id: 'modules', icon: 'box', color: 'text-blue', title: 'Modül Yönetimi', desc: 'Ulaşım Kartı ve Paket Sipariş sekmelerini ülkeye/müşteriye göre açıp kapatın.', badge: <Badge tone="warn">{MODULE_ON_COUNT}/2 AÇIK</Badge> },
     { id: 'reset', icon: 'alert', color: 'text-red', title: 'Kasa & Ciro Sıfırlama', desc: 'İlk kurulum için tüm işletme hareketlerini sıfırlayın (tehlikeli işlem).' },
     { id: 'profile', icon: 'user', color: 'text-amber2', title: 'Profil Özeti', desc: 'Mevcut mağaza, tema, ses, rapor ve kart görsel ayarlarının özeti.' },
@@ -1397,10 +867,8 @@ export default function SettingsScreen({
               color={t.color}
               badge={t.badge}
               onOpen={() => {
-                // Kritik bölümler yalnızca güvenlik şifresiyle açılır.
-                if (t.id === 'downloads') {
-                  setDlPassOpen(true);
-                } else if (t.id === 'reset') {
+                // Kritik bölüm yalnızca güvenlik şifresiyle açılır.
+                if (t.id === 'reset') {
                   setResetGateOpen(true);
                 } else {
                   setOpen(t.id);
@@ -1810,137 +1278,6 @@ export default function SettingsScreen({
         </SettingsModal>
       )}
 
-      {open === 'downloads' && (
-        <SettingsModal title="Kurulum & Sürüm Dosyaları" icon="monitor" color="text-amber2" onClose={() => setOpen(null)}>
-          <Panel icon="download" title="Windows Kurulum Dosyaları" color="text-amber2">
-            <p className="mb-3 text-[10.5px] leading-relaxed text-mut2">
-              Hazır <span className="font-mono text-amber2">.EXE</span> dosyası sunucuya eklendiyse doğrudan indirin.
-              Eğer henüz EXE yoksa, otomatik Windows build paketini indirip GitHub Actions üzerinde kurulum dosyasını
-              üretebilirsiniz.
-            </p>
-            <div className="rounded-lg border border-line bg-ink/40 p-3 font-mono text-[10px] leading-relaxed text-mut2">
-              Hazır EXE yolu: public/downloads/MOSBARKODYAZILIM-Setup.exe
-            </div>
-            <Btn v="mint" className="mt-3 w-full" onClick={downloadReadyExe}>
-              <Ic n="download" c="h-4 w-4" /> Hazır EXE Dosyasını İndir
-            </Btn>
-            <Btn v="primary" className="mt-2 w-full" onClick={downloadWindowsPackage} disabled={winBusy}>
-              {winBusy ? (
-                <>
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" /> Paket hazırlanıyor...
-                </>
-              ) : (
-                <>
-                  <Ic n="download" c="h-4 w-4" /> EXE Otomatik Build Paketini İndir
-                </>
-              )}
-            </Btn>
-          </Panel>
-
-          <Panel icon="download" title="Program Update Dosyaları" color="text-blue">
-            <p className="mb-3 text-[10.5px] leading-relaxed text-mut2">
-              Program güncellemeleri için Windows ve Linux Mint platformlarına özel update dosyalarını buradan indirebilirsiniz.
-              Update dosyasını Program Güncelleme bölümünden yükleyebilirsiniz.
-            </p>
-
-            <div className="mb-3 space-y-2">
-              {updates.length > 0 ? (
-                updates.map((update, index) => (
-                  <div key={index} className="rounded-lg border border-line bg-ink/40 p-3">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="font-mono text-[12px] font-bold text-blue">
-                          {update.version} ({update.platform})
-                        </div>
-                        <div className="text-[9px] text-mut2">
-                          {update.date} • {update.size}
-                        </div>
-                        {update.notes && update.notes.length > 0 && (
-                          <div className="mt-1 text-[10px] text-mut2">
-                            {update.notes[0]}
-                          </div>
-                        )}
-                      </div>
-                      <Btn
-                        v={update.platform === 'windows' ? 'primary' : 'mint'}
-                        className="px-3 py-1.5 text-[11px]"
-                        onClick={() => {
-                          if (update.url) {
-                            window.open(update.url, '_blank');
-                            toast(`${update.platform} update dosyası indiriliyor...`);
-                          } else {
-                            toast('Update dosyası henüz mevcut değil', 'err');
-                          }
-                        }}
-                      >
-                        <Ic n="download" c="h-3.5 w-3.5" /> İndir
-                      </Btn>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="rounded-lg border border-line bg-ink/40 p-3 text-center text-[11px] text-mut2">
-                  Update listesi yükleniyor...
-                </div>
-              )}
-            </div>
-
-            <p className="mt-3 text-[10px] text-mut2">
-              💡 İpucu: Update dosyalarını GitHub Releases veya kendi sunucunuzdan indirebilirsiniz.
-              Dosya formatı: .mosbupdate, .zip veya .json
-            </p>
-          </Panel>
-
-          <Panel icon="download" title="Linux Mint Kurulum Dosyaları" color="text-mint">
-            <p className="mb-3 text-[10.5px] leading-relaxed text-mut2">
-              Linux Mint / Ubuntu üzerinde programı masaüstüne sabitlemek için hazır kurulum paketi indirin. Paket,
-              uygulamayı yerel sunucu üzerinden çalıştırır ve masaüstü kısayolu oluşturur.
-            </p>
-            <div className="rounded-lg border border-line bg-ink/40 p-3 font-mono text-[10px] leading-relaxed text-mut2">
-              Kurulum: ZIP'i çıkar → install-linux-mint.sh çalıştır → Menü ve masaüstünde MOSBARKODYAZILIM görünür.
-            </div>
-            <Btn v="mint" className="mt-3 w-full" onClick={downloadLinuxMintPackage} disabled={linuxBusy}>
-              {linuxBusy ? (
-                <>
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" /> Paket hazırlanıyor...
-                </>
-              ) : (
-                <>
-                  <Ic n="download" c="h-4 w-4" /> Linux Mint Kurulum Paketini İndir
-                </>
-              )}
-            </Btn>
-          </Panel>
-        </SettingsModal>
-      )}
-
-      {open === 'mobileSetup' && (
-        <SettingsModal title="Mobil Kurulum (APK & iOS)" icon="camera" color="text-mint" wide={false} onClose={() => setOpen(null)}>
-          <Panel icon="monitor" title="PWA Kurulum Adımları" color="text-mint" desc="Uygulama Progressive Web App (PWA) olarak Android ve iOS cihazlara kurulabilir.">
-            <div className="grid gap-3 md:grid-cols-2">
-              <div className="rounded-lg border border-line bg-panel2/50 p-3">
-                <div className="mb-1.5 flex items-center gap-2 text-[12.5px] font-bold text-mint"><Ic n="check" c="h-4 w-4" /> Android (Telefon / Tablet)</div>
-                <ol className="list-decimal space-y-1 pl-4 text-[11px] leading-relaxed text-mut">
-                  <li>Chrome tarayıcısında bu uygulamayı açın.</li>
-                  <li>Üst menüden <b className="text-mut">"Ana ekrana ekle"</b> seçin.</li>
-                  <li>İkon masaüstüne gelir; uygulamadan bağımsız, tam ekran açılır.</li>
-                  <li><b className="text-mut">APK üretmek için:</b> pwabuilder.com adresine bu sayfanın URL'sini yapıştırıp "Download Package" ile resmi APK alabilirsiniz (ücretsiz). Alternatif: Bubblewrap (TWA).</li>
-                </ol>
-              </div>
-              <div className="rounded-lg border border-line bg-panel2/50 p-3">
-                <div className="mb-1.5 flex items-center gap-2 text-[12.5px] font-bold text-mint"><Ic n="check" c="h-4 w-4" /> iOS (iPhone / iPad)</div>
-                <ol className="list-decimal space-y-1 pl-4 text-[11px] leading-relaxed text-mut">
-                  <li>Safari ile bu uygulamayı açın.</li>
-                  <li>Alt kısımdaki <b className="text-mut">Paylaş</b> (kutu + ok) düğmesine basın.</li>
-                  <li><b className="text-mut">"Ana Ekrana Ekle"</b> seçin; ikon uygulamalar arasında görünür.</li>
-                  <li>Tam donanımlı native app için Xcode + TestFlight dağıtımı gerekir; PWA çözümündeki tüm işlevler birebir çalışır.</li>
-                </ol>
-              </div>
-            </div>
-          </Panel>
-        </SettingsModal>
-      )}
-
       {open === 'modules' && (
         <SettingsModal title="Modül Yönetimi" icon="box" color="text-blue" wide={false} onClose={() => setOpen(null)}>
           <Panel icon="box" title="Aktif Modüller (Sekmeler)" color="text-blue" desc="Her ülke veya müşteri bu sekmelerin tümüne ihtiyaç duymayabilir. Kapattığınız sekme menüden kaldırılır; değişiklik anında kaydedilir.">
@@ -2069,26 +1406,6 @@ export default function SettingsScreen({
           }}
           onError={() => toast('Hatalı güvenlik şifresi!', 'err')}
           onClose={() => setResetGateOpen(false)}
-        />
-      )}
-
-      {dlPassOpen && (
-        <SecurityGateModal
-          title="Kurulum & Sürüm Dosyaları — Güvenlik Şifresi Gerekli"
-          confirmLabel="Şifreyi Onayla ve Aç"
-          color="text-amber2"
-          warning={
-            <div className="rounded-lg border border-amber/30 bg-amber/10 p-3 text-[11px] leading-relaxed text-amber2">
-              Bu bölümde <b className="font-bold">Windows EXE build paketi, Linux Mint kurulumu ve hazır EXE</b> indirme
-              dosyaları bulunur. Yalnızca yetkili yöneticiler açmalıdır.
-            </div>
-          }
-          onAuthorized={() => {
-            setDlPassOpen(false);
-            setOpen('downloads');
-          }}
-          onError={() => toast('Hatalı güvenlik şifresi!', 'err')}
-          onClose={() => setDlPassOpen(false)}
         />
       )}
 

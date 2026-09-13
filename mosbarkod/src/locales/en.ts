@@ -273,8 +273,6 @@ export const en: TranslationTable = {
   'settings.updateDesc': 'Upload and verify new version packages (.mosbupdate / .zip / .json).',
   'settings.downloads': 'Installers & Version Files',
   'settings.downloadsDesc': 'Windows EXE build package, Linux Mint installer and ready EXE download.',
-  'settings.mobileSetup': 'Mobile Install (APK & iOS)',
-  'settings.mobileSetupDesc': 'Steps to install the app on phones and tablets as a PWA.',
   'settings.reset': 'Reset Cash & Turnover',
   'settings.resetDesc': 'Reset all business transactions for initial setup (dangerous operation).',
   'settings.profile': 'Profile Summary',

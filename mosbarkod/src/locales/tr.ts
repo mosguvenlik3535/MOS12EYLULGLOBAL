@@ -273,8 +273,6 @@ export const tr: TranslationTable = {
   'settings.updateDesc': 'Yeni sürüm paketlerini (.mosbupdate / .zip / .json) yükleyip doğrulayın.',
   'settings.downloads': 'Kurulum & Sürüm Dosyaları',
   'settings.downloadsDesc': 'Windows EXE build paketi, Linux Mint kurulumu ve hazır EXE indirme.',
-  'settings.mobileSetup': 'Mobil Kurulum (APK & iOS)',
-  'settings.mobileSetupDesc': 'Uygulamayı telefon ve tabletlere PWA olarak kurma adımları.',
   'settings.reset': 'Kasa & Ciro Sıfırlama',
   'settings.resetDesc': 'İlk kurulum için tüm işletme hareketlerini sıfırlayın (tehlikeli işlem).',
   'settings.profile': 'Profil Özeti',
