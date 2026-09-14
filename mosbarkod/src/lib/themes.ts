@@ -67,6 +67,7 @@ export const THEMES: Theme[] = [
   { id: 'safir', name: 'Safir', desc: 'Derin safir mavisi', accent: '#4f46e5', accent2: '#818cf8', ink: '#070914', panel: '#0d1020', panel2: '#12162b', panel3: '#191e38', line: '#1b213c', line2: '#2b3459', ...D },
 
   /* ---------------- AÇIK TEMALAR ---------------- */
+  { id: 'modernAcik', name: 'Modern Açık', desc: 'Çağdaş gri-beyaz ve indigo', light: true, accent: '#6366f1', accent2: '#4f46e5', ink: '#eceff5', panel: '#ffffff', panel2: '#f3f5fa', panel3: '#e7ebf3', line: '#e1e7f0', line2: '#c6d0e0', ...L },
   { id: 'gunIsigi', name: 'Gün Işığı', desc: 'Klasik açık beyaz tema', light: true, accent: '#d97706', accent2: '#b45309', ink: '#f7f8fa', panel: '#ffffff', panel2: '#f2f4f7', panel3: '#e9ecf1', line: '#e4e7ec', line2: '#d0d5dd', ...L },
   { id: 'kagit', name: 'Kağıt', desc: 'Sıcak krem kağıt tonu', light: true, accent: '#b45309', accent2: '#92400e', ink: '#faf6f0', panel: '#fffdf9', panel2: '#f5efe6', panel3: '#ece4d8', line: '#e8e0d4', line2: '#d6cbba', ...L },
   { id: 'acikMavi', name: 'Açık Mavi', desc: 'Ferah gökyüzü mavisi', light: true, accent: '#0284c7', accent2: '#0369a1', ink: '#f4f9fd', panel: '#ffffff', panel2: '#eef6fc', panel3: '#e2eff9', line: '#dceaf5', line2: '#c3dcee', ...L },
