@@ -29,16 +29,6 @@ const D = {
   blue: '#5aa2f0',
 };
 
-/* İnci beyazı serisinde ortak metin/durum renkleri (siyah fontlar) */
-const LP = {
-  txt: '#111111',
-  mut: '#3f3f3f',
-  mut2: '#6e6e6e',
-  mint: '#047857',
-  red: '#b91c1c',
-  blue: '#1d4ed8',
-};
-
 /* Açık temalarda ortak metin/durum renkleri */
 const L = {
   txt: '#101828',
@@ -78,12 +68,6 @@ export const THEMES: Theme[] = [
 
   /* ---------------- AÇIK TEMALAR ---------------- */
   { id: 'modernAcik', name: 'Modern Açık', desc: 'Çağdaş gri-beyaz ve indigo', light: true, accent: '#6366f1', accent2: '#4f46e5', ink: '#eceff5', panel: '#ffffff', panel2: '#f3f5fa', panel3: '#e7ebf3', line: '#e1e7f0', line2: '#c6d0e0', ...L },
-  { id: 'inciSafir', name: 'İnci Safir', desc: 'İnci beyazı ve safir mavisi', light: true, accent: '#1d4ed8', accent2: '#1e40af', ink: '#f5f3ee', panel: '#fffdf9', panel2: '#f1ede3', panel3: '#e7e1d2', line: '#e3dccb', line2: '#cfc3a8', ...LP },
-  { id: 'inciZumrut', name: 'İnci Zümrüt', desc: 'İnci beyazı ve zümrüt yeşili', light: true, accent: '#047857', accent2: '#065f46', ink: '#f5f3ee', panel: '#fffdf9', panel2: '#f1ede3', panel3: '#e7e1d2', line: '#e3dccb', line2: '#cfc3a8', ...LP },
-  { id: 'inciBordo', name: 'İnci Bordo', desc: 'İnci beyazı ve bordo', light: true, accent: '#9f1239', accent2: '#881337', ink: '#f5f3ee', panel: '#fffdf9', panel2: '#f1ede3', panel3: '#e7e1d2', line: '#e3dccb', line2: '#cfc3a8', ...LP },
-  { id: 'inciMor', name: 'İnci Mor', desc: 'İnci beyazı ve mor', light: true, accent: '#6d28d9', accent2: '#5b21b6', ink: '#f5f3ee', panel: '#fffdf9', panel2: '#f1ede3', panel3: '#e7e1d2', line: '#e3dccb', line2: '#cfc3a8', ...LP },
-  { id: 'inciTuruncu', name: 'İnci Turuncu', desc: 'İnci beyazı ve turuncu', light: true, accent: '#c2410c', accent2: '#9a3412', ink: '#f5f3ee', panel: '#fffdf9', panel2: '#f1ede3', panel3: '#e7e1d2', line: '#e3dccb', line2: '#cfc3a8', ...LP },
-  { id: 'inciGrafit', name: 'İnci Grafit', desc: 'İnci beyazı ve grafit siyahı', light: true, accent: '#27272a', accent2: '#18181b', ink: '#f5f3ee', panel: '#fffdf9', panel2: '#f1ede3', panel3: '#e7e1d2', line: '#e3dccb', line2: '#cfc3a8', ...LP },
   { id: 'gunIsigi', name: 'Gün Işığı', desc: 'Klasik açık beyaz tema', light: true, accent: '#d97706', accent2: '#b45309', ink: '#f7f8fa', panel: '#ffffff', panel2: '#f2f4f7', panel3: '#e9ecf1', line: '#e4e7ec', line2: '#d0d5dd', ...L },
   { id: 'kagit', name: 'Kağıt', desc: 'Sıcak krem kağıt tonu', light: true, accent: '#b45309', accent2: '#92400e', ink: '#faf6f0', panel: '#fffdf9', panel2: '#f5efe6', panel3: '#ece4d8', line: '#e8e0d4', line2: '#d6cbba', ...L },
   { id: 'acikMavi', name: 'Açık Mavi', desc: 'Ferah gökyüzü mavisi', light: true, accent: '#0284c7', accent2: '#0369a1', ink: '#f4f9fd', panel: '#ffffff', panel2: '#eef6fc', panel3: '#e2eff9', line: '#dceaf5', line2: '#c3dcee', ...L },
