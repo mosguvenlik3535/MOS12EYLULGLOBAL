@@ -1,6 +1,16 @@
 MOSBARKODYAZILIM — iPhone (PWA) PAKETİ KURULUM KILAVUZU
 =====================================================
 
+HAZIR ADRES (hosting gerekmez!)
+-------------------------------
+Uygulama şu adreste otomatik yayındadır, her sürümde güncellenir:
+
+  https://mosguvenlik3535.github.io/MOS12EYLULGLOBAL/
+
+iPhone'da Safari ile bu adresi açıp "Paylaş → Ana Ekrana Ekle"
+yapmanız yeterli. Kendi hosting'inizi kullanmak isterseniz
+aşağıdaki ADIM 1'i izleyin.
+
 Bu paket, uygulamayı iPhone'da Safari üzerinden "Ana Ekrana Ekle" ile
 tam ekran uygulama gibi çalıştırır. App Store, Apple onayı ve 99 $
 üyelik GEREKMEZ.
