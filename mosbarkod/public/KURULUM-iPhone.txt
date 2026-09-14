@@ -1,0 +1,39 @@
+MOSBARKODYAZILIM — iPhone (PWA) PAKETİ KURULUM KILAVUZU
+=====================================================
+
+Bu paket, uygulamayı iPhone'da Safari üzerinden "Ana Ekrana Ekle" ile
+tam ekran uygulama gibi çalıştırır. App Store, Apple onayı ve 99 $
+üyelik GEREKMEZ.
+
+ADIM 1 — DOSYALARI HOSTING'E YÜKLEYİN
+-------------------------------------
+1. Bu ZIP'i bilgisayarınızda bir klasöre açın.
+2. İçindeki TÜM dosya ve klasörleri (index.html, manifest.webmanifest,
+   sw.js, icons/, KURULUM-iPhone.txt) hosting'inizin web klasörüne
+   (genelde public_html veya www) yükleyin. Alt klasör de olur
+   (örn. siteniz.com/mos/).
+3. Site adresinizin HTTPS (https://) ile açıldığından emin olun.
+   Kamera barkod okuma SADECE https:// adreslerde çalışır.
+
+ADIM 2 — iPHONE'DA KURUN
+------------------------
+1. iPhone'da Safari'yi açıp site adresinize gidin.
+2. Paylaş düğmesine (kare + yukarı ok) dokunun.
+3. "Ana Ekrana Ekle" → "Ekle"ye dokunun.
+4. Artık ana ekrandaki MOSBARKOD ikonuyla tam ekran açılır.
+
+ÖNEMLİ NOTLAR
+-------------
+- Güncelleme: Yeni sürümde ZIP'teki dosyaları hosting'e yeniden
+  yükleyin; uygulama açıldığında otomatik tazelenir.
+- Yedekleme: Ayarlar'dan düzenli yerel yedek alın; isterseniz
+  PRO ile bulut yedeklemeyi (Google Drive / Dropbox) açın.
+- Yazıcı: iPhone Safari Bluetooth termal yazıcıya doğrudan
+  bağlanamaz. Fiş için AirPrint uyumlu yazıcı kullanın ya da
+  fişi PDF olarak paylaşıp yazdırın.
+- Lisans: Bu paket mağaza dışıdır; mevcut lisans anahtarı
+  sisteminiz aynen geçerlidir.
+- İnternet: İlk açılışta gerekir; sonrası çevrimdışı çalışır.
+  Bulut yedek ve e-posta için internet gerekir.
+
+İyi satışlar!
