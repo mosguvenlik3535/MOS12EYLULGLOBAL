@@ -485,6 +485,7 @@ export interface Settings {
     lastPackageDate: string | null;
     lastPackageName: string | null;
     lastCheckedAt: string | null;
+    seedMigration?: string;
   };
   criticalDefault: number;
   kentkartLimit: number;
@@ -925,6 +926,14 @@ export const defaultProducts = (): Product[] => [
   mkP('Maydanoz (Demet)', '8691041040401', 'Manav', 40, 'adet', 10, 9, 11, 8, undefined, 1),
 ];
 
+/** v1.14.0 ile gelen 20 yeni örnek ürünün barkodları — göçte yalnızca eksik olanlar eklenir. */
+const SEED_114_BARCODES = new Set([
+  '8691041021211', '8691041022221', '8691041023231', '8691041024241', '8691041025251',
+  '8691041026261', '8691041027271', '8691041028281', '8691041029291', '8691041030301',
+  '8691041031311', '8691041032321', '8691041033331', '8691041034341', '8691041035351',
+  '8691041036361', '8691041037371', '8691041038381', '8691041039391', '8691041040401',
+]);
+
 export const defaultCustomers = (): Customer[] => [
   {
     id: 'c1',
@@ -1312,6 +1321,24 @@ export function loadState(): AppState {
           if (st.report && st.report.ownerPhone === '00 90 555 406 61 43') st.report.ownerPhone = '';
           if (st.autobackup && st.autobackup.folder && st.autobackup.folder.includes('mosgu')) st.autobackup.folder = '';
           if (st.update && st.update.currentVersion === 'v1.5.0-PRO') st.update.currentVersion = appVersionLabel();
+        }
+        /* v1.14.1 göçü (tek seferlik): v1.14.0 ile gelen 20 yeni örnek ürün
+           (çikolata/cips/dondurma/manav) kayıtlı envanterde eksikse eklenir;
+           POS Entegrasyonu modülü kapalı konuma alınır. Kullanıcının kendi
+           ürünlerine ve diğer ayarlarına dokunulmaz. */
+        {
+          const st = merged.settings;
+          if (st.update && st.update.seedMigration !== '1.14.1') {
+            const have = new Set(merged.products.map((p) => p.barcode));
+            for (const p of defaultProducts()) {
+              if (SEED_114_BARCODES.has(p.barcode) && !have.has(p.barcode)) {
+                merged.products.push(p);
+                have.add(p.barcode);
+              }
+            }
+            st.modules = { ...st.modules, posint: false };
+            st.update.seedMigration = '1.14.1';
+          }
         }
         if (!merged.imkart) merged.imkart = { limit: 3000, txns: [] };
         if (!Array.isArray(merged.imkart.txns)) merged.imkart.txns = [];
