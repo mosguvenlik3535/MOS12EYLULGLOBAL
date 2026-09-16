@@ -563,14 +563,15 @@ export default function App() {
   // Kapatılan bir modülün sekmesine gidilmeye çalışılırsa Satış'a düş.
   const viewAllowed = (v: ViewId) =>
     (v === 'imkart' ? moduleEnabled(state.settings, 'imkart') : true) &&
-    (v === 'delivery' ? moduleEnabled(state.settings, 'delivery') : true);
+    (v === 'delivery' ? moduleEnabled(state.settings, 'delivery') : true) &&
+    (v === 'pos-integration' ? moduleEnabled(state.settings, 'posint') : true);
   const goView = (v: ViewId) => setView(viewAllowed(v) ? v : 'sales');
 
   // Görünüm dışarıdan kapatılmış bir modüle set edilirse (ör. geri yükleme/uzak eşleme) Satış'a çevir.
   useEffect(() => {
     if (!viewAllowed(view)) setView('sales');
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [view, state.settings.modules?.imkart, state.settings.modules?.delivery]);
+  }, [view, state.settings.modules?.imkart, state.settings.modules?.delivery, state.settings.modules?.posint]);
 
   const ciroToday = round2(state.sales.filter((s) => isToday(s.date)).reduce((a, s) => a + s.total, 0));
   const todaySaleCount = state.sales.filter((s) => isToday(s.date)).length;

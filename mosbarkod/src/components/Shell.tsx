@@ -15,13 +15,14 @@ import {
   setActiveCurrencyCode,
   type Settings,
   type ViewId,
+  type ModuleId,
 } from '../data';
 
-export const NAV: { id: ViewId; key: string; icon: string; module?: 'imkart' | 'delivery' }[] = [
+export const NAV: { id: ViewId; key: string; icon: string; module?: ModuleId }[] = [
   { id: 'sales', key: 'nav.sales', icon: 'cart' },
   { id: 'delivery', key: 'nav.delivery', icon: 'bag', module: 'delivery' },
   { id: 'imkart', key: 'nav.imkart', icon: 'card', module: 'imkart' },
-  { id: 'pos-integration', key: 'nav.posIntegration', icon: 'card' },
+  { id: 'pos-integration', key: 'nav.posIntegration', icon: 'card', module: 'posint' },
   { id: 'stock', key: 'nav.stock', icon: 'box' },
   { id: 'purchase', key: 'nav.purchase', icon: 'bag' },
   { id: 'credit', key: 'nav.credit', icon: 'scale' },

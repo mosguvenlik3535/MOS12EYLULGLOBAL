@@ -437,6 +437,7 @@ export interface Settings {
   modules: {
     imkart: boolean;   // Ulaşım Kartı sekmesi
     delivery: boolean; // Paket Sipariş sekmesi
+    posint: boolean;   // POS Entegrasyonu sekmesi
   };
   report: {
     enabled: boolean;
@@ -805,7 +806,7 @@ export const METHOD_META: Record<PayMethod, { label: string; color: string }> = 
 export const VIEWS_LOCKED_FOR_CASHIER: ViewId[] = ['purchase', 'expense', 'staff', 'settings'];
 
 /** Kapatılabilen ana modüller (sekmeler). */
-export type ModuleId = 'imkart' | 'delivery';
+export type ModuleId = 'imkart' | 'delivery' | 'posint';
 
 /** Bir modülün açık olup olmadığını döndürür (tanımsızsa açık kabul edilir). */
 export const moduleEnabled = (settings: Settings, mod: ModuleId): boolean => settings.modules?.[mod] !== false;
@@ -1102,7 +1103,7 @@ export const defaultSettings = (): Settings => ({
     keepDays: 7,
     lastRun: null,
   },
-  modules: { imkart: true, delivery: true },
+  modules: { imkart: true, delivery: true, posint: true },
   report: {
     enabled: false,
     ownerPhone: '',

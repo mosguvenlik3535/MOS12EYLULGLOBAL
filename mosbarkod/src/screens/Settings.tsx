@@ -840,7 +840,8 @@ export default function SettingsScreen({
   const activeCurrency = s.currency?.active || 'TRY';
   const imkartOn = moduleEnabled(s, 'imkart');
   const deliveryOn = moduleEnabled(s, 'delivery');
-  const MODULE_ON_COUNT = (imkartOn ? 1 : 0) + (deliveryOn ? 1 : 0);
+  const posintOn = moduleEnabled(s, 'posint');
+  const MODULE_ON_COUNT = (imkartOn ? 1 : 0) + (deliveryOn ? 1 : 0) + (posintOn ? 1 : 0);
 
   const TILES: { id: TileId; icon: string; color: string; title: string; desc: string; badge?: React.ReactNode }[] = [
     { id: 'language', icon: 'globe', color: 'text-mint', title: t('settings.language'), desc: `${t('settings.languageDesc')} (${LOCALES.length})` },
@@ -854,7 +855,7 @@ export default function SettingsScreen({
     { id: 'hardware', icon: 'barcode', color: 'text-mint', title: 'Donanım Entegrasyonu', desc: 'Barkod okuyucu, terminal fiş yazıcı ve elektronik terazi uyumluluğu.' },
     { id: 'backup', icon: 'download', color: 'text-blue', title: 'Yedekleme & Sistem Sağlık', desc: 'Otomatik tam yedekleme, manuel yedek/yükleme ve sistem taraması.' },
     { id: 'update', icon: 'reset', color: 'text-blue', title: 'Program Güncelleme', desc: 'Yeni sürüm paketlerini (.mosbupdate / .zip / .json) yükleyip doğrulayın.' },
-    { id: 'modules', icon: 'box', color: 'text-blue', title: 'Modül Yönetimi', desc: 'Ulaşım Kartı ve Paket Sipariş sekmelerini ülkeye/müşteriye göre açıp kapatın.', badge: <Badge tone="warn">{MODULE_ON_COUNT}/2 AÇIK</Badge> },
+    { id: 'modules', icon: 'box', color: 'text-blue', title: 'Modül Yönetimi', desc: 'Ulaşım Kartı, Paket Sipariş ve POS Entegrasyonu sekmelerini ülkeye/müşteriye göre açıp kapatın.', badge: <Badge tone="warn">{MODULE_ON_COUNT}/3 AÇIK</Badge> },
     { id: 'reset', icon: 'alert', color: 'text-red', title: 'Kasa & Ciro Sıfırlama', desc: 'İlk kurulum için tüm işletme hareketlerini sıfırlayın (tehlikeli işlem).' },
     { id: 'profile', icon: 'user', color: 'text-amber2', title: 'Profil Özeti', desc: 'Mevcut mağaza, tema, ses, rapor ve kart görsel ayarlarının özeti.' },
   ];
@@ -1329,10 +1330,10 @@ export default function SettingsScreen({
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {[
-                  { label: 'Tam Paket', desc: 'İmkart + Sipariş', m: { imkart: true, delivery: true } },
-                  { label: 'Sipariş Yok', desc: 'yalnız İmkart', m: { imkart: true, delivery: false } },
-                  { label: 'İmkart Yok', desc: 'yalnız Sipariş', m: { imkart: false, delivery: true } },
-                  { label: 'Yalnız POS', desc: 'ikisi kapalı', m: { imkart: false, delivery: false } },
+                  { label: 'Tam Paket', desc: 'üçü açık', m: { imkart: true, delivery: true, posint: true } },
+                  { label: 'Sipariş Yok', desc: 'İmkart + POS Ent.', m: { imkart: true, delivery: false, posint: true } },
+                  { label: 'İmkart Yok', desc: 'Sipariş + POS Ent.', m: { imkart: false, delivery: true, posint: true } },
+                  { label: 'Yalnız Satış', desc: 'üçü kapalı', m: { imkart: false, delivery: false, posint: false } },
                 ].map((pr) => (
                   <button
                     key={pr.label}
@@ -1367,6 +1368,14 @@ export default function SettingsScreen({
                   on: deliveryOn,
                   offHint: 'Kapatılırsa sipariş telefonları (order rolü) Satış ekranına yönlendirilir.',
                 },
+                {
+                  id: 'posint',
+                  icon: 'monitor',
+                  title: 'POS Entegrasyonu',
+                  desc: 'Banka ve yazar kasa POS cihaz bağlantı ayarları sekmesi (marka kataloğu, TCP/seri/USB/API).',
+                  on: posintOn,
+                  offHint: 'Kapatılırsa sekme menüden kaldırılır; kartla satış (kart / nakit+POS) etkilenmez.',
+                },
               ] as const).map((m) => (
                 <div
                   key={m.id}
@@ -1395,7 +1404,7 @@ export default function SettingsScreen({
             </div>
             <div className="rounded-lg border border-line bg-ink/40 p-3 text-[10.5px] leading-relaxed text-mut2">
               <b className="text-mut">Not:</b> Ayar cihazda kalıcı saklanır; uygulama yeniden açıldığında da geçerlidir. Kapattığınız
-              modüle ait mevcut veriler (dolum geçmişi, siparişler) silinmez — yalnızca ekranlar gizlenir.
+              modüle ait mevcut veriler (dolum geçmişi, siparişler, POS bağlantı ayarları) silinmez — yalnızca ekranlar gizlenir.
             </div>
           </Panel>
         </SettingsModal>
