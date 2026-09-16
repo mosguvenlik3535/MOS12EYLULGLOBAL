@@ -23,7 +23,15 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - uses: android-actions/setup-android@v3
+      # ubuntu-latest'te Android SDK önceden kurulu (/usr/local/lib/android/sdk).
+      # setup-android@v3, Google'ın 15 Eyl 2026'da kaldırdığı eski 'tools' paketini
+      # istediği için kurulum adımında patlıyor — bu yüzden kullanılmıyor.
+      - name: Verify preinstalled Android SDK
+        run: |
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          ls "$ANDROID_SDK_ROOT" || exit 1
+          rm -rf "${ANDROID_SDK_ROOT:?}/tools"
 
       - name: Install dependencies
         working-directory: mosbarkod
