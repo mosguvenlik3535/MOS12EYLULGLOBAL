@@ -437,7 +437,7 @@ export interface Settings {
   modules: {
     imkart: boolean;   // Ulaşım Kartı sekmesi
     delivery: boolean; // Paket Sipariş sekmesi
-    posint: boolean;   // POS Entegrasyonu sekmesi
+    posint: boolean;   // POS Entegrasyonu sekmesi (varsayılan kapalı)
   };
   report: {
     enabled: boolean;
@@ -864,7 +864,8 @@ const mkP = (
   p2: number,
   p3: number,
   critical: number,
-  image?: string
+  image?: string,
+  vat?: number
 ): Product => ({
   id: 'p' + barcode.slice(-6),
   name,
@@ -878,6 +879,7 @@ const mkP = (
   cost: round2(p1 * 0.62),
   critical,
   image,
+  ...(vat != null ? { vatRate: vat } : {}),
 });
 
 export const defaultProducts = (): Product[] => [
@@ -901,6 +903,26 @@ export const defaultProducts = (): Product[] => [
   mkP('Filtre Kahve 250g', '8691041018181', 'Kahve & Çay', 40, 'adet', 320, 300, 340, 10),
   mkP('Kahve Telvesi 250g', '8691041019191', 'Kahve & Çay', 22, 'adet', 260, 240, 280, 10),
   mkP('Siyah Çay 250g', '8691041020201', 'Kahve & Çay', 55, 'adet', 85, 78, 90, 12),
+  mkP('Sütlü Çikolata 60g', '8691041021211', 'Çikolata & Gofret', 90, 'adet', 45, 42, 48, 15, undefined, 10),
+  mkP('Bitter Çikolata 60g', '8691041022221', 'Çikolata & Gofret', 70, 'adet', 50, 47, 54, 12, undefined, 10),
+  mkP('Fındıklı Gofret 45g', '8691041023231', 'Çikolata & Gofret', 110, 'adet', 30, 28, 33, 20, undefined, 10),
+  mkP('Karamelli Çikolata Bar 50g', '8691041024241', 'Çikolata & Gofret', 95, 'adet', 35, 32, 38, 15, undefined, 10),
+  mkP('Patates Cipsi Sade 130g', '8691041025251', 'Atıştırmalık', 85, 'adet', 65, 60, 70, 15),
+  mkP('Nacho Mısır Cipsi 120g', '8691041026261', 'Atıştırmalık', 75, 'adet', 60, 56, 65, 15),
+  mkP('Yoğurtlu Baharatlı Cips 120g', '8691041027271', 'Atıştırmalık', 70, 'adet', 60, 56, 65, 15),
+  mkP('Vanilyalı Dondurma 500ml', '8691041028281', 'Dondurma', 30, 'adet', 120, 112, 128, 8, undefined, 10),
+  mkP('Kakaolu Dondurma 500ml', '8691041029291', 'Dondurma', 30, 'adet', 120, 112, 128, 8, undefined, 10),
+  mkP('Çilekli Dondurma 500ml', '8691041030301', 'Dondurma', 28, 'adet', 120, 112, 128, 8, undefined, 10),
+  mkP('Çikolata Kaplı Vanilya Bar 90ml', '8691041031311', 'Dondurma', 60, 'adet', 55, 52, 58, 12, undefined, 10),
+  mkP('Külah Dondurma Karışık 120ml', '8691041032321', 'Dondurma', 65, 'adet', 45, 42, 48, 12, undefined, 10),
+  mkP('Domates (Dökme)', '8691041033331', 'Manav', 30, 'kg', 40, 36, 44, 5, undefined, 1),
+  mkP('Salatalık (Dökme)', '8691041034341', 'Manav', 25, 'kg', 35, 32, 38, 5, undefined, 1),
+  mkP('Elma (Dökme)', '8691041035351', 'Manav', 28, 'kg', 50, 46, 54, 5, undefined, 1),
+  mkP('Muz (Dökme)', '8691041036361', 'Manav', 20, 'kg', 80, 74, 86, 4, undefined, 1),
+  mkP('Patates (Dökme)', '8691041037371', 'Manav', 50, 'kg', 20, 18, 22, 8, undefined, 1),
+  mkP('Kuru Soğan (Dökme)', '8691041038381', 'Manav', 45, 'kg', 22, 20, 24, 8, undefined, 1),
+  mkP('Limon (Dökme)', '8691041039391', 'Manav', 15, 'kg', 45, 42, 48, 3, undefined, 1),
+  mkP('Maydanoz (Demet)', '8691041040401', 'Manav', 40, 'adet', 10, 9, 11, 8, undefined, 1),
 ];
 
 export const defaultCustomers = (): Customer[] => [
@@ -1103,7 +1125,7 @@ export const defaultSettings = (): Settings => ({
     keepDays: 7,
     lastRun: null,
   },
-  modules: { imkart: true, delivery: true, posint: true },
+  modules: { imkart: true, delivery: true, posint: false },
   report: {
     enabled: false,
     ownerPhone: '',
