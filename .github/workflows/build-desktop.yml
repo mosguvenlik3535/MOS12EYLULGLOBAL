@@ -77,12 +77,23 @@ jobs:
             --title "MOSBARKODYAZILIM ${{ github.ref_name }}" \
             --notes "Yapay Zeka Destekli Barkod Satış Programı — masaüstü (Windows .exe + DEMO) ve Linux (AppImage) sürümleri." \
             2>/dev/null || true
-          for i in 1 2 3; do
-            if gh release upload "${{ github.ref_name }}" $files --clobber; then
-              echo "upload ok (attempt $i)"
-              break
+          # Büyük dosyalar tek komutta toplu yüklenince GitHub tarafı bağlantıyı
+          # düşürebiliyor (Eyl 2026'dan beri raporlanıyor) → tek tek + retry.
+          for f in $files; do
+            ok=0
+            for i in 1 2 3 4 5; do
+              if gh release upload "${{ github.ref_name }}" "$f" --clobber; then
+                echo "upload ok: $f (attempt $i)"
+                ok=1
+                break
+              fi
+              echo "::warning::upload failed for $f (attempt $i/5), retrying..."
+              sleep 30
+            done
+            if [ "$ok" != "1" ]; then
+              echo "::error::upload failed for $f after 5 attempts"
+              exit 1
             fi
-            echo "::warning::upload attempt $i failed, retrying..."
-            sleep 20
-            [ "$i" = "3" ] && exit 1
           done
+          echo "--- release assets ---"
+          gh release view "${{ github.ref_name }}" --json assets --jq '.assets[].name'
