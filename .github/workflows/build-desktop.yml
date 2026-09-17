@@ -69,13 +69,20 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           files=$(ls mosbarkod/release/${{ matrix.glob }} mosbarkod/release-demo/*.exe 2>/dev/null || true)
-          if [ -n "$files" ]; then
-            gh release create "${{ github.ref_name }}" \
-              --title "MOSBARKODYAZILIM ${{ github.ref_name }}" \
-              --notes "Yapay Zeka Destekli Barkod Satış Programı — masaüstü (Windows .exe + DEMO) ve Linux (AppImage) sürümleri." \
-              $files 2>/dev/null || \
-            gh release upload "${{ github.ref_name }}" $files --clobber
-          else
+          if [ -z "$files" ]; then
             echo "::warning::release dosyası bulunamadı"
             exit 1
           fi
+          gh release create "${{ github.ref_name }}" \
+            --title "MOSBARKODYAZILIM ${{ github.ref_name }}" \
+            --notes "Yapay Zeka Destekli Barkod Satış Programı — masaüstü (Windows .exe + DEMO) ve Linux (AppImage) sürümleri." \
+            2>/dev/null || true
+          for i in 1 2 3; do
+            if gh release upload "${{ github.ref_name }}" $files --clobber; then
+              echo "upload ok (attempt $i)"
+              break
+            fi
+            echo "::warning::upload attempt $i failed, retrying..."
+            sleep 20
+            [ "$i" = "3" ] && exit 1
+          done
