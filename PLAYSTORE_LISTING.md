@@ -8,7 +8,7 @@
 
 | Alan | Değer |
 |---|---|
-| Uygulama adı (Play) | **MOSBARKOD POS — Barkod Satış & Kasa** |
+| Uygulama adı (Play) | **MOS: Barkod Satış Kasa ve Stok** (30 karakter) |
 | Kısa ad | MOSBARKOD |
 | Paket adı (applicationId) | `com.mosbarkodyazilim.pos` |
 | Kategori | İş / Business |
