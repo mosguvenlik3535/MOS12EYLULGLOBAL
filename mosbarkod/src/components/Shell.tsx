@@ -92,7 +92,7 @@ export function Sidebar({
       )}
     >
       <StoreCard settings={settings} collapsed={collapsed} />
-      <nav className="flex-1 space-y-1 overflow-y-auto p-2">
+      <nav className="min-h-0 flex-1 space-y-1 overflow-y-auto p-2">
         {(() => {
           const { t } = useLocale();
           const labelOf = (id: string) => t(NAV.find((n) => n.id === id)?.key ?? 'nav.sales');

@@ -268,7 +268,7 @@ export default function DeliveryScreen({
               return (
                 <div key={s.id} className="flex min-w-[220px] flex-col rounded-xl border border-line bg-ink/30">
                   <div className={cn('border-b border-line px-3 py-2 font-mono text-[11px] font-bold uppercase tracking-widest', s.tone)}>{s.label} · {col.length}</div>
-                  <div className="flex-1 space-y-2 overflow-y-auto p-2.5">
+                  <div className="min-h-0 flex-1 space-y-2 overflow-y-auto p-2.5">
                     {col.length === 0 ? <div className="rounded-lg border border-dashed border-line2 px-3 py-6 text-center font-mono text-[10.5px] text-mut2">Kayıt yok</div> : col.map((o) => {
                       const nxt = nextStatus(o.status);
                       return (

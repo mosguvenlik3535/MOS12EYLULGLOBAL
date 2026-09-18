@@ -615,7 +615,14 @@ function CartPanel(props: PosProps & { handle: React.ReactNode; fullWidth?: bool
 
   return (
     <section
-      className={cn('relative flex shrink-0 flex-col rounded-xl border border-line bg-panel', dragging && 'border-amber/50')}
+      className={cn(
+        'relative flex flex-col rounded-xl border border-line bg-panel',
+        /* Telefonda panel ekranı doldurur: aksi hâlde sepet büyüdükçe ödeme
+           bloğu ekranın dışına taşıyor ve sayfa kaymadığı için satış
+           tamamlanamıyordu (3+ üründe "Ödeme Al" görünmüyordu). */
+        props.fullWidth ? 'h-full min-h-0' : 'shrink-0',
+        dragging && 'border-amber/50'
+      )}
       style={{ width: props.fullWidth ? '100%' : w }}
     >
       <div
@@ -638,7 +645,7 @@ function CartPanel(props: PosProps & { handle: React.ReactNode; fullWidth?: bool
           )}
         />
       </div>
-      <div className="flex items-center gap-2 border-b border-line px-3.5 py-3">
+      <div className="flex shrink-0 items-center gap-2 border-b border-line px-3.5 py-3">
         <Ic n="cart" c="h-5 w-5 text-amber" />
         <h2 className="font-mono text-[13px] font-bold tracking-wide">{t('pos.cartTitle', { n: register })}</h2>
         <div className="ml-auto flex items-center gap-1.5">
@@ -661,7 +668,7 @@ function CartPanel(props: PosProps & { handle: React.ReactNode; fullWidth?: bool
         </div>
       </div>
 
-      <div className="flex items-center gap-2 border-b border-line px-3.5 py-2.5">
+      <div className="flex shrink-0 items-center gap-2 border-b border-line px-3.5 py-2.5">
         <span className="font-mono text-[10px] uppercase tracking-widest text-mut2">Fiyat Modu:</span>
         <div className="flex flex-1 gap-1">
           {PRICE_MODES.map((m) => (
@@ -681,7 +688,7 @@ function CartPanel(props: PosProps & { handle: React.ReactNode; fullWidth?: bool
         </div>
       </div>
 
-      <div className="flex-1 space-y-2 overflow-y-auto p-3">
+      <div className="flex-1 min-h-0 space-y-2 overflow-y-auto p-3">
         {cart.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-line2 px-5 text-center">
             <div className="rounded-xl border border-line2 bg-panel3 p-4 text-mut2">
@@ -712,7 +719,8 @@ function CartPanel(props: PosProps & { handle: React.ReactNode; fullWidth?: bool
         )}
       </div>
 
-      <div className="space-y-2 border-t border-line p-3.5">
+      {/* Toplam + "Ödeme Al" bloğu her zaman ekranda kalır (küçülmez). */}
+      <div className="shrink-0 space-y-2 border-t border-line p-3.5">
         <div className="flex items-center justify-between text-[12px]">
           <span className="text-mut">{t('pos.subtotal')}</span>
           <span className="font-mono font-bold tabular-nums">{fmt(subtotal)}</span>
@@ -1151,7 +1159,12 @@ function ExtrasPanel(
   }
 
   return (
-    <aside className={cn('w-full shrink-0 flex-col gap-3 overflow-y-auto', props.mobile ? 'flex' : 'hidden xl:flex w-[268px]')}>
+    <aside
+      className={cn(
+        'w-full shrink-0 flex-col gap-3 overflow-y-auto',
+        props.mobile ? 'flex h-full min-h-0' : 'hidden xl:flex w-[268px]'
+      )}
+    >
       {quick.length > 0 && (
         <section className="rounded-xl border border-line bg-panel p-3">
           <div className="flex items-center gap-1.5">
