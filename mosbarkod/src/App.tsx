@@ -172,6 +172,9 @@ export default function App() {
   const [licensed, setLicensed] = useState(() => IS_DEMO || Boolean(getStoredLicense()));
   const [pro, setPro] = useState(false);
   const [proOpen, setProOpen] = useState(false);
+  const [proBannerOff, setProBannerOff] = useState(() => {
+    try { return localStorage.getItem('mos_pro_banner_off') === '1'; } catch { return false; }
+  });
   // Play ücretsiz katman kilidi: yalnızca Play derlemesinde, lisanssız ve PRO'suzken true.
   const proLocked = IS_PLAY && !licensed && !pro;
   const requirePro = () => setProOpen(true);
@@ -1541,13 +1544,23 @@ export default function App() {
           DEMO SÜRÜM · {Math.max(0, DEMO_MAX_SALES - Math.max(0, state.sales.length - demoBaseline))} SATIŞ KALDI
         </div>
       )}
-      {IS_PLAY && !licensed && !pro && (
-        <button
-          onClick={() => setProOpen(true)}
-          className="fixed left-1/2 top-[70px] z-[80] -translate-x-1/2 rounded-full border border-mint/70 bg-mint px-3 py-1 font-mono text-[10px] font-black tracking-[0.2em] text-[#04211a] shadow-lg transition-transform hover:scale-105"
-        >
-          ★ ÜCRETSİZ SÜRÜM — PRO'YA YÜKSELT
-        </button>
+      {IS_PLAY && !licensed && !pro && !proBannerOff && (
+        <div className="fixed bottom-[76px] left-1/2 z-[80] flex max-w-[94vw] -translate-x-1/2 items-center gap-1 rounded-full border border-mint/70 bg-mint py-1 pl-3 pr-1 shadow-lg">
+          <button
+            onClick={() => setProOpen(true)}
+            className="whitespace-nowrap font-mono text-[10px] font-black tracking-[0.15em] text-[#04211a]"
+          >
+            ★ ÜCRETSİZ SÜRÜM — PRO'YA YÜKSELT
+          </button>
+          <button
+            onClick={() => { setProBannerOff(true); try { localStorage.setItem('mos_pro_banner_off', '1'); } catch { /* ignore */ } }}
+            aria-label="PRO şeridini kapat"
+            title="Kapat"
+            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[14px] font-black leading-none text-[#04211a]/70 transition-colors hover:bg-black/10 hover:text-[#04211a]"
+          >
+            ×
+          </button>
+        </div>
       )}
     </div>
     </LocaleContext.Provider>
