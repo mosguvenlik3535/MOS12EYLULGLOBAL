@@ -158,12 +158,18 @@ export function MobileNav({ view, go, settings }: { view: ViewId; go: (v: ViewId
             onClick={() => go(it.id)}
             title={label}
             className={cn(
-              'flex min-w-[64px] flex-1 flex-col items-center gap-0.5 rounded-lg px-1 py-1.5 transition-colors',
+              'flex min-w-[58px] flex-1 flex-col items-center gap-0.5 rounded-lg px-0.5 py-1.5 transition-colors',
               active ? 'bg-amber/15 text-amber2' : 'text-mut active:bg-panel3'
             )}
           >
-            <Ic n={it.icon} c="h-5 w-5" />
-            <span className="w-full truncate text-center font-mono text-[8.5px] font-semibold uppercase tracking-wide">
+            <Ic n={it.icon} c="h-[18px] w-[18px]" />
+            {/* Etiket tek satıra sığmıyorsa iki satıra kırılır (kesilmez). */}
+            <span
+              className={cn(
+                'line-clamp-2 w-full break-words text-center font-mono font-semibold uppercase leading-[1.1] tracking-[0.02em]',
+                label.length > 14 ? 'text-[8px]' : 'text-[9px]'
+              )}
+            >
               {label}
             </span>
           </button>

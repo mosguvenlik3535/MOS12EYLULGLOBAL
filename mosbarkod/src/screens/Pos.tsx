@@ -8,6 +8,7 @@ import CameraScanner from '../components/CameraScanner';
 import { useLocale } from '../locales/i18n';
 import AiVisionModal from '../components/AiVisionModal';
 import { broadcastToCfd, CustomerDisplay } from '../components/CustomerDisplay';
+import { resolveProductImage } from '../lib/seedImages';
 import {
   CATEGORIES,
   PRICE_MODES,
@@ -110,7 +111,8 @@ function ImgOrTile({
   fit?: 'cover' | 'contain';
 }) {
   const [fail, setFail] = useState(false);
-  if (!p.image || fail) {
+  const src = resolveProductImage(p.image);
+  if (!src || fail) {
     return (
       <div
         className="flex h-full w-full items-center justify-center"
@@ -124,7 +126,7 @@ function ImgOrTile({
   }
   return (
     <img
-      src={p.image}
+      src={src}
       alt={p.name}
       loading="lazy"
       onError={() => setFail(true)}
@@ -394,7 +396,7 @@ function RowImg({ src, dot, name }: { src: string; dot: string; name: string }) 
         </span>
       </div>
     );
-  return <img src={src} alt={name} loading="lazy" onError={() => setFail(true)} className="h-full w-full object-cover" />;
+  return <img src={resolveProductImage(src)} alt={name} loading="lazy" onError={() => setFail(true)} className="h-full w-full object-cover" />;
 }
 
 /* ---------- terazi entegrasyonu (gram & kilogram bazlı satış) ---------- */
@@ -557,6 +559,9 @@ const cartWInit = () => {
     return 380;
   }
 };
+
+/** Telefonda ürün kartlarının kolon sayısı — Ayarlar → Görünüm Özelleştirme'den seçilir. */
+const MOBILE_COL_CLASS: Record<number, string> = { 2: 'grid-cols-2', 3: 'grid-cols-3', 4: 'grid-cols-4' };
 
 function useIsMobile() {
   const [m, setM] = useState(() => window.matchMedia('(max-width: 767px)').matches);
@@ -764,6 +769,7 @@ function CartPanel(props: PosProps & { handle: React.ReactNode; fullWidth?: bool
 
 function ProductBrowser(props: PosProps & { handle: React.ReactNode; onOpenWeight: (p: Product) => void; onOpenAiVision: () => void }) {
   const { products, priceMode, settings, scanFx } = props;
+  const isMobile = useIsMobile();
   const [code, setCode] = useState('');
   const [query, setQuery] = useState('');
   const [cat, setCat] = useState('Hepsi');
@@ -799,6 +805,17 @@ function ProductBrowser(props: PosProps & { handle: React.ReactNode; onOpenWeigh
         p.category.toLowerCase().includes(query.toLowerCase()) ||
         p.barcode.includes(query))
   );
+
+  /* ---- telefon düzeni: küçük görseller + sıkı kartlar ---- */
+  const ui0 = settings.ui;
+  const mobCols = Math.min(4, Math.max(2, Math.round(ui0.mobileCols || 3)));
+  /** Telefonda tam-kart görsel modu kapalıdır: 40 px kutuya yazı sığmaz, kartlar okunmaz. */
+  const useFullCard = Boolean(ui0.fullCardImage) && !isMobile;
+  const imgH = isMobile
+    ? Math.max(24, Math.min(160, Math.round(ui0.mobileImgH || 40)))
+    : useFullCard
+      ? ui0.productImgH + 58
+      : ui0.productImgH;
 
   const okut = () => {
     if (!code.trim()) return;
@@ -887,8 +904,9 @@ function ProductBrowser(props: PosProps & { handle: React.ReactNode; onOpenWeigh
         ))}
       </div>
 
+      {/* Akıllı Öneri şeridi telefonda yer kaplamasın diye yalnızca tablet/masaüstünde görünür. */}
       {suggestions.length > 0 && (
-        <div className="flex shrink-0 items-center gap-2 overflow-x-auto border-b border-line bg-gradient-to-r from-amber/8 to-transparent px-3 py-2">
+        <div className="hidden shrink-0 items-center gap-2 overflow-x-auto border-b border-line bg-gradient-to-r from-amber/8 to-transparent px-3 py-2 md:flex">
           <span className="flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-widest text-amber2">
             <Ic n="sparkles" c="h-3.5 w-3.5" /> Akıllı Öneri
           </span>
@@ -907,7 +925,10 @@ function ProductBrowser(props: PosProps & { handle: React.ReactNode; onOpenWeigh
       )}
 
       <div
-        className="grid min-h-0 flex-1 auto-rows-min grid-cols-2 content-start gap-2.5 overflow-y-auto overscroll-contain p-3 sm:grid-cols-[repeat(auto-fill,minmax(150px,1fr))]"
+        className={cn(
+          'grid min-h-0 flex-1 auto-rows-min content-start overflow-y-auto overscroll-contain p-2 md:grid-cols-[repeat(auto-fill,minmax(150px,1fr))] md:gap-2.5 md:p-3',
+          isMobile ? `${MOBILE_COL_CLASS[mobCols] ?? 'grid-cols-3'} gap-1.5` : 'grid-cols-2 gap-2.5'
+        )}
         style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}
       >
         {list.map((p) => {
@@ -992,7 +1013,7 @@ function ProductBrowser(props: PosProps & { handle: React.ReactNode; onOpenWeigh
                 </div>
               ) : (
                 <>
-                  <div className="relative overflow-hidden bg-panel3" style={{ height: ui.productImgH }}>
+                  <div className="relative overflow-hidden bg-panel3" style={{ height: imgH }}>
                     <ImgOrTile p={p} dot={c.dot} scale={ui.productImgScale} fit={ui.productImgFit} />
                     {ui.overlayEnabled && ovRaw.trim() !== '' && (
                       <span
@@ -1025,18 +1046,30 @@ function ProductBrowser(props: PosProps & { handle: React.ReactNode; onOpenWeigh
                       </span>
                     )}
                   </div>
-                  <div className="p-2.5">
-                    <div className="font-mono text-[8.5px] uppercase tracking-[0.14em] text-mut2">{p.category}</div>
+                  <div className={cn(isMobile ? 'p-1.5' : 'p-2.5')}>
+                    <div className={cn('font-mono text-[8.5px] uppercase tracking-[0.14em] text-mut2', isMobile && 'hidden')}>
+                      {p.category}
+                    </div>
                     <div
-                      className="mt-0.5 truncate leading-tight"
-                      style={{ fontSize: ui.nameSize, fontWeight: ui.nameWeight, color: ui.nameColor || undefined }}
+                      className={cn('mt-0.5 leading-tight', isMobile ? 'line-clamp-2' : 'truncate')}
+                      style={{
+                        fontSize: isMobile ? Math.min(ui.nameSize, 12) : ui.nameSize,
+                        fontWeight: ui.nameWeight,
+                        color: ui.nameColor || undefined,
+                      }}
                     >
                       {p.name}
                     </div>
-                    <div className="mt-2 flex items-center justify-between gap-1 border-t border-line pt-1.5">
+                    <div
+                      className={cn(
+                        'flex items-center justify-between gap-1 border-t border-line',
+                        isMobile ? 'mt-1 pt-1' : 'mt-2 pt-1.5'
+                      )}
+                    >
                       <span
                         className={cn(
-                          'font-mono text-[10px] tabular-nums',
+                          'font-mono tabular-nums',
+                          isMobile ? 'text-[9px]' : 'text-[10px]',
                           isNeg ? 'font-bold text-red' : isCrit ? 'font-bold text-amber2' : ''
                         )}
                         style={isNeg || isCrit ? undefined : { color: ui.stockColor || undefined }}
@@ -1044,7 +1077,7 @@ function ProductBrowser(props: PosProps & { handle: React.ReactNode; onOpenWeigh
                         Stok: {fmtN(p.stock)}
                       </span>
                       <span
-                        className="font-mono text-[12px] font-bold tabular-nums"
+                        className={cn('font-mono font-bold tabular-nums', isMobile ? 'text-[11px]' : 'text-[12px]')}
                         style={{ color: ui.priceColor || undefined }}
                       >
                         {priceMode === 'taksit' ? `3x ${fmt(round2(price / 3))}` : fmt(price)}

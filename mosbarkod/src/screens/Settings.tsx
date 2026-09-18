@@ -15,6 +15,7 @@ import { LOCALES } from '../locales/i18n';
 import Flag from '../components/Flag';
 import { IS_DEMO, IS_PLAY, appVersionLabel } from '../lib/buildMode';
 import { fxRate, fxUpdatedAt, isFxStale, refreshFxForce, refreshFxIfStale } from '../lib/fx';
+import { SEED_IMAGES } from '../lib/seedImages';
 
 /** Kur gösterim biçimi: 1'in üstü 2, altı 4 ondalık. */
 const fmtFxRate = (r: number) => (r >= 1 ? r.toFixed(2) : r.toFixed(4));
@@ -86,7 +87,7 @@ function AppearanceCard({ ui, onPatch }: { ui: Settings['ui']; onPatch: (p: Part
       {ui.fullCardImage ? (
         <div className="relative overflow-hidden" style={{ height: ui.productImgH + 58 }}>
           <img
-            src="https://images.pexels.com/photos/15875047/pexels-photo-15875047.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=400&w=640"
+            src={SEED_IMAGES.biraKutu}
             alt=""
             className="h-full w-full"
             style={{ objectFit: ui.productImgFit, transform: `scale(${Math.max(50, Math.min(200, ui.productImgScale)) / 100})`, transformOrigin: 'center center' }}
@@ -114,7 +115,7 @@ function AppearanceCard({ ui, onPatch }: { ui: Settings['ui']; onPatch: (p: Part
         <>
           <div className="relative overflow-hidden bg-panel3" style={{ height: ui.productImgH }}>
             <img
-              src="https://images.pexels.com/photos/15875047/pexels-photo-15875047.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=400&w=640"
+              src={SEED_IMAGES.biraKutu}
               alt=""
               className="h-full w-full"
               style={{ objectFit: ui.productImgFit, transform: `scale(${Math.max(50, Math.min(200, ui.productImgScale)) / 100})`, transformOrigin: 'center center' }}
@@ -166,6 +167,50 @@ function AppearanceCard({ ui, onPatch }: { ui: Settings['ui']; onPatch: (p: Part
                 <p className="mt-0.5 text-[10px] text-mut2">Resim kartın en alt kavisli köşelerine kadar tüm kartı kaplar.</p>
               </div>
               <Toggle on={ui.fullCardImage} onChange={(b) => set('fullCardImage', b)} />
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-line bg-ink/40 p-3">
+            <div className="mb-2 font-mono text-[10px] font-bold uppercase tracking-widest text-mut">
+              Telefon (Mobil) Düzeni
+            </div>
+            <div className="mb-3">
+              <span className="mb-1.5 block font-mono text-[10px] uppercase tracking-widest text-mut2">Kolon Sayısı</span>
+              <div className="flex gap-1.5">
+                {[2, 3, 4].map((c) => (
+                  <button
+                    key={c}
+                    onClick={() => set('mobileCols', c)}
+                    className={cn(
+                      'flex-1 rounded-lg border px-2 py-2 text-[12px] font-semibold transition-colors',
+                      (ui.mobileCols || 3) === c
+                        ? 'border-amber bg-amber/15 text-amber2'
+                        : 'border-line2 bg-ink/40 text-mut hover:text-txt'
+                    )}
+                  >
+                    {c}'li
+                  </button>
+                ))}
+              </div>
+              <p className="mt-1 text-[10px] text-mut2">Telefonda tek ekrana kaç ürün sığsın.</p>
+            </div>
+            <div>
+              <div className="mb-1 flex items-center justify-between">
+                <span className="font-mono text-[10px] uppercase tracking-widest text-mut">Mobil Görsel Yüksekliği</span>
+                <span className="font-mono text-[11px] font-bold text-amber2 tabular-nums">{ui.mobileImgH} px</span>
+              </div>
+              <input
+                type="range"
+                min={24}
+                max={120}
+                step={2}
+                value={ui.mobileImgH}
+                onChange={(e) => set('mobileImgH', Number(e.target.value))}
+                className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-line2 accent-[var(--color-amber)]"
+              />
+              <p className="mt-1 text-[10px] text-mut2">
+                Telefonda ürün fotoğrafı kutusunun yüksekliği — masaüstü ayarını etkilemez.
+              </p>
             </div>
           </div>
 
@@ -1434,6 +1479,7 @@ export default function SettingsScreen({
               <div className="flex justify-between"><span className="text-mut2">E-posta Raporu:</span><span>{s.email.enabled ? 'Aktif' : 'Kapalı'}</span></div>
               <div className="flex justify-between"><span className="text-mut2">Otomatik Yedek:</span><span>{s.autobackup.enabled ? `${s.autobackup.interval} dk` : 'Kapalı'}</span></div>
               <div className="flex justify-between"><span className="text-mut2">Tam Kart Görsel:</span><span>{s.ui.fullCardImage ? 'Açık' : 'Kapalı'}</span></div>
+              <div className="flex justify-between"><span className="text-mut2">Mobil Düzen:</span><span>{s.ui.mobileCols || 3} kolon · {s.ui.mobileImgH || 40} px</span></div>
               <div className="flex justify-between"><span className="text-mut2">POS Entegrasyonu:</span><span>{s.pos.enabled ? 'Açık' : 'Kapalı'}</span></div>
             </div>
           </Panel>

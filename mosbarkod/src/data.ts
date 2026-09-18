@@ -1,5 +1,6 @@
 import { appVersionLabel } from './lib/buildMode';
 import { fxRate as _fxRate, initFx } from './lib/fx';
+import { SEED_IMAGES } from './lib/seedImages';
 
 export type PriceMode = 'f1' | 'f2' | 'f3' | 'kkart' | 'taksit';
 export type PayMethod = 'nakit' | 'kart' | 'nakit+pos' | 'veresiye';
@@ -503,6 +504,10 @@ export interface Settings {
     productImgScale: number;
     productImgFit: 'cover' | 'contain';
     fullCardImage: boolean;
+    /** Telefonda (genişlik < 768px) ürün kartlarının kolon sayısı: 2 / 3 / 4 */
+    mobileCols: number;
+    /** Telefonda ürün görsel kutusunun yüksekliği (px) */
+    mobileImgH: number;
     showNameOnImage: boolean;
     showPriceOnImage: boolean;
     overlayEnabled: boolean;
@@ -838,16 +843,17 @@ export const ALL_REPORT_IDS = REPORT_ITEMS.map((i) => i.id);
 const px = (id: number) =>
   `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=400&w=640`;
 
+/* Görseller uygulamanın içine gömülüdür (internet gerekmez) — bkz. lib/seedImages.ts */
 const IMG = {
-  tuborg: px(15875047),
-  efes: px(20329457),
-  corona: px(30664243),
-  cola: px(10812066),
-  raki1: px(33123450),
-  raki2: px(33123433),
-  viski1: px(31758683),
-  viski2: px(34630638),
-  cips1: px(19141651),
+  tuborg: SEED_IMAGES.biraKutu,
+  efes: SEED_IMAGES.biraSise,
+  corona: SEED_IMAGES.biraAcik,
+  cola: SEED_IMAGES.kola,
+  raki1: SEED_IMAGES.rakiKucuk,
+  raki2: SEED_IMAGES.rakiBuyuk,
+  viski1: SEED_IMAGES.viski1,
+  viski2: SEED_IMAGES.viski2,
+  cips1: SEED_IMAGES.cips,
   cips2: px(8023869),
   snack1: px(7375283),
   nuts1: px(38935853),
@@ -1082,6 +1088,8 @@ export const defaultUI = () => ({
   productImgScale: 100,
   productImgFit: 'cover' as const,
   fullCardImage: true,
+  mobileCols: 3,
+  mobileImgH: 40,
   showNameOnImage: true,
   showPriceOnImage: true,
   overlayEnabled: false,

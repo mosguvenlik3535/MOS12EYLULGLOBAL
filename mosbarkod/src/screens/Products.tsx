@@ -12,16 +12,19 @@ import { fetchProductByBarcode, generateEan13, searchProductsByName, type AiProd
 import { fileToDataUrl } from '../lib/image';
 import { analyzeStock, ABC_META, type AbcClass } from '../lib/stockIntel';
 import { buildCountEntries, summarizeCount, type StockCountSummary } from '../lib/stockCount';
+import { SEED_IMAGES, resolveProductImage } from '../lib/seedImages';
 
 type Toast = (msg: string, type?: 'ok' | 'err') => void;
 
-/* Yerel Hızlı Görüntü Şablonları */
+/* Yerel Hızlı Görüntü Şablonları — görseller uygulamanın içine gömülüdür,
+   internet olmadan da (Play Store / telefon sürümü dahil) görünür. */
 const PRESETS = {
-  beer: 'https://images.pexels.com/photos/15875047/pexels-photo-15875047.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=400&w=640',
-  liquor: 'https://images.pexels.com/photos/33123450/pexels-photo-33123450.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=400&w=640',
-  tobacco: 'https://images.pexels.com/photos/32651589/pexels-photo-32651589.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=400&w=640',
-  soda: 'https://images.pexels.com/photos/10812066/pexels-photo-10812066.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=400&w=640',
-  chips: 'https://images.pexels.com/photos/19141651/pexels-photo-19141651.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=400&w=640',
+  beer: SEED_IMAGES.biraKutu,
+  liquor: SEED_IMAGES.rakiBuyuk,
+  tobacco: SEED_IMAGES.sigara,
+  soda: SEED_IMAGES.kola,
+  chips: SEED_IMAGES.cips,
+  /* ekmek/manav görseli bir sonraki sürümde gömülecek — şablon yanlış fotoğraf göstermesin */
   bread: 'https://images.pexels.com/photos/32651589/pexels-photo-32651589.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=400&w=640',
 };
 
@@ -36,7 +39,8 @@ const LOCAL_BARCODES: Record<string, { name: string; brand: string; gram: string
 function Thumb({ p, dot, big }: { p: Product; dot: string; big?: boolean }) {
   const [fail, setFail] = useState(false);
   const sz = big ? 'h-12 w-12' : 'h-9 w-14';
-  if (!p.image || fail) {
+  const src = resolveProductImage(p.image);
+  if (!src || fail) {
     return (
       <div
         className={cn('flex shrink-0 items-center justify-center rounded-md', sz)}
@@ -48,7 +52,7 @@ function Thumb({ p, dot, big }: { p: Product; dot: string; big?: boolean }) {
       </div>
     );
   }
-  return <img src={p.image} alt="" loading="lazy" onError={() => setFail(true)} className={cn('shrink-0 rounded-md object-cover', sz)} />;
+  return <img src={src} alt="" loading="lazy" onError={() => setFail(true)} className={cn('shrink-0 rounded-md object-cover', sz)} />;
 }
 
 const emptyForm = (s: Settings) => ({

@@ -1,0 +1,64 @@
+/* ---------- gömülü örnek ürün görselleri (v1.14.4) ----------
+ *
+ * Örnek (seed) ürünlerin fotoğrafları eskiden images.pexels.com adresinden
+ * internet üzerinden çekiliyordu. İnternet erişimi olmayan ya da CDN
+ * isteğini engelleyen cihazlarda — özellikle Play Store / Android
+ * sürümünde — ürün kartları tamamen resimsiz kalıyordu.
+ *
+ * Görseller artık derleme sırasında uygulamanın içine gömülüyor
+ * (`?inline` → data URL), yani internet olmadan da her cihazda görünür.
+ *
+ * Kullanıcının kendi eklediği görseller (data URL / yerel dosya / kendi
+ * URL'si) hiç değiştirilmez, olduğu gibi kullanılır.
+ */
+
+import biraAcik from '../assets/urunler/bira-acik.jpg?inline';
+import biraKutu from '../assets/urunler/bira-kutu.jpg?inline';
+import biraSise from '../assets/urunler/bira-sise.jpg?inline';
+import cips from '../assets/urunler/cips.jpg?inline';
+import kola from '../assets/urunler/kola.jpg?inline';
+import rakiBuyuk from '../assets/urunler/raki-buyuk.jpg?inline';
+import rakiKucuk from '../assets/urunler/raki-kucuk.jpg?inline';
+import sigara from '../assets/urunler/sigara.jpg?inline';
+import viski1 from '../assets/urunler/viski-1.jpg?inline';
+import viski2 from '../assets/urunler/viski-2.jpg?inline';
+
+export const SEED_IMAGES = {
+  biraAcik,
+  biraKutu,
+  biraSise,
+  cips,
+  kola,
+  rakiBuyuk,
+  rakiKucuk,
+  sigara,
+  viski1,
+  viski2,
+} as const;
+
+/* Eski kayıtlarda (kullanıcının localStorage'ındaki envanter dahil) ürün
+   görselleri pexels adresi olarak saklanıyor. Fotoğraf kimliğine göre
+   gömülü görsele çeviriyoruz — böylece eski kurulumlar da otomatik
+   düzelir, kullanıcı bir şey yapmak zorunda kalmaz. */
+const PEXELS_ID_TO_LOCAL: Record<string, string> = {
+  '15875047': SEED_IMAGES.biraKutu, // Tuborg Gold (kutu bira)
+  '20329457': SEED_IMAGES.biraSise, // Efes Malt (şişe bira)
+  '30664243': SEED_IMAGES.biraAcik, // Corona Extra (açık renk şişe)
+  '33123450': SEED_IMAGES.rakiKucuk, // Yeni Rakı 5cl
+  '33123433': SEED_IMAGES.rakiBuyuk, // Bozcaada 70cl
+  '31758683': SEED_IMAGES.viski1, // Ballantine's
+  '34630638': SEED_IMAGES.viski2, // Chivas Regal
+  '32651589': SEED_IMAGES.sigara, // Sigara & Tütün
+  '10812066': SEED_IMAGES.kola, // Coca-Cola / Meşrubat
+  '19141651': SEED_IMAGES.cips, // Cips
+};
+
+/** Ürün görselini çözer: bilinen eski pexels adreslerini gömülü görselle
+ *  değiştirir, diğer tüm kaynakları (kullanıcının kendi görselleri) aynen döner. */
+export function resolveProductImage(src?: string): string | undefined {
+  if (!src) return undefined;
+  if (src.startsWith('data:') || src.startsWith('blob:')) return src;
+  const m = /images\.pexels\.com\/photos\/(\d+)/.exec(src);
+  if (m) return PEXELS_ID_TO_LOCAL[m[1]] ?? src;
+  return src;
+}
