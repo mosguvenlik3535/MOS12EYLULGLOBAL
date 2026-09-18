@@ -7,9 +7,14 @@ import CameraPermissionHint from './CameraPermissionHint';
 export default function CameraScanner({
   onDetected,
   onClose,
+  continuous = false,
+  onToggleContinuous,
 }: {
   onDetected: (code: string) => boolean;
   onClose: () => void;
+  /** Sürekli okutma: kamera açık kalır, okutulan her ürün sepete eklenir. */
+  continuous?: boolean;
+  onToggleContinuous?: (next: boolean) => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const controlsRef = useRef<IScannerControls | null>(null);
@@ -20,6 +25,7 @@ export default function CameraScanner({
   const [torchReady, setTorchReady] = useState(false);
   const startRef = useRef<(() => void) | null>(null);
   const [attempt, setAttempt] = useState(0);
+  const [added, setAdded] = useState(0);
 
   const stop = () => {
     try {
@@ -64,12 +70,21 @@ export default function CameraScanner({
             if (!text) return;
             const ok = onDetected(text);
             if (ok) {
-              doneRef.current = true;
-              setStatus(`Okundu: ${text}`);
-              setTimeout(() => {
-                stop();
-                onClose();
-              }, 250);
+              if (continuous) {
+                /* Sürekli mod: kamera açık kalır, sayaç artar, devam edilir. */
+                setAdded((n) => n + 1);
+                setStatus(`✓ Eklendi: ${text}`);
+                window.setTimeout(() => {
+                  if (!doneRef.current) setStatus('Sıradaki barkodu okutun');
+                }, 1200);
+              } else {
+                doneRef.current = true;
+                setStatus(`Okundu: ${text}`);
+                setTimeout(() => {
+                  stop();
+                  onClose();
+                }, 250);
+              }
             } else {
               setStatus(`${text} okundu ancak ürün bulunamadı. Başka barkod deneyin.`);
             }
@@ -161,6 +176,11 @@ export default function CameraScanner({
           <div className={cn('rounded-lg border px-3 py-2 text-center font-mono text-[11px]', error ? 'border-red/30 bg-red/5 text-red' : 'border-blue/25 bg-blue/5 text-blue')}>
             {status}
           </div>
+          {continuous && added > 0 && !error && (
+            <div className="mt-1.5 rounded-lg border border-mint/30 bg-mint/10 px-3 py-1.5 text-center font-mono text-[11px] font-bold text-mint">
+              Sepete eklenen ürün: {added}
+            </div>
+          )}
           {error && (
             <div className="mt-2 flex flex-col items-center">
               <CameraPermissionHint compact />
@@ -189,6 +209,18 @@ export default function CameraScanner({
                 <Ic n="zap" c="h-4 w-4" /> {torch ? 'Feneri Kapat' : 'Feneri Aç'}
               </button>
             )}
+            {onToggleContinuous && !error && (
+              <button
+                onClick={() => onToggleContinuous(!continuous)}
+                title="Sürekli okutma: kamera açık kalır, okuttukça ürün sepete eklenir"
+                className={cn(
+                  'flex flex-1 items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-[12px] font-semibold',
+                  continuous ? 'border-mint bg-mint/15 text-mint' : 'border-line2 bg-ink/50 text-mut'
+                )}
+              >
+                <Ic n="barcode" c="h-4 w-4" /> {continuous ? 'Sürekli: AÇIK' : 'Sürekli: Kapalı'}
+              </button>
+            )}
             <button
               onClick={() => {
                 stop();
@@ -196,7 +228,7 @@ export default function CameraScanner({
               }}
               className="flex flex-1 items-center justify-center rounded-lg border border-line2 bg-ink/50 px-3 py-2.5 text-[12px] font-semibold text-txt"
             >
-              İptal
+              {continuous && added > 0 ? `Bitir (${added})` : 'İptal'}
             </button>
           </div>
         </div>

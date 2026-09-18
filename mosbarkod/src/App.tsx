@@ -30,6 +30,7 @@ import { IS_DEMO, IS_PLAY, DEMO_MAX_SALES, FREE_MAX_PRODUCTS } from './lib/build
 import { initPlayBilling, isPlayBillingAvailable, isProActive } from './lib/playBilling';
 import ProUpsellModal from './components/ProUpsellModal';
 import LoginGate from './components/LoginGate';
+import { useWakeLock } from './lib/wakeLock';
 import { CustomerDisplay } from './components/CustomerDisplay';
 import {
   LocaleContext,
@@ -60,6 +61,7 @@ import {
   moduleEnabled,
   priceOf,
   round2,
+  SAVE_ERROR_EVENT,
   saveState,
   setActiveCurrencyCode,
   todayKey,
@@ -409,6 +411,29 @@ export default function App() {
     setToasts((items) => [...items.slice(-3), { id, msg, type }]);
     setTimeout(() => setToasts((items) => items.filter((x) => x.id !== id)), 3000);
   };
+
+  /* ---------- kayıt hatası uyarısı (depolama kotası dolunca veri sessizce kaybolurdu) ---------- */
+  const saveErrAt = useRef(0);
+  useEffect(() => {
+    const onErr = (e: Event) => {
+      const now = Date.now();
+      if (now - saveErrAt.current < 20000) return;
+      saveErrAt.current = now;
+      const detail = (e as CustomEvent<string>).detail;
+      toast(
+        detail === 'QuotaExceededError'
+          ? 'DİKKAT: Telefon depolama alanı doldu, veriler kaydedilemedi! Ayarlar → Yedekleme bölümünden yedek alıp eski verileri temizleyin.'
+          : 'DİKKAT: Veriler kaydedilemedi! Depolama kotasını/iznini kontrol edin.',
+        'err'
+      );
+    };
+    window.addEventListener(SAVE_ERROR_EVENT, onErr);
+    return () => window.removeEventListener(SAVE_ERROR_EVENT, onErr);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /* Telefonda ekran satış sırasında kapanmasın — Ayarlar → Mobil (Telefon) Ayarları'ndan kapatılabilir. */
+  useWakeLock(state.settings.mobile?.wakeLock !== false);
 
   // Ana bilgisayar tarafında mobil bağlantı her açılışta QR'a hazır olsun.
   useEffect(() => {
@@ -1342,6 +1367,7 @@ export default function App() {
               settings={state.settings}
               isAdmin={isAdmin}
               toast={toast}
+              onPatchSettings={patchSettings}
               discount={discounts[register]}
               setDiscount={(n) => setDiscounts((d) => ({ ...d, [register]: n }))}
               allowNeg={allowNegMap[register]}

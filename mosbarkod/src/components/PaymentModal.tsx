@@ -16,6 +16,7 @@ import {
   type Settings,
 } from '../data';
 import { printSale } from '../lib/printReceipt';
+import { buildReceiptText } from '../lib/share';
 
 export interface PayPayload {
   method: PayMethod;
@@ -25,7 +26,7 @@ export interface PayPayload {
   pos: number;
   customerId?: string;
   newCustomerName?: string;
-  receiptOpt: 'bilgi' | 'mali' | 'print';
+  receiptOpt: 'bilgi' | 'mali' | 'print' | 'whatsapp';
 }
 
 const QUICK = [5, 10, 20, 50, 100, 200, 500];
@@ -47,7 +48,7 @@ export function PaymentModal({
   const [pos, setPos] = useState('');
   const [customerId, setCustomerId] = useState(customers[0]?.id ?? '');
   const [newName, setNewName] = useState('');
-  const [opt, setOpt] = useState<'bilgi' | 'mali' | 'print'>('bilgi');
+  const [opt, setOpt] = useState<'bilgi' | 'mali' | 'print' | 'whatsapp'>('bilgi');
 
   const rec = Number(received.replace(',', '.')) || 0;
   const csh = Number(cash.replace(',', '.')) || 0;
@@ -260,12 +261,13 @@ export function PaymentModal({
 
       <div className="mt-3.5">
         <div className="mb-1.5 font-mono text-[10.5px] uppercase tracking-wider text-mut">Fiş Seçenekleri</div>
-        <div className="grid grid-cols-3 gap-1.5">
+        <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
           {(
             [
-              { id: 'bilgi', label: 'Bilgi Fişi (Mali Değersiz)', icon: 'file' },
+              { id: 'bilgi', label: 'Bilgi Fişi', icon: 'file' },
               { id: 'mali', label: 'Mali Değerli Fiş', icon: 'check' },
-              { id: 'print', label: 'Fiş Yazdırma', icon: 'print' },
+              { id: 'print', label: 'Yazdır', icon: 'print' },
+              { id: 'whatsapp', label: 'WhatsApp', icon: 'phone' },
             ] as const
           ).map((o) => (
             <button
@@ -303,6 +305,34 @@ export function ReceiptModal({
 }) {
   const [printState, setPrintState] = useState<'idle' | 'printing' | 'done' | 'error'>('idle');
   const [printMsg, setPrintMsg] = useState('');
+  const [waState, setWaState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle');
+  const [waMsg, setWaMsg] = useState('');
+
+  /** Fişi düz metin olarak paylaş (WhatsApp / SMS / e-posta — telefon için en kullanışlısı). */
+  const sendWhatsApp = async () => {
+    setWaState('sending');
+    const text = buildReceiptText(sale, settings);
+    try {
+      const n = navigator as Navigator & { share?: (d: { title?: string; text?: string }) => Promise<void> };
+      if (typeof n.share === 'function') {
+        await n.share({ title: `Fiş ${sale.no}`, text });
+        setWaState('done');
+        setWaMsg('Fiş paylaşıldı (WhatsApp seçebilirsiniz)');
+        return;
+      }
+      await navigator.clipboard.writeText(text);
+      setWaState('done');
+      setWaMsg('Fiş metni kopyalandı — WhatsApp’a yapıştırıp gönderin');
+    } catch (e) {
+      const name = (e as { name?: string }).name ?? '';
+      if (name === 'AbortError') {
+        setWaState('idle');
+        return;
+      }
+      setWaState('error');
+      setWaMsg('Paylaşılamadı — fişi elle kopyalayın');
+    }
+  };
 
   const doPrint = async () => {
     setPrintState('printing');
@@ -322,6 +352,11 @@ export function ReceiptModal({
       const t = setTimeout(doPrint, 400);
       return () => clearTimeout(t);
     }
+    if (opt === 'whatsapp') {
+      const t = setTimeout(() => void sendWhatsApp(), 500);
+      return () => clearTimeout(t);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opt]);
 
   const m = METHOD_META[sale.method];
@@ -426,7 +461,20 @@ export function ReceiptModal({
               {printState === 'printing' ? 'Yazdırılıyor...' : printMsg}
             </div>
           )}
+          {waState !== 'idle' && (
+            <div
+              className={cn(
+                'mb-2 rounded-md px-3 py-1.5 font-mono text-[11px]',
+                waState === 'error' ? 'bg-red-500/15 text-red-400' : 'bg-mint/10 text-mint'
+              )}
+            >
+              {waState === 'sending' ? 'Paylaşılıyor...' : waMsg}
+            </div>
+          )}
           <div className="flex gap-2">
+            <Btn v="ghost" className="flex-1" onClick={() => void sendWhatsApp()} disabled={waState === 'sending'}>
+              <Ic n="phone" c="h-4 w-4" /> WhatsApp
+            </Btn>
             <Btn v="ghost" className="flex-1" onClick={doPrint} disabled={printState === 'printing'}>
               <Ic n="print" c="h-4 w-4" /> Yazdır
             </Btn>

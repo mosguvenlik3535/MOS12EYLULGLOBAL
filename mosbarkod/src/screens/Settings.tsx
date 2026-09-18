@@ -5,7 +5,7 @@ import { cn } from '../utils/cn';
 import { Ic } from '../icons';
 import { Badge, Btn, Field, Inp, Modal, ScreenHead, Sel } from '../components/ui';
 import { HardwareCard, ReportCard, WhatsAppCard, EmailCard } from './SettingsIntegrations';
-import { AutoBackupCard, CloudBackupCard, HealthCheckCard, SoundCard, ThemesCard } from './SettingsSystem';
+import { AutoBackupCard, CloudBackupCard, HealthCheckCard, MobileCard, SoundCard, ThemesCard } from './SettingsSystem';
 import { applyTheme } from '../lib/themes';
 import { defaultUI, DEFAULT_CURRENCIES, setActiveCurrencyCode, moduleEnabled, type AppState, type Settings, type CurrencyConfig } from '../data';
 import CameraScanner from '../components/CameraScanner';
@@ -1330,6 +1330,7 @@ export default function SettingsScreen({
           <AppearanceCard ui={s.ui} onPatch={onPatch} />
           <ThemesCard current={s.theme} onApply={(id) => { onPatch({ theme: id }); applyTheme(id); }} toast={toast} />
           <SoundCard cfg={s.sound} onPatch={onPatch} />
+          <MobileCard cfg={s.mobile} onPatch={onPatch} toast={toast} />
         </SettingsModal>
       )}
 

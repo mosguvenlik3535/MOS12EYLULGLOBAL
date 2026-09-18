@@ -62,6 +62,8 @@ interface PosProps {
   sales: Sale[];
   proLocked?: boolean;
   onRequirePro?: () => void;
+  /** Ayarları kalıcı olarak güncellemek için (ör. sürekli okutma anahtarı). */
+  onPatchSettings?: (p: Partial<Settings>) => void;
 }
 
 /* ---------- reorder handle ---------- */
@@ -181,6 +183,29 @@ function CartRow({
   const isManual = l.unitPrice !== l.p1 && l.unitPrice !== l.p2 && l.unitPrice !== l.p3;
   const minCost = product?.cost ?? 0;
 
+  /* Telefonda satırı sola kaydırarak silme */
+  const [dx, setDx] = useState(0);
+  const [swiping, setSwiping] = useState(false);
+  const touchRef = useRef<{ x: number; y: number } | null>(null);
+  const onTouchStart = (e: React.TouchEvent) => {
+    const t = e.touches[0];
+    touchRef.current = { x: t.clientX, y: t.clientY };
+    setSwiping(true);
+  };
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (!touchRef.current) return;
+    const t = e.touches[0];
+    const ddx = t.clientX - touchRef.current.x;
+    const ddy = t.clientY - touchRef.current.y;
+    if (Math.abs(ddy) > Math.abs(ddx) + 8) return; // dikey hareket: sepet listesi kaydırma
+    setDx(Math.max(-80, Math.min(0, ddx)));
+  };
+  const onTouchEnd = () => {
+    setSwiping(false);
+    setDx((v) => (v < -40 ? -80 : 0));
+    touchRef.current = null;
+  };
+
   const openI = () => {
     setVal(l.lineDiscount ? String(l.lineDiscount) : '');
     setIsk(true);
@@ -214,7 +239,25 @@ function CartRow({
   };
 
   return (
-    <div className="anim-pop rounded-xl border border-line bg-panel2/70 p-2.5 transition-colors hover:border-line2">
+    <div className="relative overflow-hidden rounded-xl">
+      {/* Parmakla sola kaydırınca çıkan silme alanı */}
+      <div className="absolute inset-y-0 right-0 w-20">
+        <button
+          onClick={onRemove}
+          title="Satırı sil"
+          className="flex h-full w-full items-center justify-center gap-1 bg-red/90 font-mono text-[11px] font-bold text-white"
+        >
+          <Ic n="trash" c="h-4 w-4" /> SİL
+        </button>
+      </div>
+      <div
+        className="anim-pop rounded-xl border border-line bg-panel2/70 p-2.5 transition-colors hover:border-line2"
+        style={{ transform: `translateX(${dx}px)`, transition: swiping ? 'none' : 'transform .18s ease-out' }}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+        onTouchCancel={onTouchEnd}
+      >
       <div className="flex items-center gap-2.5">
         {/* görsel */}
         <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-line bg-panel3">
@@ -302,9 +345,10 @@ function CartRow({
             <div className="flex items-center gap-0.5 rounded-md border border-line2 bg-ink/60 p-0.5">
               <button
                 onClick={onDec}
-                className="flex h-5.5 w-5.5 items-center justify-center rounded text-mut transition-colors hover:text-amber2"
+                title="Adet azalt"
+                className="flex h-7 w-7 items-center justify-center rounded text-mut transition-colors hover:bg-panel3 hover:text-amber2"
               >
-                <Ic n="minus" c="h-3 w-3" />
+                <Ic n="minus" c="h-3.5 w-3.5" />
               </button>
               <span className="min-w-[52px] text-center font-mono text-[11px] font-semibold tabular-nums">
                 {(l.unit === 'kg' || l.unit === 'lt'
@@ -314,9 +358,10 @@ function CartRow({
               </span>
               <button
                 onClick={onInc}
-                className="flex h-5.5 w-5.5 items-center justify-center rounded text-mut transition-colors hover:text-amber2"
+                title="Adet artır"
+                className="flex h-7 w-7 items-center justify-center rounded text-mut transition-colors hover:bg-panel3 hover:text-amber2"
               >
-                <Ic n="plus" c="h-3 w-3" />
+                <Ic n="plus" c="h-3.5 w-3.5" />
               </button>
             </div>
 
@@ -375,12 +420,13 @@ function CartRow({
             <button
               onClick={onRemove}
               title="Satırı sil"
-              className="ml-auto rounded p-1 text-mut2 transition-colors hover:bg-red/10 hover:text-red"
+              className="ml-auto rounded p-2 text-mut2 transition-colors hover:bg-red/10 hover:text-red"
             >
-              <Ic n="trash" c="h-3.5 w-3.5" />
+              <Ic n="trash" c="h-4 w-4" />
             </button>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );
@@ -562,6 +608,18 @@ const cartWInit = () => {
 
 /** Telefonda ürün kartlarının kolon sayısı — Ayarlar → Görünüm Özelleştirme'den seçilir. */
 const MOBILE_COL_CLASS: Record<number, string> = { 2: 'grid-cols-2', 3: 'grid-cols-3', 4: 'grid-cols-4' };
+
+/** Telefon yatay çevrildiğinde (kısa ekran + geniş) iki panelli düzene geçilir. */
+function useIsLandscape() {
+  const [l, setL] = useState(() => window.matchMedia('(orientation: landscape) and (max-height: 560px)').matches);
+  useEffect(() => {
+    const q = window.matchMedia('(orientation: landscape) and (max-height: 560px)');
+    const h = () => setL(q.matches);
+    q.addEventListener('change', h);
+    return () => q.removeEventListener('change', h);
+  }, []);
+  return l;
+}
 
 function useIsMobile() {
   const [m, setM] = useState(() => window.matchMedia('(max-width: 767px)').matches);
@@ -1110,6 +1168,12 @@ function ProductBrowser(props: PosProps & { handle: React.ReactNode; onOpenWeigh
             return props.submitBarcode(barcode);
           }}
           onClose={() => setCameraOpen(false)}
+          continuous={Boolean(props.settings.mobile?.continuousScan)}
+          onToggleContinuous={(next) => {
+            const m = props.settings.mobile ?? { wakeLock: true, continuousScan: false };
+            props.onPatchSettings?.({ mobile: { ...m, continuousScan: next } });
+            props.toast(next ? 'Sürekli okutma AÇIK — okuttukça sepete eklenir' : 'Sürekli okutma kapatıldı');
+          }}
         />
       )}
     </section>
@@ -1296,6 +1360,7 @@ export default function Pos(props: PosProps) {
   const [aiVisionOpen, setAiVisionOpen] = useState(false);
   const [cfdOpen, setCfdOpen] = useState(false);
   const isMobile = useIsMobile();
+  const isLandscape = useIsLandscape();
   const [mTab, setMTab] = useState<PanelId>('browser');
 
   // Real-time broadcast to 2nd Customer Facing Display (CFD)
@@ -1409,6 +1474,16 @@ export default function Pos(props: PosProps) {
   );
 
   if (isMobile) {
+    /* Yatay mod: sol yarıda ürünler, sağ yarıda sepet — sekmelerle uğraşmadan satış yapılır. */
+    if (isLandscape) {
+      return (
+        <div className="flex h-full gap-2">
+          <div className="min-h-0 min-w-0 flex-1">{render('browser', { mobile: true })}</div>
+          <div className="min-h-0 w-[46%] max-w-[440px]">{render('cart', { mobile: true })}</div>
+          {sharedModals}
+        </div>
+      );
+    }
     const tabs: { id: PanelId; label: string; icon: string }[] = [
       { id: 'browser', label: 'Ürünler', icon: 'box' },
       { id: 'cart', label: cartCount > 0 ? `Kasa (${cartCount})` : 'Kasa', icon: 'cart' },

@@ -27,6 +27,7 @@ import {
   unpackFromCloud,
   type CloudFile,
 } from '../lib/cloudBackup';
+import { shareOrDownload } from '../lib/share';
 
 type Toast = (msg: string, type?: 'ok' | 'err') => void;
 
@@ -322,6 +323,15 @@ export function AutoBackupCard({
     }
   };
 
+  /** Telefonda dosya indirmek zahmetli — yedeği doğrudan WhatsApp / Drive vb. paylaş. */
+  const shareFull = async () => {
+    const json = JSON.stringify(fullBackupData(state));
+    const file = new File([json], `mosbarkod-yedek-${todayKey()}.json`, { type: 'application/json' });
+    const r = await shareOrDownload([file], 'MOSBARKOD Yedek', `MOSBARKOD tam yedek — ${todayKey()}`);
+    if (r.cancelled) return;
+    toast(r.via === 'share' ? 'Yedek paylaşıldı (WhatsApp, Drive, e-posta…)' : 'Yedek indirildi');
+  };
+
   const downloadFull = () => {
     downloadBackup(`mosbarkod-yedek-${todayKey()}.json`, fullBackupData(state), 'full');
     toast('Tam yedek indirildi');
@@ -457,12 +467,21 @@ export function AutoBackupCard({
           <span className="font-mono text-[10.5px] font-bold uppercase tracking-widest text-blue">İşlemler</span>
           <span className="ml-auto font-mono text-[10px] text-mut2">{humanBytes(usage.bytes)} yerel depolama kullanımı</span>
         </div>
+        {usage.bytes > 4000000 && (
+          <div className="mb-2 rounded-md border border-red/30 bg-red/10 px-3 py-1.5 text-[11px] leading-relaxed text-red">
+            DİKKAT: Depolama dolmak üzere. Yedek alıp eski ürün görsellerini veya satış kayıtlarını temizlemezseniz
+            yeni satışlar kaydedilemeyebilir.
+          </div>
+        )}
         <div className="flex flex-wrap gap-2">
           <Btn v="ghost" className="border-blue/50 bg-blue/10 text-blue hover:bg-blue/20" onClick={makeSnapshot}>
             <Ic n="check" c="h-4 w-4" /> Şimdi Yedekle
           </Btn>
           <Btn v="ghost" onClick={downloadFull}>
             <Ic n="download" c="h-4 w-4" /> Tam Yedek İndir
+          </Btn>
+          <Btn v="ghost" className="border-mint/50 bg-mint/10 text-mint hover:bg-mint/20" onClick={() => void shareFull()}>
+            <Ic n="phone" c="h-4 w-4" /> Yedek Paylaş (WhatsApp)
           </Btn>
           <Btn v="ghost" onClick={downloadData} title="Ayarlar hariç tüm işletme verileri">
             <Ic n="download" c="h-4 w-4" /> Sadece Veri
@@ -949,6 +968,63 @@ export function HealthCheckCard({ state, toast }: { state: AppState; toast: Toas
           Tam tarama yalnızca birkaç saniye sürer ve hiçbir işletme verisini değiştirmez.
         </div>
       )}
+    </Card>
+  );
+}
+
+/* ---------------- MOBİL (TELEFON) AYARLARI ---------------- */
+
+export function MobileCard({
+  cfg,
+  onPatch,
+  toast,
+}: {
+  cfg: Settings['mobile'];
+  onPatch: (p: Partial<Settings>) => void;
+  toast: Toast;
+}) {
+  const m = cfg ?? { wakeLock: true, continuousScan: false };
+  const set = (k: keyof Settings['mobile'], v: boolean) => onPatch({ mobile: { ...m, [k]: v } });
+  return (
+    <Card
+      icon="monitor"
+      title="Mobil (Telefon) Ayarları"
+      color="text-mint"
+      desc="Telefonda satış yapmayı kolaylaştıran davranışlar. İkisi de isterseniz kapatılabilir."
+    >
+      <div className="space-y-2.5">
+        <div className="flex items-start justify-between gap-3 rounded-lg border border-line bg-ink/40 px-3 py-2.5">
+          <div className="min-w-0">
+            <div className="font-mono text-[11px] font-bold uppercase tracking-widest text-txt">Ekran Uyanık Kalsın</div>
+            <p className="mt-0.5 text-[10.5px] leading-relaxed text-mut2">
+              Satış ekranındayken telefon ekranı kapanmaz. Pil tüketimini artırabilir — istemezseniz kapatın.
+            </p>
+          </div>
+          <Toggle
+            on={m.wakeLock !== false}
+            onChange={(b) => {
+              set('wakeLock', b);
+              toast(b ? 'Ekran artık kapanmayacak' : 'Ekran normal şekilde kapanacak');
+            }}
+          />
+        </div>
+
+        <div className="flex items-start justify-between gap-3 rounded-lg border border-line bg-ink/40 px-3 py-2.5">
+          <div className="min-w-0">
+            <div className="font-mono text-[11px] font-bold uppercase tracking-widest text-txt">Sürekli Barkod Okutma</div>
+            <p className="mt-0.5 text-[10.5px] leading-relaxed text-mut2">
+              Kamera açık kalır; okuttuğunuz her ürün sepete eklenir. “Bitir”e basana kadar devam eder.
+            </p>
+          </div>
+          <Toggle
+            on={Boolean(m.continuousScan)}
+            onChange={(b) => {
+              set('continuousScan', b);
+              toast(b ? 'Sürekli okutma açıldı' : 'Sürekli okutma kapatıldı');
+            }}
+          />
+        </div>
+      </div>
     </Card>
   );
 }

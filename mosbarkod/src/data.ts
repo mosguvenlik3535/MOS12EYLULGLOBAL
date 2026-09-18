@@ -493,6 +493,13 @@ export interface Settings {
   kkartDiscount: number;
   /** WebRTC mobil bağlantı için sabit kod. Boşsa rastgele kod üretilir. */
   mobileSyncCode: string;
+  /** Telefon davranışları — kullanıcı Ayarlar'dan açıp kapatabilir. */
+  mobile: {
+    /** Satış sırasında ekranın kapanmaması (Screen Wake Lock) */
+    wakeLock: boolean;
+    /** Sürekli barkod okutma: kamera açık kalır, okuttukça sepete ekler */
+    continuousScan: boolean;
+  };
   /** Kullanıcı PIN kodları — 4 haneli. Anahtar: kullanıcı id (u1/u2/u3) */
   pins: Record<string, string>;
   /** Donanım entegrasyonu — aktif ekipmanlar (reader, receipt, label, scale, drawer, display) */
@@ -1186,6 +1193,7 @@ export const defaultSettings = (): Settings => ({
   kentkartLimit: 3000,
   kkartDiscount: 8,
   mobileSyncCode: 'MOSB',
+  mobile: { wakeLock: true, continuousScan: false },
   pins: { u1: '0000', u2: '1111', u3: '2222' },
   hardware: {
     enabledDevices: ['reader', 'receipt', 'scale'],
@@ -1298,6 +1306,7 @@ export function loadState(): AppState {
             currency: { ...d.currency, ...(s.settings.currency || {}) },
             cfd: { ...d.cfd, ...(s.settings.cfd || {}) },
             hardware: { ...d.hardware, ...(s.settings.hardware || {}) },
+            mobile: { ...d.mobile, ...(s.settings.mobile || {}) },
             printer: { ...d.printer, ...(s.settings.printer || {}) },
             label: { ...d.label, ...(s.settings.label || {}) },
             pos: { ...d.pos, ...(s.settings.pos || {}) },
@@ -1367,11 +1376,24 @@ export function loadState(): AppState {
   return defaultState();
 }
 
+/** Depolama kotası dolduğunda (veya kayıt başarısız olduğunda) tetiklenir.
+ *  App.tsx dinleyip kullanıcıya uyarı gösterir — aksi hâlde veri sessizce kaybolur. */
+export const SAVE_ERROR_EVENT = 'mosbarkod:save-error';
+
 export function saveState(s: AppState) {
   try {
     localStorage.setItem(KEY, JSON.stringify(s));
-  } catch {
-    /* ignore */
+    return true;
+  } catch (e) {
+    /* Kota dolu / özel mod / WebView kısıtı — kullanıcıya haber verilmezse
+       satışlar kaydedilmiş gibi görünür ama kaybolur. */
+    try {
+      const name = (e as { name?: string }).name || 'error';
+      window.dispatchEvent(new CustomEvent(SAVE_ERROR_EVENT, { detail: name }));
+    } catch {
+      /* yoksay */
+    }
+    return false;
   }
 }
 
