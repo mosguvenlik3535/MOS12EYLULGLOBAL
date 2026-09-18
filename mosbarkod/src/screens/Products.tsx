@@ -24,8 +24,7 @@ const PRESETS = {
   tobacco: SEED_IMAGES.sigara,
   soda: SEED_IMAGES.kola,
   chips: SEED_IMAGES.cips,
-  /* ekmek/manav görseli bir sonraki sürümde gömülecek — şablon yanlış fotoğraf göstermesin */
-  bread: 'https://images.pexels.com/photos/32651589/pexels-photo-32651589.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=400&w=640',
+  bread: SEED_IMAGES.ekmek,
 };
 
 /* Yerel Barkod Veritabanı (Open Food Facts çalışmazsa veya offline iken fallback) */

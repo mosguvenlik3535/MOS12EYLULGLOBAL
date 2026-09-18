@@ -12,11 +12,16 @@
  * URL'si) hiç değiştirilmez, olduğu gibi kullanılır.
  */
 
+import antepFistigi from '../assets/urunler/antep-fistigi.jpg?inline';
 import biraAcik from '../assets/urunler/bira-acik.jpg?inline';
 import biraKutu from '../assets/urunler/bira-kutu.jpg?inline';
 import biraSise from '../assets/urunler/bira-sise.jpg?inline';
 import cips from '../assets/urunler/cips.jpg?inline';
+import ekmek from '../assets/urunler/ekmek.jpg?inline';
+import fistik from '../assets/urunler/fistik.jpg?inline';
 import kola from '../assets/urunler/kola.jpg?inline';
+import kuruyemisKarisik from '../assets/urunler/kuruyemis-karisik.jpg?inline';
+import misirCerez from '../assets/urunler/misir-cerez.jpg?inline';
 import rakiBuyuk from '../assets/urunler/raki-buyuk.jpg?inline';
 import rakiKucuk from '../assets/urunler/raki-kucuk.jpg?inline';
 import sigara from '../assets/urunler/sigara.jpg?inline';
@@ -24,11 +29,16 @@ import viski1 from '../assets/urunler/viski-1.jpg?inline';
 import viski2 from '../assets/urunler/viski-2.jpg?inline';
 
 export const SEED_IMAGES = {
+  antepFistigi,
   biraAcik,
   biraKutu,
   biraSise,
   cips,
+  ekmek,
+  fistik,
   kola,
+  kuruyemisKarisik,
+  misirCerez,
   rakiBuyuk,
   rakiKucuk,
   sigara,
@@ -51,6 +61,10 @@ const PEXELS_ID_TO_LOCAL: Record<string, string> = {
   '32651589': SEED_IMAGES.sigara, // Sigara & Tütün
   '10812066': SEED_IMAGES.kola, // Coca-Cola / Meşrubat
   '19141651': SEED_IMAGES.cips, // Cips
+  '7375283': SEED_IMAGES.misirCerez, // Mısır Atıştırmalık
+  '38935853': SEED_IMAGES.kuruyemisKarisik, // Karışık Lüks Kuru Yemiş
+  '8023869': SEED_IMAGES.fistik, // Tuzlu Fıstık
+  '10112101': SEED_IMAGES.antepFistigi, // Kavrulmuş Antep Fıstığı
 };
 
 /** Ürün görselini çözer: bilinen eski pexels adreslerini gömülü görselle

@@ -840,9 +840,6 @@ export const ALL_REPORT_IDS = REPORT_ITEMS.map((i) => i.id);
 
 /* ---------------- seed data ---------------- */
 
-const px = (id: number) =>
-  `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=400&w=640`;
-
 /* Görseller uygulamanın içine gömülüdür (internet gerekmez) — bkz. lib/seedImages.ts */
 const IMG = {
   tuborg: SEED_IMAGES.biraKutu,
@@ -854,11 +851,10 @@ const IMG = {
   viski1: SEED_IMAGES.viski1,
   viski2: SEED_IMAGES.viski2,
   cips1: SEED_IMAGES.cips,
-  cips2: px(8023869),
-  snack1: px(7375283),
-  nuts1: px(38935853),
-  nuts2: px(10112101),
-  puffs: px(15475390),
+  cips2: SEED_IMAGES.fistik,
+  snack1: SEED_IMAGES.misirCerez,
+  nuts1: SEED_IMAGES.kuruyemisKarisik,
+  nuts2: SEED_IMAGES.antepFistigi,
 };
 
 const mkP = (
