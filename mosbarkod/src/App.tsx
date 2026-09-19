@@ -79,6 +79,7 @@ import {
   type Staff,
   type StockCountSession,
   type ViewId,
+  resolveSaleCustomer,
 } from './data';
 import { fxUpdatedAt, refreshFxIfStale, subscribeFx } from './lib/fx';
 
@@ -854,8 +855,8 @@ export default function App() {
   const finalizeSale = (p: PayPayload, posAuth?: string) => {
     const cashier = USERS.find((u) => u.id === user)!;
     const now = new Date().toISOString();
-    const customerName =
-      p.newCustomerName ?? (p.customerId ? state.customers.find((c) => c.id === p.customerId)?.name : undefined);
+    /* Müşteri adı / açıklama: ödeme ekranına yazılan ad, yoksa veresiye müşterisi */
+    const customerName = resolveSaleCustomer(p, state.customers);
     const sale: Sale = {
       id: uid(),
       no: `F-${new Date().getFullYear()}-${String(state.sales.length + 1).padStart(4, '0')}`,
@@ -1087,6 +1088,13 @@ export default function App() {
             return pr;
           })
         : s.products,
+    }));
+
+  /* Satış hareketlerinden müşteri adı / açıklama sonradan eklenebilir veya düzeltilebilir. */
+  const updateSale = (id: string, patch: Partial<Sale>) =>
+    setState((s) => ({
+      ...s,
+      sales: s.sales.map((x) => (x.id === id ? { ...x, ...patch } : x)),
     }));
 
   const updateInvoice = (id: string, patch: Partial<Invoice>) =>
@@ -1472,6 +1480,7 @@ export default function App() {
               onImkartBulk={(amount, via) => addImkartDolum(amount, via, '')}
               onPatch={patchSettings}
               onRefund={applyRefund}
+              onUpdateSale={updateSale}
               isAdmin={isAdmin}
               toast={toast}
               proLocked={proLocked}

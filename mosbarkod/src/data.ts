@@ -394,6 +394,23 @@ export function invoiceVatSummary(inv: Invoice) {
   };
 }
 
+/**
+ * Satışa yazılacak müşteri adını (açıklama) belirler.
+ * Sıra: 1) ödeme ekranına elle yazılan ad → 2) veresiye yeni müşteri adı
+ * → 3) veresiye defterinden seçilen müşteri.
+ */
+export function resolveSaleCustomer(
+  p: { customerName?: string; customerId?: string; newCustomerName?: string },
+  customers: Customer[],
+): string | undefined {
+  const yazilan = (p.customerName ?? '').trim();
+  if (yazilan) return yazilan;
+  const yeni = (p.newCustomerName ?? '').trim();
+  if (yeni) return yeni;
+  if (p.customerId) return customers.find((c) => c.id === p.customerId)?.name || undefined;
+  return undefined;
+}
+
 export interface StaffPay {
   id: string;
   date: string;

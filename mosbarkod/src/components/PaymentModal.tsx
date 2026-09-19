@@ -26,6 +26,8 @@ export interface PayPayload {
   pos: number;
   customerId?: string;
   newCustomerName?: string;
+  /** Satışa işlenecek müşteri adı / açıklama (tüm ödeme türlerinde) */
+  customerName?: string;
   receiptOpt: 'bilgi' | 'mali' | 'print' | 'whatsapp';
 }
 
@@ -48,7 +50,16 @@ export function PaymentModal({
   const [pos, setPos] = useState('');
   const [customerId, setCustomerId] = useState(customers[0]?.id ?? '');
   const [newName, setNewName] = useState('');
+  /* Satışa işlenecek müşteri adı / açıklama */
+  const [saleName, setSaleName] = useState('');
   const [opt, setOpt] = useState<'bilgi' | 'mali' | 'print' | 'whatsapp'>('bilgi');
+
+  /* Veresiyede seçilen/yazılan müşteri, satış adı alanına da yansır. */
+  useEffect(() => {
+    if (method !== 'veresiye') return;
+    const secili = customers.find((c) => c.id === customerId)?.name ?? '';
+    setSaleName(newName.trim() || secili);
+  }, [method, customerId, newName, customers]);
 
   const rec = Number(received.replace(',', '.')) || 0;
   const csh = Number(cash.replace(',', '.')) || 0;
@@ -79,6 +90,7 @@ export function PaymentModal({
       pos: method === 'kart' ? total : method === 'nakit+pos' ? toTRY(ps) : 0,
       customerId: method === 'veresiye' && !newName.trim() ? customerId || undefined : undefined,
       newCustomerName: method === 'veresiye' ? newName.trim() || undefined : undefined,
+      customerName: saleName.trim() || undefined,
       receiptOpt: opt,
     });
   };
@@ -127,6 +139,27 @@ export function PaymentModal({
         {methodBtn('kart', 'Kredi Kartı', 'card')}
         {methodBtn('nakit+pos', 'Nakit + POS', 'wallet')}
         {methodBtn('veresiye', 'Veresiye', 'scale')}
+      </div>
+
+      {/* Müşteri adı / açıklama — satış hareketlerinde görünür, sonradan da eklenebilir */}
+      <div className="mt-3">
+        <label className="mb-1.5 block font-mono text-[10.5px] uppercase tracking-wider text-mut">
+          Müşteri Adı / Açıklama <span className="normal-case text-mut2">(isteğe bağlı)</span>
+        </label>
+        <input
+          list="mos-musteri-listesi"
+          value={saleName}
+          onChange={(e) => setSaleName(e.target.value)}
+          placeholder="Örn. Ahmet Yılmaz"
+          autoComplete="off"
+          title="Müşteri adını yazın veya listeden seçin"
+          className="w-full rounded-lg border border-line2 bg-ink/70 px-3.5 py-2.5 font-mono text-[13px] font-semibold outline-none placeholder:font-normal placeholder:text-mut2/60 focus:border-amber/70"
+        />
+        <datalist id="mos-musteri-listesi">
+          {customers.map((c) => (
+            <option key={c.id} value={c.name} />
+          ))}
+        </datalist>
       </div>
 
       <div className="mt-3 rounded-xl border border-line bg-panel2/60 p-3.5">

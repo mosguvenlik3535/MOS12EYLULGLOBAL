@@ -22,6 +22,7 @@ import {
   tstr,
   activeSymbol,
   type AppState,
+  type Sale,
   type Settings,
 } from '../data';
 
@@ -294,6 +295,7 @@ export default function AnalyticsScreen({
   onImkartBulk,
   onPatch,
   onRefund,
+  onUpdateSale,
   isAdmin = true,
   toast,
   proLocked = false,
@@ -305,12 +307,17 @@ export default function AnalyticsScreen({
   onImkartBulk: (amount: number, via: 'nakit' | 'pos') => void;
   onPatch: (p: Partial<Settings>) => void;
   onRefund: (saleId: string, itemsToRefund: Record<string, number>, reason: string, method: 'nakit' | 'kart' | 'veresiye') => void;
+  /** Satış hareketlerinden müşteri adı / açıklama ekleme & düzeltme */
+  onUpdateSale?: (saleId: string, patch: Partial<Sale>) => void;
   isAdmin?: boolean;
   toast: Toast;
   proLocked?: boolean;
   onRequirePro?: () => void;
 }) {
   const [range, setRange] = useState<Range>('today');
+  /* Satış hareketlerinde müşteri adı satır içi düzenleme */
+  const [nameEditId, setNameEditId] = useState<string | null>(null);
+  const [nameEditVal, setNameEditVal] = useState('');
   const [cashOpen, setCashOpen] = useState(false);
   const [zOpen, setZOpen] = useState(false);
   const [printOpen, setPrintOpen] = useState(false);
@@ -363,6 +370,18 @@ export default function AnalyticsScreen({
   };
 
   const sales = useMemo(() => state.sales.filter((s) => inRange(s.date)), [state.sales, range, dateFrom, dateTo]);
+
+  const startNameEdit = (id: string, current?: string) => {
+    setNameEditId(id);
+    setNameEditVal(current ?? '');
+  };
+
+  const saveNameEdit = () => {
+    if (!onUpdateSale || !nameEditId) return;
+    onUpdateSale(nameEditId, { customer: nameEditVal.trim() || undefined });
+    setNameEditId(null);
+    toast(nameEditVal.trim() ? 'Müşteri adı kaydedildi' : 'Müşteri adı kaldırıldı');
+  };
   const costMap = useMemo(() => new Map(state.products.map((p) => [p.name.toLowerCase(), p.cost || 0])), [state.products]);
 
   const ciro = round2(sales.reduce((a, s) => a + s.total, 0));
@@ -985,11 +1004,12 @@ export default function AnalyticsScreen({
           </h3>
           <span className="ml-auto font-mono text-[10px] text-mut2">Toplam Satış Fişi: {sales.length}</span>
         </div>
-        <table className="w-full min-w-[840px] border-collapse">
+        <table className="w-full min-w-[1000px] border-collapse">
           <thead className="border-b border-line">
             <tr>
               <Th>Satış Saati & Kasiyer</Th>
               <Th>Fiş No</Th>
+              <Th>Müşteri / Açıklama</Th>
               <Th>Ürün Kalemleri</Th>
               <Th>Ödeme Türü</Th>
               <Th className="text-right">Toplam Tutar</Th>
@@ -1020,6 +1040,40 @@ export default function AnalyticsScreen({
                     {partial && <span className="ml-1.5 rounded bg-amber/15 px-1.5 py-0.5 font-mono text-[9px] font-bold text-amber2">KISMİ İADE</span>}
                   </Td>
                   <Td className={cn('font-mono text-[11px]', s.isRefund ? 'text-red' : 'text-amber2')}>{s.no}</Td>
+                  <Td>
+                    {nameEditId === s.id ? (
+                      <input
+                        autoFocus
+                        value={nameEditVal}
+                        onChange={(e) => setNameEditVal(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') saveNameEdit();
+                          if (e.key === 'Escape') setNameEditId(null);
+                        }}
+                        onBlur={saveNameEdit}
+                        placeholder="Müşteri adı yazın"
+                        title="Müşteri adını yazın ve Enter'a basın"
+                        className="w-full min-w-[120px] rounded border border-amber/60 bg-ink/80 px-2 py-1 font-mono text-[11px] outline-none"
+                      />
+                    ) : s.customer ? (
+                      <button
+                        onClick={() => startNameEdit(s.id, s.customer)}
+                        title="Müşteri adını düzenle"
+                        className="group flex max-w-[180px] items-center gap-1.5 text-left"
+                      >
+                        <span className="truncate text-[11.5px] font-semibold text-txt">{s.customer}</span>
+                        <Ic n="edit" c="h-3 w-3 shrink-0 text-mut2 group-hover:text-amber2" />
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => startNameEdit(s.id)}
+                        title="Bu satışa müşteri adı ekle"
+                        className="rounded border border-dashed border-line2 px-2 py-0.5 font-mono text-[10px] text-mut2 transition-colors hover:border-amber/50 hover:text-amber2"
+                      >
+                        + Ekle
+                      </button>
+                    )}
+                  </Td>
                   <Td className="text-mut">
                     {s.items.length} Kalem ({totalQty} Adet)
                   </Td>
@@ -1050,7 +1104,7 @@ export default function AnalyticsScreen({
             })}
             {sales.length === 0 && (
               <tr>
-                <td colSpan={7} className="py-8 text-center font-mono text-[12px] text-mut2">Bu dönemde satış yok.</td>
+                <td colSpan={8} className="py-8 text-center font-mono text-[12px] text-mut2">Bu dönemde satış yok.</td>
               </tr>
             )}
           </tbody>
