@@ -926,13 +926,13 @@ export const defaultProducts = (): Product[] => [
   mkP('Çikolata Kaplı Vanilya Bar 90ml', '8691041031311', 'Dondurma', 60, 'adet', 55, 52, 58, 12, SEED_IMAGES.dondurmaBar, 10),
   mkP('Külah Dondurma Karışık 120ml', '8691041032321', 'Dondurma', 65, 'adet', 45, 42, 48, 12, SEED_IMAGES.dondurmaKulah, 10),
   mkP('Domates (Dökme)', '8691041033331', 'Manav', 30, 'kg', 40, 36, 44, 5, SEED_IMAGES.domates, 1),
-  mkP('Salatalık (Dökme)', '8691041034341', 'Manav', 25, 'kg', 35, 32, 38, 5, undefined, 1),
-  mkP('Elma (Dökme)', '8691041035351', 'Manav', 28, 'kg', 50, 46, 54, 5, undefined, 1),
-  mkP('Muz (Dökme)', '8691041036361', 'Manav', 20, 'kg', 80, 74, 86, 4, undefined, 1),
-  mkP('Patates (Dökme)', '8691041037371', 'Manav', 50, 'kg', 20, 18, 22, 8, undefined, 1),
-  mkP('Kuru Soğan (Dökme)', '8691041038381', 'Manav', 45, 'kg', 22, 20, 24, 8, undefined, 1),
-  mkP('Limon (Dökme)', '8691041039391', 'Manav', 15, 'kg', 45, 42, 48, 3, undefined, 1),
-  mkP('Maydanoz (Demet)', '8691041040401', 'Manav', 40, 'adet', 10, 9, 11, 8, undefined, 1),
+  mkP('Salatalık (Dökme)', '8691041034341', 'Manav', 25, 'kg', 35, 32, 38, 5, SEED_IMAGES.salatalik, 1),
+  mkP('Elma (Dökme)', '8691041035351', 'Manav', 28, 'kg', 50, 46, 54, 5, SEED_IMAGES.elma, 1),
+  mkP('Muz (Dökme)', '8691041036361', 'Manav', 20, 'kg', 80, 74, 86, 4, SEED_IMAGES.muz, 1),
+  mkP('Patates (Dökme)', '8691041037371', 'Manav', 50, 'kg', 20, 18, 22, 8, SEED_IMAGES.patates, 1),
+  mkP('Kuru Soğan (Dökme)', '8691041038381', 'Manav', 45, 'kg', 22, 20, 24, 8, SEED_IMAGES.sogan, 1),
+  mkP('Limon (Dökme)', '8691041039391', 'Manav', 15, 'kg', 45, 42, 48, 3, SEED_IMAGES.limon, 1),
+  mkP('Maydanoz (Demet)', '8691041040401', 'Manav', 40, 'adet', 10, 9, 11, 8, SEED_IMAGES.maydanoz, 1),
 ];
 
 /** v1.14.0 ile gelen 20 yeni örnek ürünün barkodları — göçte yalnızca eksik olanlar eklenir. */

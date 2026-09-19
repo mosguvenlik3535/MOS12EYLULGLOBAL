@@ -36,15 +36,22 @@ import gofret from '../assets/urunler/gofret.jpg?inline';
 import kahveFiltre from '../assets/urunler/kahve-filtre.jpg?inline';
 import kahveTelve from '../assets/urunler/kahve-telve.jpg?inline';
 import ekmek from '../assets/urunler/ekmek.jpg?inline';
+import elma from '../assets/urunler/elma.jpg?inline';
+import limon from '../assets/urunler/limon.jpg?inline';
+import maydanoz from '../assets/urunler/maydanoz.jpg?inline';
+import muz from '../assets/urunler/muz.jpg?inline';
+import patates from '../assets/urunler/patates.jpg?inline';
 import fistik from '../assets/urunler/fistik.jpg?inline';
 import kola from '../assets/urunler/kola.jpg?inline';
 import kuruyemisKarisik from '../assets/urunler/kuruyemis-karisik.jpg?inline';
 import misirCerez from '../assets/urunler/misir-cerez.jpg?inline';
 import rakiBuyuk from '../assets/urunler/raki-buyuk.jpg?inline';
 import rakiKucuk from '../assets/urunler/raki-kucuk.jpg?inline';
+import salatalik from '../assets/urunler/salatalik.jpg?inline';
 import sigara from '../assets/urunler/sigara.jpg?inline';
 import sigaraAltin from '../assets/urunler/sigara-altin.jpg?inline';
 import sigaraKirmizi from '../assets/urunler/sigara-kirmizi.jpg?inline';
+import sogan from '../assets/urunler/sogan.jpg?inline';
 import viski1 from '../assets/urunler/viski-1.jpg?inline';
 import viski2 from '../assets/urunler/viski-2.jpg?inline';
 
@@ -70,18 +77,25 @@ export const SEED_IMAGES = {
   dondurmaKulah,
   dondurmaVanilya,
   ekmek,
+  elma,
   fistik,
   gofret,
   kahveFiltre,
   kahveTelve,
   kola,
   kuruyemisKarisik,
+  limon,
+  maydanoz,
   misirCerez,
+  muz,
+  patates,
   rakiBuyuk,
   rakiKucuk,
+  salatalik,
   sigara,
   sigaraAltin,
   sigaraKirmizi,
+  sogan,
   viski1,
   viski2,
 } as const;
