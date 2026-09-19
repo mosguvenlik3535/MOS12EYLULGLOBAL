@@ -16,12 +16,22 @@ import antepFistigi from '../assets/urunler/antep-fistigi.jpg?inline';
 import ayran from '../assets/urunler/ayran.jpg?inline';
 import biraAcik from '../assets/urunler/bira-acik.jpg?inline';
 import biraKutu from '../assets/urunler/bira-kutu.jpg?inline';
+import biraKutu2 from '../assets/urunler/bira-kutu-2.jpg?inline';
 import biraSise from '../assets/urunler/bira-sise.jpg?inline';
 import cay from '../assets/urunler/cay.jpg?inline';
 import cikolataBitter from '../assets/urunler/cikolata-bitter.jpg?inline';
 import cikolataKaramelli from '../assets/urunler/cikolata-karamelli.jpg?inline';
 import cikolataSutlu from '../assets/urunler/cikolata-sutlu.jpg?inline';
 import cips from '../assets/urunler/cips.jpg?inline';
+import cipsBaharatli from '../assets/urunler/cips-baharatli.jpg?inline';
+import cipsNacho from '../assets/urunler/cips-nacho.jpg?inline';
+import cipsPatates from '../assets/urunler/cips-patates.jpg?inline';
+import domates from '../assets/urunler/domates.jpg?inline';
+import dondurmaBar from '../assets/urunler/dondurma-bar.jpg?inline';
+import dondurmaCilekli from '../assets/urunler/dondurma-cilekli.jpg?inline';
+import dondurmaKakaolu from '../assets/urunler/dondurma-kakaolu.jpg?inline';
+import dondurmaKulah from '../assets/urunler/dondurma-kulah.jpg?inline';
+import dondurmaVanilya from '../assets/urunler/dondurma-vanilya.jpg?inline';
 import gofret from '../assets/urunler/gofret.jpg?inline';
 import kahveFiltre from '../assets/urunler/kahve-filtre.jpg?inline';
 import kahveTelve from '../assets/urunler/kahve-telve.jpg?inline';
@@ -43,12 +53,22 @@ export const SEED_IMAGES = {
   ayran,
   biraAcik,
   biraKutu,
+  biraKutu2,
   biraSise,
   cay,
   cikolataBitter,
   cikolataKaramelli,
   cikolataSutlu,
   cips,
+  cipsBaharatli,
+  cipsNacho,
+  cipsPatates,
+  domates,
+  dondurmaBar,
+  dondurmaCilekli,
+  dondurmaKakaolu,
+  dondurmaKulah,
+  dondurmaVanilya,
   ekmek,
   fistik,
   gofret,
