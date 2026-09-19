@@ -359,7 +359,9 @@ export function calcVatDeclaration(state: AppState, period: string, locale: Loca
 
 /** Fatura KDV özeti — oran bazında matrah/KDV kırılımı */
 export function invoiceVatSummary(inv: Invoice) {
-  const incl = inv.vatIncluded ?? false;
+  /* Alış faturaları KDV DAHİL (brüt) esaslıdır: mal alınırken KDV bedeli
+     fiilen ödendiği için maliyet brüt üzerinden hesaplanır. */
+  const incl = inv.vatIncluded ?? true;
   const byRate = new Map<number, { base: number; vat: number; gross: number }>();
   let base = 0;
   let vat = 0;
@@ -520,6 +522,8 @@ export interface Settings {
     lastPackageName: string | null;
     lastCheckedAt: string | null;
     seedMigration?: string;
+    /** Alış faturalarının KDV DAHİL esasa geçirildiği sürüm. */
+    invoiceVatMigration?: string;
   };
   criticalDefault: number;
   kentkartLimit: number;
@@ -1067,10 +1071,10 @@ export const defaultInvoices = (): Invoice[] => [
     date: daysAgo(3, 11),
     supplier: 'Türk Tuborg Bayii',
     payType: 'nakit',
-    vatIncluded: false,
+    vatIncluded: true,
     lines: [
-      { name: 'Efes Malt Şişe 50cl', qty: 48, cost: 42, sale: 72, vatRate: 20 },
-      { name: 'Tuborg Gold Kütü 50cl', qty: 36, cost: 45, sale: 75, vatRate: 20 },
+      { name: 'Efes Malt Şişe 50cl', qty: 48, cost: 50.4, sale: 72, vatRate: 20 },
+      { name: 'Tuborg Gold Kütü 50cl', qty: 36, cost: 54, sale: 75, vatRate: 20 },
     ],
     subtotal: 3636,
     vatTotal: 727.2,
@@ -1086,10 +1090,10 @@ export const defaultInvoices = (): Invoice[] => [
     date: daysAgo(1, 14),
     supplier: 'Anadolu Kuru Yemiş',
     payType: 'veresiye',
-    vatIncluded: false,
+    vatIncluded: true,
     lines: [
-      { name: 'Antep Fıstığı (Dökme)', qty: 10, cost: 380, sale: 480, vatRate: 1 },
-      { name: 'Tuzlu Fıstık (Dökme)', qty: 15, cost: 180, sale: 220, vatRate: 1 },
+      { name: 'Antep Fıstığı (Dökme)', qty: 10, cost: 383.8, sale: 480, vatRate: 1 },
+      { name: 'Tuzlu Fıstık (Dökme)', qty: 15, cost: 181.8, sale: 220, vatRate: 1 },
     ],
     subtotal: 6500,
     vatTotal: 65,
@@ -1388,6 +1392,38 @@ export function loadState(): AppState {
             }
             st.modules = { ...st.modules, posint: false };
             st.update.seedMigration = '1.14.1';
+          }
+        }
+        /* v1.15.5 göçü (tek seferlik): ALIŞ FATURALARI ARTIK KDV DAHİL.
+           Eski kayıtlarda kalem maliyetleri KDV HARİÇ (net) tutuluyordu;
+           hepsi brüte çevrilir (mal alınırken KDV fiilen ödendiği için
+           maliyet KDV DAHİL olmalıdır). Fatura toplamları DEĞİŞMEZ — yalnızca
+           birim maliyet/matrah gösterimi düzeltildi.
+           Ayrıca faturadan gelmiş (birebir eşleşen) ürün maliyetleri de
+           brüte çevrilir; kullanıcının elle girdiği maliyetlere dokunulmaz. */
+        {
+          const st = merged.settings;
+          if (st.update && st.update.invoiceVatMigration !== '1.15.5') {
+            const cevrilen: { name: string; net: number; gross: number }[] = [];
+            for (const inv of merged.invoices) {
+              if (!inv || inv.vatIncluded === true) continue;
+              for (const l of Array.isArray(inv.lines) ? inv.lines : []) {
+                const net = round2(l.cost || 0);
+                const gross = round2(net * (1 + (l.vatRate ?? 0) / 100));
+                cevrilen.push({ name: (l.name || '').toLowerCase(), net, gross });
+                l.cost = gross;
+              }
+              inv.vatIncluded = true;
+            }
+            for (const pr of merged.products) {
+              const pn = (pr.name || '').toLowerCase();
+              if (!pn) continue;
+              const hit = [...cevrilen]
+                .reverse()
+                .find((x) => x.name && (pn === x.name || pn.includes(x.name) || x.name.includes(pn)));
+              if (hit && round2(pr.cost || 0) === hit.net) pr.cost = hit.gross;
+            }
+            st.update.invoiceVatMigration = '1.15.5';
           }
         }
         /* v1.15.2 göçü (tek seferlik): örnek ürünlerin gömülü görselleri,

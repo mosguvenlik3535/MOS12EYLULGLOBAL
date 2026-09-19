@@ -193,7 +193,9 @@ export function PurchaseScreen({
   const [items, setItems] = useState<Array<{ productId: string; name: string; qty: number; cost: number; sale: number; vatRate: number }>>([]);
 
   /* ---------- KDV ---------- */
-  const [vatIncluded, setVatIncluded] = useState(false);
+  /* Alış faturası KDV DAHİL girilir: mal alınırken KDV bedeli fiilen
+     ödendiği için birim maliyet brüt (KDV dahil) tutulur. */
+  const [vatIncluded, setVatIncluded] = useState(true);
   const [supplierNo, setSupplierNo] = useState('');
   const [docType, setDocType] = useState<NonNullable<Invoice['docType']>>('e-fatura');
   const [taxNo, setTaxNo] = useState('');
@@ -517,8 +519,9 @@ export function PurchaseScreen({
     const lines = items.map((l) => ({
       name: l.name,
       qty: l.qty,
-      // Stok maliyeti her zaman KDV HARİÇ tutulur (KDV indirilecek vergidir, gider değil)
-      cost: toTRY(vatIncluded ? round2(l.cost / (1 + (l.vatRate ?? 0) / 100)) : l.cost),
+      /* MALİYET KDV DAHİL (brüt) yazılır: mal alınırken KDV bedeli de ödendi.
+         Girilen tutar KDV HARİÇ ise matraha çevirmeden önce brüte tamamlanır. */
+      cost: toTRY(vatIncluded ? l.cost : round2(l.cost * (1 + (l.vatRate ?? 0) / 100))),
       sale: toTRY(l.sale),
       vatRate: l.vatRate,
     }));
@@ -536,7 +539,7 @@ export function PurchaseScreen({
         supplier: finalSupplier,
         payType,
         dueDate: payType === 'veresiye' ? dueDate : undefined,
-        vatIncluded: false, // kalem maliyetleri KDV hariç normalize edildi
+        vatIncluded: true, // kalem maliyetleri KDV DAHİL (brüt) saklanır
         lines,
         subtotal: toTRY(vatCalc.base),
         vatTotal: toTRY(vatCalc.vat),
@@ -977,7 +980,7 @@ export function PurchaseScreen({
                   </table>
                 </div>
                 <p className="mt-1.5 text-[9.5px] text-mut2">
-                  Ödenen KDV <b className="text-amber2">indirilecek KDV</b> olarak muhasebeleşir; stok maliyetine dahil edilmez.
+                  Birim maliyet <b className="text-amber2">KDV DAHİL</b> alınır: malı alırken KDV bedelini de ödediğiniz için maliyet brüt hesaplanır. Ödenen KDV, KDV beyannamesinde ayrıca indirilecek KDV olarak görünür.
                 </p>
               </div>
             )}
