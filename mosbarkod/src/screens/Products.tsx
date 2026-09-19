@@ -7,7 +7,7 @@ import CameraScanner from '../components/CameraScanner';
 import LabelStudioModal from '../components/LabelStudioModal';
 import StockImportModal from '../components/StockImportModal';
 import Barcode from '../components/Barcode';
-import { CATEGORIES, dstr, fmt, fmtN, fromTRY, toTRY, tstr, uid, type Product, type Sale, type Settings, type StockCountSession } from '../data';
+import { backfillSeedImages, CATEGORIES, dstr, fmt, fmtN, fromTRY, toTRY, tstr, uid, type Product, type Sale, type Settings, type StockCountSession } from '../data';
 import { fetchProductByBarcode, generateEan13, searchProductsByName, type AiProductMeta } from '../lib/productAi';
 import { fileToDataUrl } from '../lib/image';
 import { analyzeStock, ABC_META, type AbcClass } from '../lib/stockIntel';
@@ -198,7 +198,7 @@ export default function Products({
       installment: p.installment ? String(fromTRY(p.installment)) : '',
       expiry: p.expiry ?? '',
       critical: String(p.critical),
-      image: p.image ?? '',
+      image: resolveProductImage(p.image) ?? '',
       supplier: p.supplier ?? 'Tedarikçi Yok / Standart',
       quickAccess: !!p.quick,
       isWeight: !!p.weighed || p.unit === 'kg' || p.unit === 'lt',
@@ -228,6 +228,20 @@ export default function Products({
     ]);
 
   const stamp = () => new Date().toISOString().slice(0, 10);
+
+  /* Örnek ürün görsellerini geri yükle — görseli boş kalmış ürünlere
+     uygulamanın içindeki görseller yeniden işlenir. Kullanıcının kendi
+     yüklediği görsellere dokunulmaz. */
+  const restoreSeedImages = () => {
+    const next = products.map((p) => ({ ...p }));
+    const n = backfillSeedImages(next);
+    if (!n) {
+      toast('Tüm ürünlerin görseli zaten yerinde');
+      return;
+    }
+    bulkUpdate(next);
+    toast(`${n} ürünün görseli geri yüklendi`);
+  };
 
   /* Excel (.xlsx) dışa aktar — gerçek Excel dosyası */
   const exportXlsx = () => {
@@ -412,6 +426,13 @@ export default function Products({
           </Btn>
           <Btn v="ghost" onClick={() => setCountOpen(true)}>
             <Ic n="reset" c="h-4 w-4" /> Stok Sayımı Yap
+          </Btn>
+          <Btn
+            v="ghost"
+            onClick={restoreSeedImages}
+            title="Görseli boş kalan örnek ürünlere gömülü görselleri yeniden işler — sizin yüklediğiniz görseller korunur"
+          >
+            <Ic n="image" c="h-4 w-4" /> Görselleri Geri Yükle
           </Btn>
           <Btn
             v="ghost"

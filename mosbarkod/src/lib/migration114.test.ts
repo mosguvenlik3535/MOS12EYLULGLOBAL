@@ -35,7 +35,8 @@ describe('v1.14.1 seed migration', () => {
     const loaded = loadState();
     expect(loaded.products).toHaveLength(40);
     expect(loaded.settings.modules.posint).toBe(false);
-    expect(loaded.settings.update.seedMigration).toBe('1.14.1');
+    /* göç zinciri 1.15.2'de biter (ürün görselleri de işlenir) */
+    expect(loaded.settings.update.seedMigration).toBe('1.15.2');
     const cats = new Set(loaded.products.map((p) => p.category));
     expect(cats.has('Dondurma')).toBe(true);
     expect(cats.has('Manav')).toBe(true);

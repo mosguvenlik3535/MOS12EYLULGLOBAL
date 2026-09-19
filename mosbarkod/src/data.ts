@@ -2,6 +2,39 @@ import { appVersionLabel } from './lib/buildMode';
 import { fxRate as _fxRate, initFx } from './lib/fx';
 import { SEED_IMAGES } from './lib/seedImages';
 
+/* Gömülü görselin veri adresini kısa anahtara çeviren ters tablo
+   ('seed:domates' gibi). Eski kayıtlara görsel işlerken kullanılır; böylece
+   yerel depolama ve yedek dosyaları gereksiz yere şişmez. */
+const GORSEL_ANAHTARI = new Map<string, string>(
+  (Object.entries(SEED_IMAGES) as [string, string][]).map(([k, v]) => [v, 'seed:' + k]),
+);
+
+/**
+ * Örnek ürün görsellerini envantere işler.
+ * Yalnızca görseli BOŞ olan ya da eski bir internet adresi taşıyan ve barkodu
+ * örnek ürünlerle eşleşen kayıtlar güncellenir. Kullanıcının kendi yüklediği
+ * görseller (data:/blob: ile başlayanlar) asla değiştirilmez.
+ * @returns görseli yenilenen ürün sayısı
+ */
+export function backfillSeedImages(list: Product[]): number {
+  const gorsel = new Map(
+    defaultProducts()
+      .filter((p) => !!p.image)
+      .map((p) => [p.barcode, p.image as string]),
+  );
+  let n = 0;
+  for (const p of list) {
+    const yeni = gorsel.get(p.barcode);
+    if (!yeni) continue;
+    const eski = (p.image || '').trim();
+    const bosVeyaEskiAdres = !eski || eski.startsWith('http') || eski.includes('pexels.com');
+    if (!bosVeyaEskiAdres) continue;
+    p.image = GORSEL_ANAHTARI.get(yeni) ?? yeni;
+    n += 1;
+  }
+  return n;
+}
+
 export type PriceMode = 'f1' | 'f2' | 'f3' | 'kkart' | 'taksit';
 export type PayMethod = 'nakit' | 'kart' | 'nakit+pos' | 'veresiye';
 export type ViewId =
@@ -1341,7 +1374,11 @@ export function loadState(): AppState {
            ürünlerine ve diğer ayarlarına dokunulmaz. */
         {
           const st = merged.settings;
-          if (st.update && st.update.seedMigration !== '1.14.1') {
+          if (
+            st.update &&
+            st.update.seedMigration !== '1.14.1' &&
+            st.update.seedMigration !== '1.15.2'
+          ) {
             const have = new Set(merged.products.map((p) => p.barcode));
             for (const p of defaultProducts()) {
               if (SEED_114_BARCODES.has(p.barcode) && !have.has(p.barcode)) {
@@ -1351,6 +1388,18 @@ export function loadState(): AppState {
             }
             st.modules = { ...st.modules, posint: false };
             st.update.seedMigration = '1.14.1';
+          }
+        }
+        /* v1.15.2 göçü (tek seferlik): örnek ürünlerin gömülü görselleri,
+           GÖRSEL YOKKEN kaydedilmiş eski envanterlere de işlenir. Yalnızca
+           görseli boş olan ya da eski internet adresi (pexels) taşıyan örnek
+           ürünlere dokunulur; kullanıcının kendi eklediği görseller
+           (data:/blob: ile başlayanlar) asla değiştirilmez. */
+        {
+          const st = merged.settings;
+          if (st.update && st.update.seedMigration !== '1.15.2') {
+            backfillSeedImages(merged.products);
+            st.update.seedMigration = '1.15.2';
           }
         }
         if (!merged.imkart) merged.imkart = { limit: 3000, txns: [] };

@@ -11,6 +11,22 @@ import type { Locale } from './i18n';
 export type TipTranslations = Record<Exclude<Locale, 'tr'>, string>;
 
 export const TIP_PHRASES: Record<string, TipTranslations> = {
+  /* ---- v1.15.2: örnek ürün görsellerini geri yükleme ---- */
+  'Görseli boş kalan örnek ürünlere gömülü görselleri yeniden işler — sizin yüklediğiniz görseller korunur': {
+    en: 'Re-applies the built-in images to sample products that have no image — images you uploaded are kept',
+    ar: 'يعيد تطبيق الصور المدمجة على المنتجات النموذجية التي لا تحتوي على صورة — تبقى الصور التي رفعتها كما هي',
+    ru: 'Заново применяет встроенные изображения к образцам товаров без картинки — ваши изображения сохраняются',
+    es: 'Vuelve a aplicar las imágenes integradas a los productos de ejemplo sin imagen — tus imágenes se conservan',
+    de: 'Wendet die integrierten Bilder erneut auf Beispielprodukte ohne Bild an — eigene Bilder bleiben erhalten',
+    fr: "Réapplique les images intégrées aux produits d'exemple sans image — vos images sont conservées",
+    it: 'Ri applica le immagini integrate ai prodotti di esempio senza immagine — le tue immagini restano',
+    pt: 'Volta a aplicar as imagens incorporadas aos produtos de exemplo sem imagem — as suas imagens são mantidas',
+    zh: '为没有图片的示例商品重新应用内置图片 — 您上传的图片会保留',
+    pl: 'Ponownie stosuje wbudowane obrazy do przykładowych produktów bez zdjęcia — Twoje obrazy zostają',
+    ro: 'Reaplică imaginile încorporate produselor exemplu fără imagine — imaginile tale rămân',
+    el: 'Επαναφέρει τα ενσωματωμένα γραφικά στα δείγματα προϊόντων χωρίς εικόνα — οι δικές σας εικόνες διατηρούνται',
+    nl: 'Past de ingebouwde afbeeldingen opnieuw toe op voorbeeldproducten zonder afbeelding — uw eigen afbeeldingen blijven',
+  },
   /* ---- v1.15.0: telefon (mobil) özellikleri ---- */
   'Adet azalt': {
     en: 'Decrease quantity',

@@ -126,6 +126,12 @@ const PEXELS_ID_TO_LOCAL: Record<string, string> = {
 export function resolveProductImage(src?: string): string | undefined {
   if (!src) return undefined;
   if (src.startsWith('data:') || src.startsWith('blob:')) return src;
+  /* 'seed:domates' gibi kısa gösterimler: görselin kendisi uygulamanın
+     içinde olduğu için kayıtta yalnızca anahtar saklanır — yerel depolama
+     yüzlerce KB yerine birkaç bayt tutar. */
+  if (src.startsWith('seed:')) {
+    return SEED_IMAGES[src.slice(5) as keyof typeof SEED_IMAGES] ?? undefined;
+  }
   const m = /images\.pexels\.com\/photos\/(\d+)/.exec(src);
   if (m) return PEXELS_ID_TO_LOCAL[m[1]] ?? src;
   return src;
