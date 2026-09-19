@@ -1,3 +1,9 @@
+> ⚠️ **BU ÖZELLİK ŞU ANDA DEVRE DIŞI** — v1.15.4 ile geri alındı.
+> Program zaten ücretsiz; PRO tarafı Play aboneliğiyle yürüyor.
+> Kod git geçmişinde duruyor (`185deb8`) — istenirse tek komutla geri getirilir.
+> Gizli anahtar `mosbarkod/tools/tester-private.key` dosyasında saklanmaya devam
+> eder (depoya girmez), böylece özellik geri geldiğinde eski kodlar çalışır.
+
 # Testçi Lisansı — Tek Cihaza Bağlı Ücretsiz PRO
 
 14 günlük kapalı testi tamamlayan testçilere uygulamayı **ücretsiz PRO** olarak

@@ -3,7 +3,6 @@ import JSZip from 'jszip';
 import { QRCodeSVG } from 'qrcode.react';
 import { cn } from '../utils/cn';
 import { Ic } from '../icons';
-import TesterLicenseBox from '../components/TesterLicenseBox';
 import { Badge, Btn, Field, Inp, Modal, ScreenHead, Sel } from '../components/ui';
 import { HardwareCard, ReportCard, WhatsAppCard, EmailCard } from './SettingsIntegrations';
 import { AutoBackupCard, CloudBackupCard, HealthCheckCard, MobileCard, SoundCard, ThemesCard } from './SettingsSystem';
@@ -368,8 +367,6 @@ function LicenseCard() {
           </a>
         </div>
       </div>
-
-      <TesterLicenseBox />
 
       <p className="mt-4 text-[9px] italic leading-relaxed text-mut2">
         “Bu yazılım MOSBARKODYAZILIM tarafından tescillenmiş olup tüm hakları saklıdır.”

@@ -28,7 +28,6 @@ import {
 import LicenseGate, { getStoredLicense, getStoredLicenseAsync } from './components/LicenseGate';
 import { IS_DEMO, IS_PLAY, DEMO_MAX_SALES, FREE_MAX_PRODUCTS } from './lib/buildMode';
 import { initPlayBilling, isPlayBillingAvailable, isProActive } from './lib/playBilling';
-import { checkTesterLicense, type TesterStatus } from './lib/testerLicense';
 import ProUpsellModal from './components/ProUpsellModal';
 import LoginGate from './components/LoginGate';
 import { useWakeLock } from './lib/wakeLock';
@@ -170,25 +169,6 @@ export default function App() {
     const t = setTimeout(() => setBooted(true), 400);
     return () => clearTimeout(t);
   }, []);
-
-  /* Testçi lisansı açılışta yeniden doğrulanır: kod başka bir telefona
-     kesilmişse ya da süresi dolmuşsa PRO kilidi kapatılır. */
-  useEffect(() => {
-    const check = async () => {
-      try {
-        const st = await checkTesterLicense();
-        setTesterStatus(st.status);
-        if (st.status === 'gecerli') setLicensed(true);
-        else if (st.status !== 'yok') setLicensed(false);
-      } catch {
-        /* yoksay */
-      }
-    };
-    void check();
-    const onChanged = () => void check();
-    window.addEventListener('mos-license-changed', onChanged);
-    return () => window.removeEventListener('mos-license-changed', onChanged);
-  }, []);
   const [sync, setSync] = useState<SyncStatus>({ role: 'off', code: '', connected: false });
   const [joinCode, setJoinCode] = useState('');
   const [licensed, setLicensed] = useState(() => IS_DEMO || Boolean(getStoredLicense()));
@@ -197,8 +177,6 @@ export default function App() {
   const [proBannerOff, setProBannerOff] = useState(() => {
     try { return localStorage.getItem('mos_pro_banner_off') === '1'; } catch { return false; }
   });
-  // Testçi lisansının bu cihazdaki durumu ('yok' → hiç kod girilmemiş).
-  const [testerStatus, setTesterStatus] = useState<TesterStatus>('yok');
   // Play ücretsiz katman kilidi: yalnızca Play derlemesinde, lisanssız ve PRO'suzken true.
   const proLocked = IS_PLAY && !licensed && !pro;
   const requirePro = () => setProOpen(true);
@@ -1590,17 +1568,6 @@ export default function App() {
       {demo && !demoExpired && (
         <div className="pointer-events-none fixed left-1/2 top-[70px] z-[80] -translate-x-1/2 rounded-full border border-amber/50 bg-amber/90 px-3 py-1 font-mono text-[10px] font-black tracking-[0.2em] text-black shadow-lg">
           DEMO SÜRÜM · {Math.max(0, DEMO_MAX_SALES - Math.max(0, state.sales.length - demoBaseline))} SATIŞ KALDI
-        </div>
-      )}
-      {testerStatus !== 'yok' && testerStatus !== 'gecerli' && (
-        <div className="fixed left-0 right-0 top-0 z-[85] border-b border-red/50 bg-red/20 px-3 py-2 text-center font-mono text-[10.5px] font-bold leading-snug text-red backdrop-blur">
-          {testerStatus === 'baska-cihaz' &&
-            'Bu lisans BAŞKA BİR TELEFONA kayıtlı — PRO özellikler bu cihazda kapalı. Telefon değiştirdiyseniz yeni kod alın.'}
-          {testerStatus === 'sure-bitti' &&
-            'Testçi lisansınızın süresi doldu — PRO özellikler kapalı. Yeni kod için geliştiriciye yazın.'}
-          {testerStatus === 'bozuk' && 'Lisans kodu geçersiz — PRO özellikler kapalı.'}
-          {testerStatus === 'destek-yok' &&
-            'Bu cihaz lisans doğrulamayı desteklemiyor — PRO özellikler kapalı.'}
         </div>
       )}
       {IS_PLAY && !licensed && !pro && !proBannerOff && (

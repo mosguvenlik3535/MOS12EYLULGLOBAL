@@ -11,37 +11,6 @@ import type { Locale } from './i18n';
 export type TipTranslations = Record<Exclude<Locale, 'tr'>, string>;
 
 export const TIP_PHRASES: Record<string, TipTranslations> = {
-  /* ---- v1.15.3: testçi lisansı (tek cihaza bağlı) ---- */
-  'Cihaz kodunu kopyala': {
-    en: 'Copy device code',
-    ar: 'نسخ رمز الجهاز',
-    ru: 'Скопировать код устройства',
-    es: 'Copiar código del dispositivo',
-    de: 'Gerätecode kopieren',
-    fr: "Copier le code de l'appareil",
-    it: 'Copia il codice dispositivo',
-    pt: 'Copiar código do dispositivo',
-    zh: '复制设备代码',
-    pl: 'Skopiuj kod urządzenia',
-    ro: 'Copiază codul dispozitivului',
-    el: 'Αντιγραφή κωδικού συσκευής',
-    nl: 'Apparaatcode kopiëren',
-  },
-  'Etkinleştirme kodunu yapıştırın — yalnızca bu telefonda çalışır': {
-    en: 'Paste the activation code — it only works on this phone',
-    ar: 'الصق رمز التفعيل — يعمل على هذا الهاتف فقط',
-    ru: 'Вставьте код активации — он работает только на этом телефоне',
-    es: 'Pega el código de activación — solo funciona en este teléfono',
-    de: 'Aktivierungscode einfügen — er funktioniert nur auf diesem Telefon',
-    fr: "Collez le code d'activation — il ne fonctionne que sur ce téléphone",
-    it: 'Incolla il codice di attivazione — funziona solo su questo telefono',
-    pt: 'Cole o código de ativação — funciona apenas neste telemóvel',
-    zh: '粘贴激活码 — 仅在此手机上有效',
-    pl: 'Wklej kod aktywacyjny — działa tylko na tym telefonie',
-    ro: 'Lipiți codul de activare — funcționează doar pe acest telefon',
-    el: 'Επικολλήστε τον κωδικό ενεργοποίησης — λειτουργεί μόνο σε αυτό το κινητό',
-    nl: 'Plak de activatiecode — werkt alleen op deze telefoon',
-  },
   /* ---- v1.15.2: örnek ürün görsellerini geri yükleme ---- */
   'Görseli boş kalan örnek ürünlere gömülü görselleri yeniden işler — sizin yüklediğiniz görseller korunur': {
     en: 'Re-applies the built-in images to sample products that have no image — images you uploaded are kept',
