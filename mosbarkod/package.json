@@ -1,6 +1,6 @@
 {
   "name": "mosbarkodyazilim",
-  "version": "1.15.2",
+  "version": "1.15.3",
   "description": "MOSBARKODYAZILIM - Yapay Zeka Destekli Barkod Satış Programı",
   "author": "MOSBARKODYAZILIM",
   "license": "UNLICENSED",
@@ -23,6 +23,7 @@
     "android:open": "cap open android"
   },
   "dependencies": {
+    "@capacitor/device": "^8.0.3",
     "@zxing/browser": "^0.2.1",
     "clsx": "2.1.1",
     "cordova-plugin-purchase": "^13.18.0",
