@@ -27,7 +27,7 @@ export const de: TranslationTable = {
   'login.admin': 'Als Admin fortfahren',
   'login.requiresAdmin': 'Admin-Rechte erforderlich',
   'login.adminOnly': 'Dieser Bereich ist nur für das Admin-Konto verfügbar.',
-  'topbar.subtitle': 'KI-GESTÜTZTES BARCODE-VERKAUFSPROGRAMM',
+  'topbar.subtitle': 'BARCODE-VERKAUFSPROGRAMM',
   'topbar.register': 'Kasse',
   'pos.payBtn': 'ZAHLUNG ANNEHMEN',
   'pay.title': 'Verkauf abschließen / Zahlung',

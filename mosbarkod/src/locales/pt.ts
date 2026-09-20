@@ -21,7 +21,7 @@ export const pt: TranslationTable = {
   'login.ok': 'LOGIN REALIZADO',
   'login.cancel': 'Cancelar',
   'login.admin': 'Continuar como Admin',
-  'topbar.subtitle': 'SISTEMA DE VENDAS POR CÓDIGO DE BARRAS COM IA',
+  'topbar.subtitle': 'SISTEMA DE VENDAS POR CÓDIGO DE BARRAS',
   'topbar.register': 'Caixa',
   'pos.payBtn': 'RECEBER PAGAMENTO',
   'pay.title': 'Finalizar Venda / Receber Pagamento',

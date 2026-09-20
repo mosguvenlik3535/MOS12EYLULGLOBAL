@@ -21,7 +21,7 @@ export const ro: TranslationTable = {
   'login.ok': 'AUTENTIFICARE REUȘITĂ',
   'login.cancel': 'Anulare',
   'login.admin': 'Continuați ca Admin',
-  'topbar.subtitle': 'SISTEM DE VÂNZĂRI CU CODURI DE BARE ȘI AI',
+  'topbar.subtitle': 'SISTEM DE VÂNZĂRI CU CODURI DE BARE',
   'topbar.register': 'Casă',
   'pos.payBtn': 'ÎNCASAȚI',
   'pay.title': 'Închide Vânzarea / Încasare',

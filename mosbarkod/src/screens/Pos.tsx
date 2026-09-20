@@ -923,7 +923,7 @@ function ProductBrowser(props: PosProps & { handle: React.ReactNode; onOpenWeigh
           </button>
           <button
             onClick={props.onOpenAiVision}
-            title="Yapay Zekâ Görsel Ürün Tanıma (AI Vision Checkout)"
+            title="Görsel Ürün Tanıma"
             className="flex shrink-0 items-center justify-center gap-1.5 rounded-lg border border-indigo-500/50 bg-indigo-500/15 px-3 text-indigo-300 transition-colors hover:bg-indigo-500/25 shadow-[0_0_12px_rgba(99,102,241,0.25)]"
           >
             <Ic n="sparkles" c="h-4.5 w-4.5 text-indigo-400 animate-pulse" />

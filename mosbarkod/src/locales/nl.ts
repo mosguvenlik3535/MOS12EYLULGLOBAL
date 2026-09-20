@@ -21,7 +21,7 @@ export const nl: TranslationTable = {
   'login.ok': 'INLOGGEN GELUKT',
   'login.cancel': 'Annuleren',
   'login.admin': 'Doorgaan als Admin',
-  'topbar.subtitle': 'AI-GESTUURD BARCODEVERKOOPSYSTEEM',
+  'topbar.subtitle': 'BARCODEVERKOOPSYSTEEM',
   'topbar.register': 'Kassa',
   'pos.payBtn': 'BETALING ONTVANGEN',
   'pay.title': 'Verkoop Afsluiten / Betaling',

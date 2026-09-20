@@ -27,7 +27,7 @@ export const es: TranslationTable = {
   'login.admin': 'Continuar como Admin',
   'login.requiresAdmin': 'Se requieren derechos de administrador',
   'login.adminOnly': 'Esta sección solo está disponible para la cuenta Admin.',
-  'topbar.subtitle': 'PROGRAMA DE VENTAS CON CÓDIGO DE BARRAS CON IA',
+  'topbar.subtitle': 'PROGRAMA DE VENTAS CON CÓDIGO DE BARRAS',
   'topbar.register': 'Caja',
   'pos.payBtn': 'COBRAR',
   'pay.title': 'Cerrar Venta / Cobrar',

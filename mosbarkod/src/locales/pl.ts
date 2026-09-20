@@ -21,7 +21,7 @@ export const pl: TranslationTable = {
   'login.ok': 'LOGOWANIE UDANE',
   'login.cancel': 'Anuluj',
   'login.admin': 'Kontynuuj jako Admin',
-  'topbar.subtitle': 'SYSTEM SPRZEDAŻY KODÓW KRESKOWYCH Z AI',
+  'topbar.subtitle': 'SYSTEM SPRZEDAŻY KODÓW KRESKOWYCH',
   'topbar.register': 'Kasa',
   'pos.payBtn': 'PRZYJMIJ PŁATNOŚĆ',
   'pay.title': 'Zamknij Sprzedaż / Płatność',

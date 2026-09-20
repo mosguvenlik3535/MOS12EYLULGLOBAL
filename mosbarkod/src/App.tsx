@@ -187,20 +187,20 @@ export default function App() {
   const [locale, setLocaleState] = useState<Locale>(() => loadLocale());
 
   const DOC_TITLES: Record<Locale, string> = {
-    tr: 'MOSBARKODYAZILIM — Yapay Zekâ Destekli Barkod Satış Programı',
-    en: 'MOSBARKODYAZILIM — AI-Powered Barcode Sales Program',
-    es: 'MOSBARKODYAZILIM — Programa de Ventas con Código de Barras con IA',
-    de: 'MOSBARKODYAZILIM — KI-gestütztes Barcode-Verkaufsprogramm',
-    fr: 'MOSBARKODYAZILIM — Programme de Vente par Code-Barres avec IA',
-    it: 'MOSBARKODYAZILIM — Programma di Vendita con Codice a Barre AI',
-    pt: 'MOSBARKODYAZILIM — Programa de Vendas por Código de Barras com IA',
-    zh: 'MOSBARKODYAZILIM — AI 智能条码销售系统',
-    pl: 'MOSBARKODYAZILIM — System sprzedaży kodów kreskowych z AI',
-    ro: 'MOSBARKODYAZILIM — Program de vânzări cu coduri de bare și AI',
-    el: 'MOSBARKODYAZILIM — Σύστημα πωλήσεων barcode με AI',
-    nl: 'MOSBARKODYAZILIM — AI-gestuurd barcodeverkoopprogramma',
-    ar: 'MOSBARKODYAZILIM — برنامج بيع بالباركود مدعوم بالذكاء الاصطناعي',
-    ru: 'MOSBARKODYAZILIM — Программа продаж по штрих-коду с ИИ',
+    tr: 'MOSBARKODYAZILIM — Barkod Satış Programı',
+    en: 'MOSBARKODYAZILIM — Barcode Sales Program',
+    es: 'MOSBARKODYAZILIM — Programa de Ventas con Código de Barras',
+    de: 'MOSBARKODYAZILIM — Barcode-Verkaufsprogramm',
+    fr: 'MOSBARKODYAZILIM — Programme de Vente par Code-Barres',
+    it: 'MOSBARKODYAZILIM — Programma di Vendita con Codice a Barre',
+    pt: 'MOSBARKODYAZILIM — Programa de Vendas por Código de Barras',
+    zh: 'MOSBARKODYAZILIM — 条码销售系统',
+    pl: 'MOSBARKODYAZILIM — System sprzedaży kodów kreskowych',
+    ro: 'MOSBARKODYAZILIM — Program de vânzări cu coduri de bare',
+    el: 'MOSBARKODYAZILIM — Σύστημα πωλήσεων barcode',
+    nl: 'MOSBARKODYAZILIM — barcodeverkoopprogramma',
+    ar: 'MOSBARKODYAZILIM — برنامج بيع بالباركود',
+    ru: 'MOSBARKODYAZILIM — Программа продаж по штрих-коду',
   };
 
   const setLocale = (l: Locale) => {

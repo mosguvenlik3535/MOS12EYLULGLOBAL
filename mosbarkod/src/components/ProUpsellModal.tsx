@@ -6,7 +6,7 @@ import { isPlayBillingAvailable, purchasePro, restorePro } from '../lib/playBill
 
 const FEATURES = [
   'Sınırsız ürün ve satış kaydı',
-  'Yapay zekâ görüntü tanıma ile ürün bulma',
+  'Görüntü tanıma ile ürün bulma',
   'Bulut yedekleme (Google Drive / Dropbox)',
   'Tüm raporlar, analizler ve stok zekâsı',
   'Çoklu kasa ve personel yönetimi',

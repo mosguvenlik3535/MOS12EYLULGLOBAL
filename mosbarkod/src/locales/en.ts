@@ -41,7 +41,7 @@ export const en: TranslationTable = {
   'poslock.checking': 'Checking license…',
 
   // TopBar
-  'topbar.subtitle': 'AI-Powered Barcode Sales Program',
+  'topbar.subtitle': 'Barcode Sales Program',
   'topbar.imkart': 'Transport Card Limit',
   'topbar.imkartHint': 'click to top up →',
   'topbar.todayTurnover': "Today's Turnover",
@@ -302,11 +302,11 @@ export const en: TranslationTable = {
   'labels.a4_24': 'A4 Multi Sheet (24-grid)',
   'labels.a4_40': 'A4 Mini Sheet (40-grid)',
 
-  'aivision.title': 'AI Visual Product Recognition (AI Vision)',
+  'aivision.title': 'Visual Product Recognition',
   'aivision.btn': 'AI SCAN',
-  'aivision.live': 'AI Live Object Detection',
+  'aivision.live': 'Live Object Detection',
   'aivision.train': 'Train Product (Capture)',
-  'aivision.topMatches': 'Top AI Matches',
+  'aivision.topMatches': 'Top Matches',
 
   'currency.title': 'Multi-Currency Engine',
   'currency.select': 'Select Active Currency',

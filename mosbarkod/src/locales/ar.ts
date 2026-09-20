@@ -14,7 +14,7 @@ export const ar: TranslationTable = {
   'nav.staff': 'الموظفين والراتب',
   'nav.cash': 'الصندوق والتحليلات',
   'nav.settings': 'الإعدادات',
-  'topbar.subtitle': 'برنامج بيع بالباركود مدعوم بالذكاء الاصطناعي',
+  'topbar.subtitle': 'برنامج بيع بالباركود',
   'topbar.register': 'الصندوق',
   'topbar.imkart': 'حد بطاقة إزمير',
   'pos.payBtn': 'استلام الدفع',

@@ -21,7 +21,7 @@ export const zh: TranslationTable = {
   'login.ok': '登录成功',
   'login.cancel': '取消',
   'login.admin': '以管理员身份继续',
-  'topbar.subtitle': 'AI 智能条码销售系统',
+  'topbar.subtitle': '条码销售系统',
   'topbar.register': '收银台',
   'pos.payBtn': '收款',
   'pay.title': '完成销售 / 收款',

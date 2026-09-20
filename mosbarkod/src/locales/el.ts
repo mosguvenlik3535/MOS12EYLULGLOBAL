@@ -21,7 +21,7 @@ export const el: TranslationTable = {
   'login.ok': 'ΕΠΙΤΥΧΗΣ ΣΥΝΔΕΣΗ',
   'login.cancel': 'Ακύρωση',
   'login.admin': 'Συνέχεια ως Διαχειριστής',
-  'topbar.subtitle': 'ΣΥΣΤΗΜΑ ΠΩΛΗΣΕΩΝ BARCODE ΜΕ AI',
+  'topbar.subtitle': 'ΣΥΣΤΗΜΑ ΠΩΛΗΣΕΩΝ BARCODE',
   'topbar.register': 'Ταμείο',
   'pos.payBtn': 'ΕΙΣΠΡΑΞΗ',
   'pay.title': 'Κλείσιμο Πώλησης / Πληρωμή',

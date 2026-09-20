@@ -1,7 +1,7 @@
 {
   "name": "MOSBARKODYAZILIM POS (iPhone)",
   "short_name": "MOSBARKOD",
-  "description": "Yapay Zekâ Destekli Barkod Satış Programı — iPhone (Safari PWA) paketi",
+  "description": "Barkod Satış Programı — iPhone (Safari PWA) paketi",
   "start_url": ".",
   "scope": ".",
   "display": "standalone",

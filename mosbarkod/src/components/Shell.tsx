@@ -243,7 +243,7 @@ export function TopBar({
         <div className="hidden md:block">
           <div className="font-mono text-[13px] font-bold tracking-[0.14em]">MOS BARKOD</div>
           <div className="font-mono text-[8.5px] tracking-[0.2em] text-mut2">
-            YAPAY ZEKA DESTEKLİ BARKOD SATIŞ PROGRAMI
+            BARKOD SATIŞ PROGRAMI
           </div>
         </div>
       </div>

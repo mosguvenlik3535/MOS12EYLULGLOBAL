@@ -14,7 +14,7 @@ export const ru: TranslationTable = {
   'nav.staff': 'Персонал и зарплата',
   'nav.cash': 'Деньги и аналитика',
   'nav.settings': 'Настройки',
-  'topbar.subtitle': 'Программа продаж с ИИ по штрих-коду',
+  'topbar.subtitle': 'Программа продаж по штрих-коду',
   'topbar.register': 'Касса',
   'topbar.imkart': 'Лимит карты Измира',
   'pos.payBtn': 'ПРИНЯТЬ ОПЛАТУ',

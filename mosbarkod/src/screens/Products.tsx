@@ -335,7 +335,7 @@ export default function Products({
       setAiResults(results);
       setAiSearchOpen(true);
       applyMeta(results[0]);
-      toast(`Yapay zekâ ${results.length} ürün buldu — en iyi eşleşme forma uygulandı, diğerleri listede`);
+      toast(`${results.length} ürün bulundu — en iyi eşleşme forma uygulandı, diğerleri listede`);
     } catch {
       toast('Ürün veri tabanına ulaşılamadı (ağ hatası)', 'err');
     } finally {
@@ -620,7 +620,7 @@ export default function Products({
       {/* ÜRÜN EKLEME / DÜZENLEME MODALI (GÖNDERİLEN GÖRSELİN GELİŞMİŞ HALİ) */}
       {form && (
         <Modal
-          title={isNew ? 'Yapay Zekâ Destekli Ürün Ekleme Sihirbazı' : 'Ürünü Düzenle'}
+          title={isNew ? 'Ürün Ekleme Sihirbazı' : 'Ürünü Düzenle'}
           icon={<Ic n="sparkles" c="h-4.5 w-4.5 text-amber" />}
           onClose={() => setForm(null)}
           w="max-w-2xl"
@@ -718,7 +718,7 @@ export default function Products({
                     type="button"
                     onClick={fetchByName}
                     disabled={nameFetching}
-                    title="Yapay zekâ ile bu ürünün barkodunu, tüm bilgilerini ve görselini getir"
+                    title="Bu ürünün barkodunu, tüm bilgilerini ve görselini getir"
                     className="flex h-[38px] shrink-0 items-center justify-center gap-1 rounded-lg border border-amber/50 bg-gradient-to-br from-amber/20 to-indigo-500/20 px-3 text-amber2 shadow-[0_0_14px_rgba(245,158,11,0.25)] transition-all hover:from-amber/30 hover:to-indigo-500/30 disabled:opacity-40"
                   >
                     <Ic n="sparkles" c={cn('h-4 w-4', nameFetching && 'animate-spin')} />
@@ -1218,7 +1218,7 @@ export default function Products({
 
       {aiSearchOpen && (
         <Modal
-          title="Yapay Zekâ Ürün Eşleşmeleri"
+          title="Ürün Eşleşmeleri"
           icon={<Ic n="sparkles" c="h-4.5 w-4.5 text-amber" />}
           onClose={() => setAiSearchOpen(false)}
           w="max-w-xl"

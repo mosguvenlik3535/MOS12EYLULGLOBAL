@@ -994,9 +994,9 @@ const PHRASES_A: PhraseMap = {
   'Raf Etiketi & Barkod Basım Stüdyosu': { en: 'Barcode & Shelf Label Studio', ar: 'استوديو طباعة الباركود والملصقات', ru: 'Студия печати ценников и штрихкодов', es: 'Estudio de Etiquetas y Códigos de Barras', de: 'Etiketten- & Barcode-Druckstudio', fr: 'Studio d’Impression d’Étiquettes et Codes-Barres', it: 'Studio Stampa Etichette e Codici a Barre' },
   'Raf Etiketi & Barkod': { en: 'Labels & Barcode', ar: 'الملصقات والباركود', ru: 'Ценники и штрихкоды', es: 'Etiquetas y Códigos', de: 'Etiketten & Barcode', fr: 'Étiquettes et Codes-Barres', it: 'Etichette e Codici' },
   'Etiketleri Yazdır': { en: 'Print Labels', ar: 'طباعة الملصقات', ru: 'Печать ценников', es: 'Imprimir Etiquetas', de: 'Etiketten drucken', fr: 'Imprimer les Étiquettes', it: 'Stampa Etichette' },
-  'Yapay Zekâ Destekli Görsel Ürün Tanıma': { en: 'AI Visual Product Recognition', ar: 'التعرف البصري على المنتجات بالذكاء الاصطناعي', ru: 'Распознавание товаров с ИИ', es: 'Reconocimiento Visual de Productos con IA', de: 'KI-gestützte Produkterkennung', fr: 'Reconnaissance Visuelle par IA', it: 'Riconoscimento Visivo Prodotti AI' },
+  'Görsel Ürün Tanıma': { en: 'Visual Product Recognition', ar: 'التعرف البصري على المنتجات', ru: 'Распознавание товаров', es: 'Reconocimiento Visual de Productos', de: 'Produkterkennung', fr: 'Reconnaissance Visuelle', it: 'Riconoscimento Visivo Prodotti' },
   'AI TANI': { en: 'AI SCAN', ar: 'مسح ذكي', ru: 'ИИ СКАН', es: 'ESCANEO IA', de: 'KI SCAN', fr: 'SCAN IA', it: 'SCAN AI' },
-  'En Yüksek AI Eşleşmeleri': { en: 'Top AI Matches', ar: 'أعلى تطابقات الذكاء الاصطناعي', ru: 'Лучшие совпадения ИИ', es: 'Mejores Coincidencias de IA', de: 'Beste KI-Treffer', fr: 'Meilleures Correspondances IA', it: 'Migliori Corrispondenze AI' },
+  'En Yüksek Eşleşmeler': { en: 'Top Matches', ar: 'أعلى تطابقات', ru: 'Лучшие совпадения', es: 'Mejores Coincidencias', de: 'Beste Treffer', fr: 'Meilleures Correspondances', it: 'Migliori Corrispondenze' },
   'Para Birimi & Döviz': { en: 'Multi-Currency Engine', ar: 'العملات وأسعار الصرف', ru: 'Валюты и курс', es: 'Multidivisa y Tasas', de: 'Währungsverwaltung', fr: 'Gestion Multi-Devises', it: 'Gestione Valute' },
 
 };
@@ -1046,7 +1046,7 @@ const PHRASES_B: PhraseMap = {
   'Fatura Tutarı:': { en: 'Invoice Total:', ar: 'إجمالي الفاتورة:', ru: 'Итого счёта:' },
 
   /* ---------- Üst bar ---------- */
-  'YAPAY ZEKÂ DESTEKLİ BARKOD SATIŞ PROGRAMI': { en: 'AI-POWERED BARCODE SALES PROGRAM', ar: 'برنامج بيع بالباركود مدعوم بالذكاء الاصطناعي', ru: 'ПРОГРАММА ПРОДАЖ ПО ШТРИХ-КОДУ С ИИ' },
+  'BARKOD SATIŞ PROGRAMI': { en: 'BARCODE SALES PROGRAM', ar: 'برنامج بيع بالباركود', ru: 'ПРОГРАММА ПРОДАЖ ПО ШТРИХ-КОДУ' },
   'Ulaşım Kartı Limiti': { en: 'Transport Card Limit', ar: 'حد بطاقة النقل', ru: 'Лимит транспортной карты' },
   'İzmirİmkart Limiti': { en: 'Transport Card Limit', ar: 'حد بطاقة النقل', ru: 'Лимит транспортной карты' },
   'dolum için tıkla →': { en: 'click to top up →', ar: 'انقر للشحن ←', ru: 'нажмите для пополнения →' },
@@ -1747,7 +1747,7 @@ const PHRASES_B: PhraseMap = {
   'Alış Fiyatı': { en: 'Cost Price', ar: 'سعر الشراء', ru: 'Закупочная цена' },
   'Satış Fiyatı (F1)': { en: 'Sale Price (P1)', ar: 'سعر البيع', ru: 'Цена продажи' },
   'Stok Miktarı': { en: 'Stock Qty', ar: 'كمية المخزون', ru: 'Количество' },
-  'Yapay Zekâ Destekli Ürün Ekleme Sihirbazı': { en: 'AI-Assisted Product Wizard' },
+  'Ürün Ekleme Sihirbazı': { en: 'Product Wizard' },
   'Ürünü Düzenle': { en: 'Edit Product', ar: 'تعديل المنتج', ru: 'Изменить товар' },
   'Ürünü Kaydet ve Listeye Ekle': { en: 'Save Product and Add to List' },
   'Değişiklikleri Kaydet': { en: 'Save Changes', ar: 'حفظ التغييرات', ru: 'Сохранить изменения' },

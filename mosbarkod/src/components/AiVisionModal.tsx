@@ -505,7 +505,7 @@ export default function AiVisionModal({
 
   return (
     <Modal
-      title="Yapay Zekâ Görsel Ürün Tanıma (AI Vision v2)"
+      title="Görsel Ürün Tanıma"
       icon={<Ic n="sparkles" c="h-5 w-5 text-amber" />}
       onClose={onClose}
       w="max-w-5xl"
@@ -529,7 +529,7 @@ export default function AiVisionModal({
                     <span className="h-4 w-4 border-r-2 border-t-2 border-amber" />
                   </div>
                   <div className="mx-auto rounded-full bg-black/60 px-3 py-1 text-center font-mono text-[10px] font-bold uppercase tracking-widest text-amber2 backdrop-blur-sm">
-                    AI Canlı Nesne Tespiti
+                    Canlı Nesne Tespiti
                   </div>
                   <div className="flex justify-between">
                     <span className="h-4 w-4 border-l-2 border-b-2 border-amber" />
@@ -601,7 +601,7 @@ export default function AiVisionModal({
           <div>
             <div className="mb-2 flex items-center justify-between">
               <span className="flex items-center gap-1.5 font-mono text-xs font-bold uppercase tracking-wider text-amber2">
-                <Ic n="sparkles" c="h-4 w-4" /> En Yüksek AI Eşleşmeleri
+                <Ic n="sparkles" c="h-4 w-4" /> En Yüksek Eşleşmeler
               </span>
               <span className="font-mono text-[10px] text-mut2">Tıkla ve Ekle</span>
             </div>

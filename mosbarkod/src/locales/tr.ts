@@ -41,7 +41,7 @@ export const tr: TranslationTable = {
   'poslock.checking': 'Lisans kontrol ediliyor…',
 
   // TopBar
-  'topbar.subtitle': 'YAPAY ZEKÂ DESTEKLİ BARKOD SATIŞ PROGRAMI',
+  'topbar.subtitle': 'BARKOD SATIŞ PROGRAMI',
   'topbar.imkart': 'Ulaşım Kartı Limiti',
   'topbar.imkartHint': 'dolum için tıkla →',
   'topbar.todayTurnover': 'Bugünkü Ciro',
@@ -302,11 +302,11 @@ export const tr: TranslationTable = {
   'labels.a4_24': 'A4 Çoklu Tabaka (24’lü)',
   'labels.a4_40': 'A4 Mini Tabaka (40’lı)',
 
-  'aivision.title': 'Yapay Zekâ Görsel Ürün Tanıma (AI Vision)',
+  'aivision.title': 'Görsel Ürün Tanıma',
   'aivision.btn': 'AI TANI',
-  'aivision.live': 'AI Canlı Nesne Tespiti',
+  'aivision.live': 'Canlı Nesne Tespiti',
   'aivision.train': 'Ürün Öğret (Eğit)',
-  'aivision.topMatches': 'En Yüksek AI Eşleşmeleri',
+  'aivision.topMatches': 'En Yüksek Eşleşmeler',
 
   'currency.title': 'Para Birimi & Döviz (Multi-Currency)',
   'currency.select': 'Aktif Para Birimi Seçin',
