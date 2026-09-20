@@ -11,6 +11,7 @@ import type { Locale } from './i18n';
 export type TipTranslations = Record<Exclude<Locale, 'tr'>, string>;
 
 export const TIP_PHRASES: Record<string, TipTranslations> = {
+  'AYLIK CİRO · KDV DAHİL': { en: 'MONTHLY SALES · VAT INCLUDED', ar: 'المبيعات الشهرية · شاملة الضريبة', ru: 'ПРОДАЖИ ЗА МЕСЯЦ · С НДС', de: 'MONATSUMSATZ · INKL. MWST.', es: 'VENTAS MENSUALES · IVA INCLUIDO', fr: 'VENTES MENSUELLES · TTC', it: 'VENDITE MENSILI · IVA INCLUSA', pt: 'VENDAS MENSAIS · IVA INCLUÍDO', zh: '月销售额 · 含税', pl: 'SPRZEDAŻ MIESIĘCZNA · Z VAT', ro: 'VÂNZĂRI LUNARE · TVA INCLUS', el: 'ΜΗΝΙΑΙΕΣ ΠΩΛΗΣΕΙΣ · ΜΕ ΦΠΑ', nl: 'MAANDOMZET · INCL. BTW' },
   /* ---- v1.15.6: satışa müşteri adı / açıklama ---- */
   'Müşteri adını yazın veya listeden seçin': {
     en: 'Type the customer name or pick one from the list',

@@ -1598,7 +1598,6 @@ const PHRASES_B: PhraseMap = {
   'cihaz:': { en: 'devices:' },
   'AYLIK NET KÂR / KAZANÇ': { en: 'MONTHLY NET PROFIT' },
   'Alış fatura (ay):': { en: 'Purchases (month):' },
-  'AYLIK ANA KASA · NAKİT + BANKA': { en: 'MONTHLY MAIN BALANCE · CASH + BANK' },
   'nakit + POS + veresiye bakiye': { en: 'cash + POS + credit balance' },
   'SABAH AÇILIŞ BOZUK PARA': { en: 'MORNING OPENING CASH' },
   'Her yeni gün için başlangıç nakdi · Varsayılan 0 ₺': { en: 'Starting cash each day · Default 0 ₺' },
