@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { monthlyCash } from '../lib/monthlyCash';
 import * as XLSX from 'xlsx';
 import { cn } from '../utils/cn';
@@ -316,6 +316,13 @@ export default function AnalyticsScreen({
   onRequirePro?: () => void;
 }) {
   const [range, setRange] = useState<Range>('today');
+  const [balanceTime, setBalanceTime] = useState(() => new Date());
+  useEffect(() => {
+    const refresh = () => setBalanceTime(new Date());
+    const timer = window.setInterval(refresh, 30_000);
+    window.addEventListener('focus', refresh);
+    return () => { window.clearInterval(timer); window.removeEventListener('focus', refresh); };
+  }, []);
   /* Satış hareketlerinde müşteri adı satır içi düzenleme */
   const [nameEditId, setNameEditId] = useState<string | null>(null);
   const [nameEditVal, setNameEditVal] = useState('');
@@ -416,7 +423,7 @@ export default function AnalyticsScreen({
       .reduce((a, s) => a + s.total - (s.isRefund ? -1 : 1) * s.items.reduce((b, it) => b + it.qty * (costMap.get(it.name.toLowerCase()) ?? 0), 0), 0) -
       state.expenses.filter((e) => e.date.slice(0, 7) === monthKey).reduce((a, e) => a + e.amount, 0)
   );
-  const mainCash = monthlyCash(state);
+  const mainCash = monthlyCash(state, balanceTime);
   const alisAy = round2(state.invoices.filter((i) => i.date.slice(0, 7) === monthKey).reduce((a, i) => a + i.total, 0));
 
   const profitLoss = useMemo<ProfitLossData>(() => {
@@ -559,7 +566,7 @@ export default function AnalyticsScreen({
     anaKasaNakit: { label: 'ANA KASA NAKİT TOPLAMI', val: fmt(nakitSatis + moveIn), sub: 'nakit satış + kasa girişleri' },
     anaKasaPos: { label: 'ANA KASA POS TOPLAMI', val: fmt(posSatis), sub: `kart satış: ${fmt(salePos)} · cihaz: ${fmt(devicePos)}` },
     aylikNet: { label: 'AYLIK NET KÂR / KAZANÇ', val: fmt(aylikNet), sub: `Alış fatura (ay): ${fmt(alisAy)}` },
-    genelKasa: { label: 'AYLIK ANA KASA BAKİYESİ', val: fmt(mainCash.balance), sub: `Devir: ${fmt(mainCash.carry)} · Giriş: ${fmt(mainCash.incoming)} · Çıkış: ${fmt(mainCash.outgoing)} · İçinde bulunulan ay; kayıtlı nakit hareketleri` },
+    genelKasa: { label: 'AYLIK ANA KASA · NAKİT + BANKA', val: fmt(mainCash.balance), sub: `Devir: ${fmt(mainCash.carry)} · Giriş: ${fmt(mainCash.incoming)} · Çıkış: ${fmt(mainCash.outgoing)} · Bu ay hesaba geçen POS: ${fmt(mainCash.settledPos)} · Bekleyen POS (net): ${fmt(mainCash.pendingPos)} · POS: ertesi takvim günü, komisyon hariç` },
     opening: { label: 'SABAH AÇILIŞ BOZUK PARA', val: '', sub: 'Her yeni gün için başlangıç nakdi · Varsayılan 0 ₺' },
   };
 
