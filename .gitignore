@@ -36,3 +36,6 @@ release/
 mosbarkod/android/app/src/main/assets/public/
 mosbarkod/android/.gradle/
 mosbarkod/android/local.properties
+
+# Tanıtım sitesi paketi (kendi hostingine yüklemek için)
+mosbarkod-web-sitesi.zip
