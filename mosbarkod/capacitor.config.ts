@@ -7,7 +7,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
  */
 const config: CapacitorConfig = {
   appId: 'com.mosbarkodyazilim.pos',
-  appName: 'MOSBARKODYAZILIM',
+  appName: 'MOS POS',
   webDir: 'dist',
   android: {
     allowMixedContent: true,

@@ -41,7 +41,7 @@ export const tr: TranslationTable = {
   'poslock.checking': 'Lisans kontrol ediliyor…',
 
   // TopBar
-  'topbar.subtitle': 'BARKOD SATIŞ PROGRAMI',
+  'topbar.subtitle': 'BARKOD SATIŞ VE STOK',
   'topbar.imkart': 'Ulaşım Kartı Limiti',
   'topbar.imkartHint': 'dolum için tıkla →',
   'topbar.todayTurnover': 'Bugünkü Ciro',

@@ -1,6 +1,6 @@
 {
-  "name": "MOSBARKODYAZILIM POS (iPhone)",
-  "short_name": "MOSBARKOD",
+  "name": "MOS POS: Barkod Satış ve Stok",
+  "short_name": "MOS POS",
   "description": "Barkod Satış Programı — iPhone (Safari PWA) paketi",
   "start_url": ".",
   "scope": ".",

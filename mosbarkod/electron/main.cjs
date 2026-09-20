@@ -466,7 +466,7 @@ function createWindow() {
     height: 768,
     minWidth: 1024,
     minHeight: 650,
-    title: 'MOSBARKODYAZILIM - Yapay Zeka Destekli Barkod Satış Programı',
+    title: 'MOS POS: Barkod Satış ve Stok',
     backgroundColor: '#0a0e13',
     autoHideMenuBar: true,
     icon: path.join(ROOT, 'icons', 'icon-512.png'),

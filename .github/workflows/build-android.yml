@@ -76,7 +76,7 @@ jobs:
         run: |
           gh release create "${{ github.ref_name }}" \
             --title "MOSBARKODYAZILIM ${{ github.ref_name }}" \
-            --notes "Barkod Satış Programı — Windows (.exe + DEMO), Linux (AppImage) ve Android (APK + DEMO) sürümleri." \
+            --notes "Yapay Zeka Destekli Barkod Satış Programı — Windows (.exe + DEMO), Linux (AppImage) ve Android (APK + DEMO) sürümleri." \
             mosbarkod/android/app/build/outputs/apk/debug/app-debug.apk 2>/dev/null || \
           gh release upload "${{ github.ref_name }}" mosbarkod/android/app/build/outputs/apk/debug/app-debug.apk --clobber
 

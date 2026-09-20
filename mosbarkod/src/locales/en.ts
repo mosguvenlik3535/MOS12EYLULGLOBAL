@@ -41,7 +41,7 @@ export const en: TranslationTable = {
   'poslock.checking': 'Checking license…',
 
   // TopBar
-  'topbar.subtitle': 'Barcode Sales Program',
+  'topbar.subtitle': 'Sales & Inventory',
   'topbar.imkart': 'Transport Card Limit',
   'topbar.imkartHint': 'click to top up →',
   'topbar.todayTurnover': "Today's Turnover",

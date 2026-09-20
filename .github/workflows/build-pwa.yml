@@ -57,7 +57,7 @@ jobs:
           if [ -n "$files" ]; then
             gh release create "${{ github.ref_name }}" \
               --title "MOSBARKODYAZILIM ${{ github.ref_name }}" \
-              --notes "Barkod Satış Programı — iPhone (PWA) paketi." \
+              --notes "Yapay Zeka Destekli Barkod Satış Programı — iPhone (PWA) paketi." \
               $files 2>/dev/null || \
             gh release upload "${{ github.ref_name }}" $files --clobber
           else

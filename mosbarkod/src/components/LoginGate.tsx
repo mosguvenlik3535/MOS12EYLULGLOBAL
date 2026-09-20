@@ -14,7 +14,7 @@ export default function LoginGate({
   onCancel,
   mode = 'login',
   presetUser,
-  brandTitle = 'MOSBARKODYAZILIM',
+  brandTitle = 'MOS POS',
 }: {
   pins: Record<string, string>;
   onSuccess: (userId: string) => void;

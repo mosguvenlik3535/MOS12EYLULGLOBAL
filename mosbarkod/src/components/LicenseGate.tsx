@@ -139,14 +139,14 @@ export default function LicenseGate({
           </div>
         </div>
 
-        <div className="mt-5 font-mono text-[15px] font-bold tracking-[0.14em] text-amber2">MOSBARKODYAZILIM</div>
+        <div className="mt-5 font-mono text-[15px] font-bold tracking-[0.14em] text-amber2">MOS POS</div>
         <div className="mt-1 text-[10px] text-mut2">Profesyonel Barkodlu Satış Çözümleri</div>
 
         {/* Bilgi kutusu */}
         <div className="mt-5 space-y-2 rounded-xl border border-white/20 bg-black/25 p-3 font-mono text-[9.5px]">
           <div className="flex justify-between gap-3">
             <span className="text-mut2">Yazılım Sahibi:</span>
-            <span className="font-bold text-txt">MOSBARKODYAZILIM</span>
+            <span className="font-bold text-txt">MOS POS</span>
           </div>
           <div className="flex justify-between gap-3">
             <span className="text-mut2">Sürüm:</span>

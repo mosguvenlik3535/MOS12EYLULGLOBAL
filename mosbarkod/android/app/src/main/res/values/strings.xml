@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">MOSBARKODYAZILIM</string>
-    <string name="title_activity_main">MOSBARKODYAZILIM</string>
+    <string name="app_name">MOS POS</string>
+    <string name="title_activity_main">MOS POS</string>
     <string name="package_name">com.mosbarkodyazilim.pos</string>
     <string name="custom_url_scheme">com.mosbarkodyazilim.pos</string>
 </resources>

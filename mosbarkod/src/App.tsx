@@ -1,3 +1,4 @@
+import { cashCollections } from './lib/monthlyCash';
 import { Component, useEffect, useRef, useState } from 'react';
 import { cn } from './utils/cn';
 import { Ic } from './icons';
@@ -187,20 +188,20 @@ export default function App() {
   const [locale, setLocaleState] = useState<Locale>(() => loadLocale());
 
   const DOC_TITLES: Record<Locale, string> = {
-    tr: 'MOSBARKODYAZILIM — Barkod Satış Programı',
-    en: 'MOSBARKODYAZILIM — Barcode Sales Program',
-    es: 'MOSBARKODYAZILIM — Programa de Ventas con Código de Barras',
-    de: 'MOSBARKODYAZILIM — Barcode-Verkaufsprogramm',
-    fr: 'MOSBARKODYAZILIM — Programme de Vente par Code-Barres',
-    it: 'MOSBARKODYAZILIM — Programma di Vendita con Codice a Barre',
-    pt: 'MOSBARKODYAZILIM — Programa de Vendas por Código de Barras',
-    zh: 'MOSBARKODYAZILIM — 条码销售系统',
-    pl: 'MOSBARKODYAZILIM — System sprzedaży kodów kreskowych',
-    ro: 'MOSBARKODYAZILIM — Program de vânzări cu coduri de bare',
-    el: 'MOSBARKODYAZILIM — Σύστημα πωλήσεων barcode',
-    nl: 'MOSBARKODYAZILIM — barcodeverkoopprogramma',
-    ar: 'MOSBARKODYAZILIM — برنامج بيع بالباركود',
-    ru: 'MOSBARKODYAZILIM — Программа продаж по штрих-коду',
+    tr: 'MOS POS: Barkod Satış ve Stok',
+    en: 'MOS POS: Sales & Inventory',
+    es: 'MOS POS: Sales & Inventory',
+    de: 'MOS POS: Sales & Inventory',
+    fr: 'MOS POS: Sales & Inventory',
+    it: 'MOS POS: Sales & Inventory',
+    pt: 'MOS POS: Sales & Inventory',
+    zh: 'MOS POS: Sales & Inventory',
+    pl: 'MOS POS: Sales & Inventory',
+    ro: 'MOS POS: Sales & Inventory',
+    el: 'MOS POS: Sales & Inventory',
+    nl: 'MOS POS: Sales & Inventory',
+    ar: 'MOS POS: Sales & Inventory',
+    ru: 'MOS POS: Sales & Inventory',
   };
 
   const setLocale = (l: Locale) => {
@@ -1110,7 +1111,15 @@ export default function App() {
       toast('Borcu biten veresiye kaydı bulunmuyor', 'err');
       return 0;
     }
-    setState((s) => ({ ...s, customers: s.customers.filter((c) => round2(c.balance) > 0) }));
+    setState((s) => ({
+      ...s,
+      // Preserve collected cash when settled customer records are removed.
+      cashMoves: [...cashCollections(s.customers.filter(c => round2(c.balance) <= 0)).map(e => ({
+        id: uid(), date: e.date, dir: 'in' as const, amount: e.amount,
+        label: 'Arşivlenen veresiye tahsilatı', by: 'Sistem',
+      })), ...s.cashMoves],
+      customers: s.customers.filter((c) => round2(c.balance) > 0),
+    }));
     return closed.length;
   };
 
@@ -1263,7 +1272,7 @@ export default function App() {
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-amber/50 bg-ink/90">
             <Ic n="flame" c="h-7 w-7 text-amber2" />
           </div>
-          <p className="font-mono text-[10.5px] tracking-[0.25em] text-mut2">MOSBARKODYAZILIM</p>
+          <p className="font-mono text-[10.5px] tracking-[0.25em] text-mut2">MOS POS</p>
         </div>
       </div>
     );
@@ -1278,7 +1287,7 @@ export default function App() {
           setLicensed(true);
           setDemo(false);
           setDemoExpired(false);
-          toast('Lisans etkinleştirildi — MOSBARKODYAZILIM kullanıma hazır');
+          toast('Lisans etkinleştirildi — MOS POS kullanıma hazır');
         }}
       />
     );
@@ -1288,7 +1297,7 @@ export default function App() {
     return (
       <LoginGate
         pins={state.settings.pins}
-        brandTitle={state.settings.brandTitle || 'MOSBARKODYAZILIM'}
+        brandTitle={(!state.settings.brandTitle || state.settings.brandTitle === 'MOSBARKODYAZILIM' ? 'MOS POS' : state.settings.brandTitle)}
         onSuccess={(id) => {
           setUser(id);
           setLoggedIn(true);
@@ -1343,7 +1352,7 @@ export default function App() {
           mode="switch"
           presetUser={switchUser}
           pins={state.settings.pins}
-          brandTitle={state.settings.brandTitle || 'MOSBARKODYAZILIM'}
+          brandTitle={(!state.settings.brandTitle || state.settings.brandTitle === 'MOSBARKODYAZILIM' ? 'MOS POS' : state.settings.brandTitle)}
           onCancel={() => setSwitchUser(null)}
           onSuccess={(id) => {
             setUser(id);

@@ -1170,7 +1170,7 @@ export const defaultSettings = (): Settings => ({
   phone: '',
   taxOffice: '',
   taxNo: '',
-  brandTitle: 'MOSBARKODYAZILIM',
+  brandTitle: 'MOS POS',
   logoIcon: 'flame',
   customerLogo: '',
   receiptHeader: 'MOSBARKODYAZILIM - HOŞGELDİNİZ',
