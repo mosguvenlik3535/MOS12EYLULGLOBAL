@@ -1,0 +1,27 @@
+# DEMO sürüm yapılandırması — tam sürümle yan yana kurulabilir.
+appId: com.mosbarkodyazilim.pos.demo
+productName: MOSBARKODYAZILIM Demo
+copyright: Copyright © 2026 MOSBARKODYAZILIM
+directories:
+  output: release-demo
+files:
+  - dist/**/*
+  - electron/**/*.cjs
+  - package.json
+asar: true
+npmRebuild: false
+
+win:
+  target:
+    - nsis
+    - portable
+  icon: public/icons/icon-512.png
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: MOSBARKODYAZILIM Demo
+  artifactName: MOSBARKODYAZILIM-Demo-Setup-${version}.${ext}
+portable:
+  artifactName: MOSBARKODYAZILIM-Demo-Portable-${version}.${ext}

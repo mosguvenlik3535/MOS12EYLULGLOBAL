@@ -1,0 +1,66 @@
+name: Build PWA (iPhone)
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        working-directory: mosbarkod
+        run: npm install
+
+      - name: Build web app (PWA)
+        working-directory: mosbarkod
+        run: npm run build
+
+      - name: Zip PWA package (iPhone)
+        working-directory: mosbarkod
+        run: |
+          V=$(node -p "require('./package.json').version")
+          echo "PWA paketleniyor: v$V"
+          ls dist/
+          test -f dist/index.html || (echo "::error::dist/index.html yok" && exit 1)
+          test -f dist/manifest.webmanifest || (echo "::error::manifest yok" && exit 1)
+          test -f dist/sw.js || (echo "::error::sw.js yok" && exit 1)
+          test -d dist/icons || (echo "::error::icons/ yok" && exit 1)
+          cd dist && zip -r ../MOSBARKOD-PWA-iPhone-$V.zip . -x '*.map'
+          cd ..
+          ls -la MOSBARKOD-PWA-iPhone-$V.zip
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MOSBARKODYAZILIM-PWA-iPhone
+          path: mosbarkod/MOSBARKOD-PWA-iPhone-*.zip
+          if-no-files-found: error
+
+      - name: Attach to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          files=$(ls mosbarkod/MOSBARKOD-PWA-iPhone-*.zip 2>/dev/null || true)
+          if [ -n "$files" ]; then
+            gh release create "${{ github.ref_name }}" \
+              --title "MOSBARKODYAZILIM ${{ github.ref_name }}" \
+              --notes "Yapay Zeka Destekli Barkod Satış Programı — iPhone (PWA) paketi." \
+              $files 2>/dev/null || \
+            gh release upload "${{ github.ref_name }}" $files --clobber
+          else
+            echo "::warning::release dosyası bulunamadı"
+            exit 1
+          fi

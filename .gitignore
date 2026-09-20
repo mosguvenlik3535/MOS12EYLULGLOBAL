@@ -1,0 +1,41 @@
+# Bağımlılıklar
+node_modules/
+
+# Derleme çıktıları
+dist/
+build/
+*.local
+
+# Loglar
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editör / işletim sistemi
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Ortam değişkenleri
+.env
+.env.*
+!.env.example
+
+# Elektron paket çıktıları
+release/
+
+# Capacitor Android derleme çıktıları
+mosbarkod/android/app/src/main/assets/public/
+mosbarkod/android/.gradle/
+mosbarkod/android/local.properties
+
+# Tanıtım sitesi paketi (kendi hostingine yüklemek için)
+mosbarkod-web-sitesi.zip

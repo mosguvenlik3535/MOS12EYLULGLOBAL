@@ -1,0 +1,162 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      # ubuntu-latest'te Android SDK önceden kurulu (/usr/local/lib/android/sdk).
+      # setup-android@v3, Google'ın 15 Eyl 2026'da kaldırdığı eski 'tools' paketini
+      # istediği için kurulum adımında patlıyor — bu yüzden kullanılmıyor.
+      - name: Verify preinstalled Android SDK
+        run: |
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          ls "$ANDROID_SDK_ROOT" || exit 1
+          rm -rf "${ANDROID_SDK_ROOT:?}/tools"
+
+      - name: Install dependencies
+        working-directory: mosbarkod
+        run: npm install
+
+      - name: Compute version (package.json)
+        id: version
+        working-directory: mosbarkod
+        run: |
+          V=$(node -p "require('./package.json').version")
+          echo "VERSION=$V" >> "$GITHUB_OUTPUT"
+          C=$(node -e "const [a,b,c]=process.argv[1].split('.').map(Number); console.log(a*10000+b*100+c)" "$V")
+          echo "VERSION_CODE=$C" >> "$GITHUB_OUTPUT"
+
+      # ---- TAM SÜRÜM APK ----
+      - name: Build web app
+        working-directory: mosbarkod
+        run: npm run build
+
+      - name: Sync Capacitor
+        working-directory: mosbarkod
+        run: npx cap sync android
+
+      - name: Build APK (debug)
+        working-directory: mosbarkod/android
+        env:
+          MOS_VERSION_NAME: ${{ steps.version.outputs.VERSION }}
+          MOS_VERSION_CODE: ${{ steps.version.outputs.VERSION_CODE }}
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Upload full APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MOSBARKODYAZILIM-Android-APK
+          path: mosbarkod/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+
+      - name: Attach full APK to release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            --title "MOSBARKODYAZILIM ${{ github.ref_name }}" \
+            --notes "Yapay Zeka Destekli Barkod Satış Programı — Windows (.exe + DEMO), Linux (AppImage) ve Android (APK + DEMO) sürümleri." \
+            mosbarkod/android/app/build/outputs/apk/debug/app-debug.apk 2>/dev/null || \
+          gh release upload "${{ github.ref_name }}" mosbarkod/android/app/build/outputs/apk/debug/app-debug.apk --clobber
+
+      # ---- PLAY STORE AAB (imzalı release, freemium) ----
+      - name: Build Play web app (freemium)
+        working-directory: mosbarkod
+        run: VITE_PLAY=1 npm run build
+
+      - name: Sync Capacitor (Play)
+        working-directory: mosbarkod
+        run: npx cap sync android
+
+      - name: Build release AAB (signed)
+        working-directory: mosbarkod/android
+        env:
+          MOS_VERSION_NAME: ${{ steps.version.outputs.VERSION }}
+          MOS_VERSION_CODE: ${{ steps.version.outputs.VERSION_CODE }}
+          MOS_KEYSTORE_BASE64: ${{ secrets.MOS_KEYSTORE_BASE64 }}
+          MOS_KEYSTORE_PASSWORD: ${{ secrets.MOS_KEYSTORE_PASSWORD }}
+          MOS_KEY_ALIAS: ${{ secrets.MOS_KEY_ALIAS }}
+          MOS_KEY_PASSWORD: ${{ secrets.MOS_KEY_PASSWORD }}
+        run: |
+          if [ -z "$MOS_KEYSTORE_BASE64" ]; then
+            echo "::warning::MOS_KEYSTORE_BASE64 secret'i yok — imzalı AAB üretilmedi. Keystore secret'larını ekleyin."
+            exit 0
+          fi
+          mkdir -p app/keystore
+          echo "$MOS_KEYSTORE_BASE64" | base64 -d > app/mos-release.jks
+          export MOS_KEYSTORE_PATH="$(pwd)/app/mos-release.jks"
+          ./gradlew bundleRelease --no-daemon
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MOSBARKODYAZILIM-Android-AAB
+          path: mosbarkod/android/app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: ignore
+
+      - name: Attach AAB to release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          AAB=mosbarkod/android/app/build/outputs/bundle/release/app-release.aab
+          if [ -f "$AAB" ]; then
+            gh release upload "${{ github.ref_name }}" "$AAB" --clobber
+          else
+            echo "::warning::AAB bulunamadı (imzalama secret'ları eksik olabilir)."
+          fi
+
+      # ---- DEMO SÜRÜM APK ----
+      - name: Build demo web app
+        working-directory: mosbarkod
+        run: VITE_DEMO=1 npm run build
+
+      - name: Sync Capacitor (demo)
+        working-directory: mosbarkod
+        run: npx cap sync android
+
+      - name: Build demo APK (debug)
+        working-directory: mosbarkod/android
+        env:
+          MOS_APP_ID: com.mosbarkodyazilim.pos.demo
+          MOS_VERSION_NAME: ${{ steps.version.outputs.VERSION }}
+          MOS_VERSION_CODE: ${{ steps.version.outputs.VERSION_CODE }}
+        run: ./gradlew clean assembleDebug --no-daemon
+
+      - name: Stage demo APK
+        working-directory: mosbarkod/android
+        run: cp app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/app-debug-demo.apk
+
+      - name: Upload demo APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MOSBARKODYAZILIM-Android-APK-Demo
+          path: mosbarkod/android/app/build/outputs/apk/debug/app-debug-demo.apk
+          if-no-files-found: error
+
+      - name: Attach demo APK to release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ github.ref_name }}" mosbarkod/android/app/build/outputs/apk/debug/app-debug-demo.apk --clobber

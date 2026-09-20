@@ -1,0 +1,89 @@
+name: Deploy PWA to GitHub Pages (iPhone)
+
+# Her sürüm etiketinde (v*) PWA otomatik yayınlanır:
+# https://mosguvenlik3535.github.io/MOS12EYLULGLOBAL/
+# iPhone: Safari ile adresi aç → Paylaş → Ana Ekrana Ekle.
+
+# Yayınlanan adresler:
+#   PWA (iPhone):      https://mosguvenlik3535.github.io/MOS12EYLULGLOBAL/
+#   Tanıtım sitesi:    https://mosguvenlik3535.github.io/MOS12EYLULGLOBAL/web/
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+    branches:
+      - main
+      - 'arena/**'
+    paths:
+      - 'mosbarkod/**'
+      - 'web/**'
+      - '.github/workflows/deploy-pages.yml'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'pages'
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        working-directory: mosbarkod
+        run: npm install
+
+      - name: Build web app (PWA)
+        working-directory: mosbarkod
+        run: npm run build
+
+      - name: Verify PWA files
+        working-directory: mosbarkod
+        run: |
+          test -f dist/index.html || (echo "::error::dist/index.html yok" && exit 1)
+          test -f dist/manifest.webmanifest || (echo "::error::manifest yok" && exit 1)
+          test -f dist/sw.js || (echo "::error::sw.js yok" && exit 1)
+          test -d dist/icons || (echo "::error::icons/ yok" && exit 1)
+          # Alt-klasör (project pages) güvenliği: mutlak yol kalmasın
+          if grep -q 'href="/' dist/index.html; then echo "::error::dist/index.html içinde mutlak yol var" && exit 1; fi
+          echo "PWA dosyaları hazır"
+
+      # PWA kökte, tanıtım sitesi /web/ altında yayınlanır
+      - name: Combine PWA + tanıtım sitesi
+        run: |
+          mkdir -p _site
+          cp -r mosbarkod/dist/. _site/
+          if [ -d web ]; then
+            mkdir -p _site/web
+            tar -cf - -C web --exclude=.github . | tar -xf - -C _site/web
+            echo "Tanıtım sitesi _site/web altına kopyalandı:"
+            ls _site/web
+          else
+            echo "web/ klasörü yok, sadece PWA yayınlanacak"
+          fi
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
