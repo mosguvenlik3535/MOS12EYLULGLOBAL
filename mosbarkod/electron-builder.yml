@@ -31,12 +31,23 @@ linux:
   category: Office
   icon: public/icons/icon-512.png
   maintainer: MOSBARKODYAZILIM
-  synopsis: Yapay Zeka Destekli Barkod Satış Programı
-  description: Yapay Zeka Destekli Barkod Satış Programı
+  synopsis: Barkod Satış ve Stok Programı
+  description: Barkod Satış ve Stok Programı
 appImage:
   artifactName: MOSBARKODYAZILIM-${version}-${arch}.${ext}
 
 mac:
   target:
-    - dmg
+    - target: dmg
+      arch:
+        - x64
+        - arm64
   icon: public/icons/icon-512.png
+  category: public.app-category.business
+  identity: null
+  extendInfo:
+    NSCameraUsageDescription: Barkod okuma ve ürün tanıma için kamera erişimi gerekir.
+    NSMicrophoneUsageDescription: Görüşme özelliği için mikrofon erişimi gerekir.
+    NSLocalNetworkUsageDescription: Yazıcı ve yerel ağdaki cihazlarla bağlantı için erişim gerekir.
+dmg:
+  artifactName: MOS-POS-${version}-${arch}.${ext}

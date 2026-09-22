@@ -477,7 +477,8 @@ function createWindow() {
       preload: PRELOAD,
     },
   });
-  win.on('close', () => app.quit());
+  // macOS keeps the app/server alive when the last window is closed (Dock reopen).
+  if (process.platform !== 'darwin') win.on('close', () => app.quit());
   win.loadURL(`http://127.0.0.1:${HTTP_PORT}/`).catch(() => win.loadFile(path.join(ROOT, 'index.html')));
 }
 

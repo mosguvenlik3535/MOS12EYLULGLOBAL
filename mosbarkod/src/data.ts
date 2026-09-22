@@ -859,6 +859,7 @@ export const EXPENSE_CATS: { name: string; color: string }[] = [
   { name: 'Temizlik Malzemesi', color: '#34d399' },
   { name: 'Temizlik Hizmeti', color: '#14b8a6' },
   { name: 'Teknik Servis Hizmetleri', color: '#f97316' },
+  { name: 'Araç Yakıt', color: '#fbbf24' },
   { name: 'Tedarik', color: '#f59e0b' },
   { name: 'Diğer Harcamalar', color: '#7d8ca0' },
 ];
