@@ -1,12 +1,12 @@
-# MOSBARKODYAZILIM — Gizlilik Politikası / Privacy Policy
+# MOS POS — Gizlilik Politikası / Privacy Policy
 
-> Son güncelleme: 12 Eylül 2026 · Uygulama: MOSBARKODYAZILIM (MOSBARKOD POS) · Geliştirici: MOSBARKODYAZILIM
+> Son güncelleme: 27 Eylül 2026 · Uygulama: MOS POS · Geliştirici: MOS POS
 
 ---
 
 ## 1. Özet (Türkçe)
 
-MOSBARKODYAZILIM, **yerel öncelikli (local-first)** bir barkod satış / POS / kasa programıdır. Ürün, satış, müşteri, personel ve ayar verileriniz **yalnızca sizin cihazınızda** saklanır. Geliştirici olarak biz, işletme verilerinizi kendi sunucularımızda **toplamayız, saklamayız ve işlemeyiz**. Uygulamada hesap açma yoktur; reklam yoktur; izleme/analitik SDK'sı yoktur.
+MOS POS, **yerel öncelikli (local-first)** bir barkod satış / POS / kasa programıdır. Ürün, satış, müşteri, personel ve ayar verileriniz **yalnızca sizin cihazınızda** saklanır. Geliştirici olarak biz, işletme verilerinizi kendi sunucularımızda **toplamayız, saklamayız ve işlemeyiz**. Uygulamada hesap açma yoktur; reklam yoktur; izleme/analitik SDK'sı yoktur.
 
 ### Hangi veriler nerede tutulur?
 
@@ -44,7 +44,7 @@ Sorularınız için: **m.ortayayla@gmail.com** · **+90 555 406 61 43**
 
 ## 2. Summary (English)
 
-MOSBARKODYAZILIM is a **local-first** barcode sales / POS / cash-register program. Your products, sales, customers, staff and settings are stored **only on your device**. We, as the developer, do **not** collect, store or process your business data on any of our servers. There is no account sign-up, no advertising, and no analytics/tracking SDK.
+MOS POS is a **local-first** barcode sales / POS / cash-register program. Your products, sales, customers, staff and settings are stored **only on your device**. We, as the developer, do **not** collect, store or process your business data on any of our servers. There is no account sign-up, no advertising, and no analytics/tracking SDK.
 
 ### Where data lives
 
