@@ -9,6 +9,10 @@ describe('vehicle fuel expense category', () => {
     expect(EXPENSE_CATS.map(c => c.name)).toContain('Diğer Harcamalar');
     expect(EXPENSE_CATS.find(c => c.name === 'Araç Yakıt')?.color).toMatch(/^#[a-f0-9]{6}$/);
   });
+  it('includes meals once with a translation', () => {
+    expect(EXPENSE_CATS.filter(c => c.name === 'Yemek')).toHaveLength(1);
+    expect(TIP_PHRASES['Yemek'].en).toBe('Meals');
+  });
   it('has translations in all thirteen other application languages', () => {
     expect(Object.keys(TIP_PHRASES['Araç Yakıt'])).toHaveLength(13);
     expect(TIP_PHRASES['Araç Yakıt'].en).toBe('Vehicle Fuel');

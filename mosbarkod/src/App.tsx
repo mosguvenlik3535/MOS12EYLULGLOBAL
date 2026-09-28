@@ -1,3 +1,5 @@
+import { deleteInvoiceAttachment } from './lib/invoiceAttachments';
+import { applyInvoiceStock, duplicateInvoice } from './lib/invoiceImport';
 import { cashCollections } from './lib/monthlyCash';
 import { Component, useEffect, useRef, useState } from 'react';
 import { cn } from './utils/cn';
@@ -1067,28 +1069,10 @@ export default function App() {
   };
 
   const addInvoice = (inv: Invoice, toStock: boolean) =>
-    setState((s) => ({
+    setState((s) => duplicateInvoice(s.invoices, inv.supplier, inv.supplierNo || '') ? s : ({
       ...s,
       invoices: [inv, ...s.invoices],
-      products: toStock
-        ? s.products.map((pr) => {
-            const hit = inv.lines.find(
-              (l) =>
-                l.name.toLowerCase() === pr.name.toLowerCase() ||
-                pr.name.toLowerCase().includes(l.name.toLowerCase()) ||
-                l.name.toLowerCase().includes(pr.name.toLowerCase())
-            );
-          if (hit) {
-            return {
-              ...pr,
-              stock: round2(pr.stock + hit.qty),
-              cost: hit.cost || pr.cost, // ALIŞ FİYATI STOK KARTINA YANSIR
-              p1: hit.sale || pr.p1,     // SATIŞ FİYATI STOK KARTINA YANSIR
-            };
-          }
-            return pr;
-          })
-        : s.products,
+      products: toStock ? applyInvoiceStock(s.products, inv) : s.products,
     }));
 
   /* Satış hareketlerinden müşteri adı / açıklama sonradan eklenebilir veya düzeltilebilir. */
@@ -1123,8 +1107,11 @@ export default function App() {
     return closed.length;
   };
 
-  const removeInvoice = (id: string) =>
+  const removeInvoice = (id: string) => {
+    deleteInvoiceAttachment(id).catch(()=>toast('Fatura eki silinemedi; depolama izinlerini kontrol edin', 'err'));
+    try {const files=JSON.parse(localStorage.getItem('mosbarkod_purchase_images')||'{}');delete files[id];localStorage.setItem('mosbarkod_purchase_images',JSON.stringify(files));}catch{/* legacy attachment storage */}
     setState((s) => ({ ...s, invoices: s.invoices.filter((x) => x.id !== id) }));
+  };
 
   const addCustomer = (name: string, phone: string): string => {
     const id = uid();
@@ -1222,6 +1209,8 @@ export default function App() {
     setState((s) => ({ ...s, settings: { ...s.settings, ...p } }));
 
   const resetKasa = () => {
+    deleteInvoiceAttachment().catch(()=>toast('Belge arşivi temizlenemedi; depolama izinlerini kontrol edin', 'err'));
+    try {localStorage.removeItem('mosbarkod_purchase_images');}catch{/* storage unavailable */}
     setState((s) => ({
       ...s,
       // İlk kurulum temizliği: kart tanımları ve şirket ayarları kalır, tüm işletme hareketleri sıfırlanır.

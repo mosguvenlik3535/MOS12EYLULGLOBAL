@@ -1,3 +1,7 @@
+import InvoiceImportModal from '../components/InvoiceImportModal';
+import InvoiceDocument from '../components/InvoiceDocument';
+import { duplicateInvoice as isDuplicatePurchase, type InvoiceDraft } from '../lib/invoiceImport';
+import { readAttachment, loadInvoiceAttachments, saveInvoiceAttachment } from '../lib/invoiceAttachments';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '../utils/cn';
 import { Ic } from '../icons';
@@ -21,6 +25,7 @@ import {
   suggestCountryVat,
 } from '../locales/countryVat';
 import {
+  getActiveCurrencyCode,
   calcVatDeclaration,
   dstr,
   EXPENSE_CATS,
@@ -190,7 +195,7 @@ export function PurchaseScreen({
   const [query, setQuery] = useState('');
   const [del, setDel] = useState<Invoice | null>(null);
   const [edit, setEdit] = useState<Invoice | null>(null);
-  const [items, setItems] = useState<Array<{ productId: string; name: string; qty: number; cost: number; sale: number; vatRate: number }>>([]);
+  const [items, setItems] = useState<Array<{ productId: string; name: string; qty: number; cost: number; sale: number; vatRate: number; createProduct?: boolean; unit?: string; sourceCode?: string }>>([]);
 
   /* ---------- KDV ---------- */
   /* Alış faturası KDV DAHİL girilir: mal alınırken KDV bedeli fiilen
@@ -211,6 +216,17 @@ export function PurchaseScreen({
   // Fotoğraf ilanı
   const [img, setImg] = useState<string | null>(null);
   const imgRef = useRef<HTMLInputElement>(null);
+  const [documentFile, setDocumentFile] = useState<File | null>(null);
+  const [documentBusy, setDocumentBusy] = useState(false);
+  const [savingInvoice, setSavingInvoice] = useState(false);
+  const invoiceSaveLock = useRef(false);
+  const documentReadId = useRef(0);
+  const [importText, setImportText] = useState<string | null>(null);
+  const [importSource, setImportSource] = useState<Invoice['importSource']>();
+  const [importExpected, setImportExpected] = useState<number | null>(null);
+  const [attachments, setAttachments] = useState<Record<string,string>>({});
+  useEffect(() => { let active = true; loadInvoiceAttachments().then(v => { if(active) setAttachments(v); }).catch(() => { if(active) toast('Belge arşivi açılamadı; tarayıcı depolama izinlerini kontrol edin', 'err'); }); return () => { active=false; documentReadId.current++; }; }, []);
+
   // Ödeme / kopyala
   const [payInv, setPayInv] = useState<Invoice | null>(null);
   const [supplierPhone, setSupplierPhone] = useState(() => { try { return JSON.parse(localStorage.getItem(SUPPLIER_PHONE_KEY) ?? '{}') as Record<string, string>; } catch { return {}; } });
@@ -465,21 +481,33 @@ export function PurchaseScreen({
     toast(`KDV raporu WhatsApp ile muhasebeciye gönderiliyor (${phone})`);
   };
 
-  /* ---- foto ilanı ---- */
-  const readImg = (file: File) => {
-    const reader = new FileReader();
-    reader.onload = () => setImg(String(reader.result));
-    reader.readAsDataURL(file);
+  /* PDF and photo attachments stay on this device; no external upload. */
+  const readImg = async (file: File) => {
+    const token=++documentReadId.current;
+    setDocumentBusy(true);
+    try { const data=await readAttachment(file); if(token===documentReadId.current){setImg(data);setDocumentFile(file);setImportText(null);} }
+    catch(e){toast(e instanceof Error?e.message:'Belge okunamadı','err');}
+    finally {if(token===documentReadId.current)setDocumentBusy(false);}
+  };
+  const readPdf = async () => {
+    if(!documentFile) return;
+    if(getActiveCurrencyCode()!=='TRY') return toast('PDF aktarımı için Ayarlar bölümünden para birimini TRY seçin. Belge kuru ayrıca girilir.', 'err');
+    setDocumentBusy(true);
+    try {const {readInvoicePdf}=await import('../lib/invoicePdf');setImportText(await readInvoicePdf(documentFile));}
+    catch(e){toast(e instanceof Error?e.message:'PDF okunamadı. Şifreli veya taranmış PDF olabilir.','err');}
+    finally{setDocumentBusy(false);}
   };
   const getInvImg = (inv: Invoice): string | null => {
+    if(attachments[inv.id])return attachments[inv.id];
     try { return JSON.parse(localStorage.getItem(PURCHASE_IMGS_KEY) ?? '{}')[inv.id] ?? null; } catch { return null; }
   };
-  const saveInvImg = (invId: string, data: string) => {
-    try {
-      const map = JSON.parse(localStorage.getItem(PURCHASE_IMGS_KEY) ?? '{}') as Record<string, string>;
-      map[invId] = data;
-      localStorage.setItem(PURCHASE_IMGS_KEY, JSON.stringify(map));
-    } catch { /* dolu olabilir */ }
+  const applyDraft = (d:InvoiceDraft, rate:number, pay:Invoice['payType']) => {
+    if(items.length && !window.confirm('Formdaki mevcut kalemler PDF kalemleriyle değiştirilsin mi?'))return;
+    setItems(d.rows.map(r=>{const p=products.find(p=>p.id===r.productId);return {productId:p?.id||uid(),name:p?.name||r.name,qty:r.qty,cost:r.net/r.qty*(1+r.vatRate/100)*rate,sale:p?.p1||0,vatRate:r.vatRate,createProduct:r.createProduct,unit:p?.unit||r.unit.toLocaleLowerCase('tr-TR'),sourceCode:r.code};}));
+    setSupplierNo(d.number);setInvDate(d.date);setDueDate(d.dueDate);setPayType(pay);setVatIncluded(true);
+    setImportExpected(d.currency==='TRY'?d.total:d.totalTRY);
+    setImportSource({currency:d.currency,exchangeRate:rate,total:d.total,totalTRY:d.currency==='TRY'?d.total:d.totalTRY});
+    setImportText(null);toast('Kalemler forma aktarıldı. Tedarikçiyi seçip Alış Faturasını Onayla ile kaydedin.');
   };
 
   const addProductLine = (p: Product) => {
@@ -510,29 +538,39 @@ export function PurchaseScreen({
     document.getElementById('purchase-product-search')?.focus();
   };
 
-  const submit = () => {
+  const submit = async () => {
+    if(invoiceSaveLock.current || documentBusy) return;
     if (!supplier.trim()) return toast('Tedarikçi seçin', 'err');
     if (isOther && !otherSupplier.trim()) return toast('Diğer toptancı için açıklama girin', 'err');
     if (items.length === 0) return toast('En az bir ürün ekleyin', 'err');
     if (payType === 'veresiye' && !dueDate) return toast('Veresiye için vade tarihi girin', 'err');
 
+    const finalSupplier = isOther ? otherSupplier.trim() : supplier.trim();
+    if(isDuplicatePurchase(invoices,finalSupplier,supplierNo)) return toast('Bu tedarikçi ve fatura numarası zaten kayıtlı. Stok tekrar artırılmadı.', 'err');
+    if(!invDate || !Number.isFinite(new Date(invDate+'T12:00:00').getTime())) return toast('Geçerli fatura tarihi girin', 'err');
+    if(items.some(l=>!(l.qty>0) || !Number.isFinite(l.qty) || !Number.isFinite(l.cost) || l.cost<0)) return toast('Miktar ve maliyetleri kontrol edin','err');
+    if(importExpected!==null && (getActiveCurrencyCode()!=='TRY' || Math.abs(vatCalc.gross-importExpected)>0.05)) return toast('PDF toplamı ile kalemler uyuşmuyor veya para birimi değişti. PDF kalemlerini yeniden kontrol edin.', 'err');
     const lines = items.map((l) => ({
       name: l.name,
+      productId:l.productId,createProduct:l.createProduct,unit:l.unit,sourceCode:l.sourceCode,
       qty: l.qty,
       /* MALİYET KDV DAHİL (brüt) yazılır: mal alınırken KDV bedeli de ödendi.
          Girilen tutar KDV HARİÇ ise matraha çevirmeden önce brüte tamamlanır. */
-      cost: toTRY(vatIncluded ? l.cost : round2(l.cost * (1 + (l.vatRate ?? 0) / 100))),
+      cost: importExpected!==null ? (vatIncluded ? l.cost : l.cost*(1+(l.vatRate??0)/100)) : toTRY(vatIncluded ? l.cost : round2(l.cost * (1 + (l.vatRate ?? 0) / 100))),
       sale: toTRY(l.sale),
       vatRate: l.vatRate,
     }));
-    const finalSupplier = isOther ? otherSupplier.trim() : supplier.trim();
     const newId = uid();
 
+    invoiceSaveLock.current=true;setSavingInvoice(true);
+    try {
+    if(img){await saveInvoiceAttachment(newId,img);setAttachments(a=>({...a,[newId]:img}));}
     add(
       {
         id: newId,
         no: `AF${Date.now()}`,
         supplierNo: supplierNo.trim() || undefined,
+        importSource,
         docType,
         taxNo: taxNo.trim() || undefined,
         date: new Date(invDate + 'T12:00:00').toISOString(),
@@ -549,7 +587,7 @@ export function PurchaseScreen({
       },
       toStock
     );
-    if (img) saveInvImg(newId, img);
+
     toast(`Fatura kaydedildi — Matrah ${fmt(toTRY(vatCalc.base))} + KDV ${fmt(toTRY(vatCalc.vat))} = ${fmt(toTRY(vatCalc.gross))}${toStock ? ' · stoklara işlendi' : ''}`);
     setSupplier('');
     setOtherSupplier('');
@@ -557,11 +595,13 @@ export function PurchaseScreen({
     setDueDate('');
     setItems([]);
     setQuery('');
-    setImg(null);
+    setImg(null);setDocumentFile(null);setImportExpected(null);setImportSource(undefined);
     setSupplierNo('');
     setTaxNo('');
     setInvDate(todayKey());
     setTab('history');
+    } catch {toast('Belge kaydedilemedi. Fatura ve stok kaydı yapılmadı; depolama alanını kontrol edin.', 'err');}
+    finally{invoiceSaveLock.current=false;setSavingInvoice(false);}
   };
 
   /* Yinelenen fatura kopyalama */
@@ -825,20 +865,23 @@ export function PurchaseScreen({
               {/* Fatura fotoğrafı (PDF/ilan) */}
               <div className="rounded-lg border border-line bg-ink/40 p-2.5">
                 <div className="mb-1.5 flex items-center gap-1.5 font-mono text-[9.5px] uppercase tracking-widest text-mut">
-                  <Ic n="camera" c="h-3.5 w-3.5 text-amber" /> Fatura Fotoğrafı / İlan
+                  <Ic n="camera" c="h-3.5 w-3.5 text-amber" /> Fatura Belgesi (PDF / Fotoğraf)
                 </div>
                 {img ? (
                   <div className="flex items-center gap-2">
-                    <img src={img} alt="" className="h-12 w-20 rounded border border-line2 object-cover" />
-                    <span className="flex-1 truncate text-[10px] text-mint">Fotoğraf eklendi</span>
-                    <button onClick={() => setImg(null)} className="rounded border border-red/40 p-1 text-red hover:bg-red/10"><Ic n="x" c="h-3 w-3" /></button>
+                    {img.startsWith('data:application/pdf') ? <span className="p-3 font-bold text-amber">PDF</span> : <img src={img} alt="" className="h-12 w-20 rounded border border-line2 object-cover" />}
+                    <span className="flex-1 truncate text-[10px] text-mint">Belge eklendi</span>
+                    <button disabled={documentBusy||savingInvoice} onClick={() => {setImg(null);setDocumentFile(null);}} className="rounded border border-red/40 p-1 text-red hover:bg-red/10"><Ic n="x" c="h-3 w-3" /></button>
                   </div>
                 ) : (
-                  <Btn v="ghost" className="w-full" onClick={() => imgRef.current?.click()}>
-                    <Ic n="camera" c="h-4 w-4" /> Fotoğraf Ekle
+                  <Btn v="ghost" className="w-full" disabled={documentBusy||savingInvoice} onClick={() => imgRef.current?.click()}>
+                    <Ic n="camera" c="h-4 w-4" /> PDF / Fotoğraf Ekle
                   </Btn>
                 )}
-                <input ref={imgRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) readImg(f); e.target.value = ''; }} />
+                <input ref={imgRef} type="file" accept="application/pdf,image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) readImg(f); e.target.value = ''; }} />
+                {img?.startsWith('data:application/pdf') && <Btn disabled={documentBusy||savingInvoice} onClick={readPdf}>{documentBusy?'PDF okunuyor…':'Fatura Kalemlerini Oku'}</Btn>}
+                {img && <Btn onClick={()=>setViewImg(img)}>Belgeyi Aç / İndir</Btn>}
+                <p className="mt-2 text-xs text-mut2">En fazla 10 MB. Metin PDF: kalem okuma. Taranmış PDF/fotoğraf: yalnızca ek, OCR yok. Belgeler bu cihazda saklanır; mevcut JSON yedeğine dahil değildir, ayrıca indirin.</p>
               </div>
 
               <div className="border-t border-line pt-3">
@@ -987,7 +1030,7 @@ export function PurchaseScreen({
 
             <div className="flex items-center justify-between border-t border-line px-4 py-3">
               <span className="font-mono text-[10px] uppercase tracking-widest text-mut2">Toplam Kalem: {lineCount} · {vatIncluded ? 'Fiyatlar KDV DAHİL' : 'Fiyatlar KDV HARİÇ'}</span>
-              <Btn v="mint" onClick={submit} className="gap-2 px-4"><Ic n="check" c="h-4 w-4" /> Alış Faturasını Onayla</Btn>
+              <Btn v="mint" disabled={savingInvoice||documentBusy} onClick={submit} className="gap-2 px-4"><Ic n="check" c="h-4 w-4" /> Alış Faturasını Onayla</Btn>
             </div>
           </section>
         </div>
@@ -1426,7 +1469,7 @@ export function PurchaseScreen({
                       <Td>
                         {attachImg ? (
                           <button onClick={() => setViewImg(attachImg)} title="Fatura fotoğrafını aç" className="block h-8 w-12 overflow-hidden rounded border border-line2 hover:border-amber/50">
-                            <img src={attachImg} alt="" className="h-full w-full object-cover" />
+                            {attachImg.startsWith('data:application/pdf') ? <span className="text-xs text-amber">PDF</span> : <img src={attachImg} alt="" className="h-full w-full object-cover" />}
                           </button>
                         ) : <span className="text-mut2">—</span>}
                       </Td>
@@ -1488,10 +1531,11 @@ export function PurchaseScreen({
         />
       )}
 
+      {importText!==null && <InvoiceImportModal text={importText} products={products} onClose={()=>setImportText(null)} onApply={applyDraft}/> }
       {viewImg && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 backdrop-blur-[2px]" onClick={() => setViewImg(null)}>
           <div className="anim-pop max-h-[92vh] max-w-[92vw] rounded-xl border border-line2 bg-panel p-2">
-            <img src={viewImg} alt="Fatura görseli" className="max-h-[85vh] rounded-lg object-contain" />
+            <InvoiceDocument data={viewImg} />
             <div className="mt-2 text-center font-mono text-[10px] text-mut2">Kapatmak için karanlık alana tıklayın</div>
           </div>
         </div>

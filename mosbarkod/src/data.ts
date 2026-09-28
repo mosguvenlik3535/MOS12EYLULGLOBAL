@@ -220,7 +220,7 @@ export interface Invoice {
   taxNo?: string;
   /** Kalem fiyatları KDV dahil mi girildi? */
   vatIncluded?: boolean;
-  lines: { name: string; qty: number; cost: number; sale?: number; vatRate?: number }[];
+  lines: { name: string; qty: number; cost: number; sale?: number; vatRate?: number; productId?: string; createProduct?: boolean; unit?: string; sourceCode?: string }[];
   /** KDV hariç matrah toplamı */
   subtotal?: number;
   /** Toplam KDV tutarı */
@@ -229,6 +229,7 @@ export interface Invoice {
   total: number;
   status: 'odendi' | 'bekliyor';
   payments?: InvoicePayment[];  // Ödeme geçmişi
+  importSource?: { currency: string; exchangeRate: number; total: number; totalTRY: number };
 }
 
 /** Satış tarafı — ürün/kategori ve seçili ülke bazlı KDV oranı bulma */
@@ -859,6 +860,7 @@ export const EXPENSE_CATS: { name: string; color: string }[] = [
   { name: 'Temizlik Malzemesi', color: '#34d399' },
   { name: 'Temizlik Hizmeti', color: '#14b8a6' },
   { name: 'Teknik Servis Hizmetleri', color: '#f97316' },
+  { name: 'Yemek', color: '#fb923c' },
   { name: 'Araç Yakıt', color: '#fbbf24' },
   { name: 'Tedarik', color: '#f59e0b' },
   { name: 'Diğer Harcamalar', color: '#7d8ca0' },

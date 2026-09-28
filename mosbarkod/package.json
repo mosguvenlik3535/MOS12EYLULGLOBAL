@@ -1,6 +1,6 @@
 {
   "name": "mosbarkodyazilim",
-  "version": "1.15.11",
+  "version": "1.15.12",
   "description": "MOSBARKODYAZILIM - Barkod Satış Programı",
   "author": "MOSBARKODYAZILIM",
   "license": "UNLICENSED",
@@ -29,6 +29,7 @@
     "cordova-plugin-purchase": "^13.18.0",
     "jszip": "^3.10.1",
     "nodemailer": "^6.9.14",
+    "pdfjs-dist": "^4.10.38",
     "peerjs": "^1.5.5",
     "qrcode.react": "^4.2.0",
     "react": "19.2.6",
@@ -47,6 +48,7 @@
     "@vitejs/plugin-react": "5.1.1",
     "electron": "^31.7.7",
     "electron-builder": "^24.13.3",
+    "fake-indexeddb": "^6.2.5",
     "tailwindcss": "4.1.17",
     "typescript": "5.9.3",
     "vite": "7.3.2",

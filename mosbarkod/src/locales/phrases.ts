@@ -555,6 +555,8 @@ const EXTRA_DE: Record<string, string> = {
 };
 
 const PHRASES_A: PhraseMap = {
+  'Fatura PDF belgesi': { en: 'Invoice PDF document' },
+  'PDF Kalem Kontrolü': { en: 'Review PDF Invoice Lines' },
   /* ---------- Menü / Genel ---------- */
   'Hızlı Satış': { en: 'Quick Sale', ar: 'المبيعات السريعة', ru: 'Быстрая продажа' },
   'Paket Sipariş': { en: 'Delivery Orders', ar: 'طلبات التوصيل', ru: 'Заказы доставки' },
