@@ -39,11 +39,30 @@ export function parseInvoiceText(text: string, products: Product[] = []): Invoic
     const matches=products.filter(p => p.name.trim().toLocaleLowerCase('tr-TR') === name.toLocaleLowerCase('tr-TR'));
     rows.push({code:m[1],name,qty,unit:m[4],unitPrice,vatRate,net,productId:matches.length===1 ? matches[0].id : '',createProduct:false});
   }
-  const totalFrom = (suffix: string) => {
-    const r = new RegExp('(?:Ödenecek Tutar|Vergiler Dahil Toplam Tutar)'+suffix+'\\s*:?\\s*([\\d.,]+)\\s*(?:'+money+')', 'i');
-    return trNumber(text.match(r)?.[1] || '0');
+  // Prefer VAT-inclusive gross totals to payable totals (which can include deductions).
+  // Match the denomination too, so the TL summary is never read as the foreign total.
+  const totalFrom = (code: string) => {
+    for (const label of ['Vergiler Dahil Toplam Tutar', 'Ödenecek Tutar']) {
+      const suffix = code === 'TRY' ? '(?:\\s*\\(\\s*(?:TL|TRY)\\s*\\))?' : '';
+      const unit = code === 'TRY' ? '(?:TRY|TL|₺)' : code;
+      const r = new RegExp(label + suffix + '\\s*:?\\s*([\\d.,]+)\\s*' + unit + '(?![A-Z])', 'i');
+      const m = text.match(r);
+      if (m) return trNumber(m[1]);
+    }
+    return 0;
   };
-  return {number,date:isoDate(text,'Fatura Tarihi'),dueDate:isoDate(text,'Vade Tarihi'),currency,total:totalFrom(''),totalTRY:totalFrom('\\s*\\(TL\\)'),rows,text};
+  const total = totalFrom(currency);
+  const totalTRY = totalFrom('TRY');
+  return {number,date:isoDate(text,'Fatura Tarihi'),dueDate:isoDate(text,'Vade Tarihi'),currency,total,totalTRY,rows,text};
+}
+/** Effective rate printed into the invoice totals, not a live/official market quote.
+ * Keep full precision for conversion; round only the displayed rate and final money.
+ */
+export function invoiceExchangeRate(currency: string, totalTRY: number, totalForeign: number): number | null {
+  if(currency === 'TRY') return 1;
+  if(!Number.isFinite(totalTRY) || !Number.isFinite(totalForeign) || totalTRY <= 0 || totalForeign <= 0) return null;
+  const rate = totalTRY / totalForeign;
+  return Number.isFinite(rate) && rate > 0 ? rate : null;
 }
 export function draftGross(rows: ImportRow[], rate: number) {
   return round2(rows.reduce((sum,r) => sum + r.net * (1+r.vatRate/100) * rate, 0));

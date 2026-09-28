@@ -1,11 +1,11 @@
-# PDF alış faturası — v1.15.12
+# PDF alış faturası — v1.15.14
 
 1. Alış Faturası → PDF / Fotoğraf Ekle (en fazla 10 MB; PDF, PNG, JPEG, WebP).
 2. Metin içeren PDF için Fatura Kalemlerini Oku. En fazla 30 sayfa.
-3. Kontrol ekranında fatura numarası/tarih/vade, para birimi, fatura kuru, ödeme durumu ve toplamları doğrulayın.
+3. Kontrol ekranında fatura numarası/tarih/vade, para birimi, toplamlardan otomatik hesaplanan fatura kuru, ödeme durumu ve toplamları doğrulayın.
 4. Her satırı bir stok ürününe eşleyin veya açıkça Yeni ürün oluştur seçin. Eşleştirme önerisi yalnızca benzersiz tam ürün adı eşleşmesidir. Mal kodu barkod yapılmaz. Koli/adet dönüşümü otomatik değildir.
-5. Eksik/yanlış satırları düzeltin. Net satır tutarı iskonto sonrası KDV hariç tutardır. Maliyet bu tutarın miktara bölünmesi, KDV ve onayladığınız kurun uygulanmasıyla hesaplanır. Birim fiyat alanı kontrol amaçlıdır.
-6. Belgenin döviz toplamı ve TL toplamı kalemlerle uyuşmalıdır (0,05 tolerans). Kur otomatik uygulanmaz; TRY belge için 1, döviz belge için faturadaki kur girilir. TL toplamı/döviz toplamı oranı yalnızca öneri olarak gösterilir. Tarihî belgeye güncel kur uygulanmaz. Aktarım sırasında uygulama para birimi TRY olmalıdır.
+5. Eksik/yanlış satırları düzeltin. Net satır tutarı iskonto sonrası KDV hariç tutardır. Maliyet bu tutarın miktara bölünmesi, KDV ve otomatik fatura kurunun uygulanmasıyla hesaplanır. Birim fiyat alanı kontrol amaçlıdır.
+6. Belgenin döviz toplamı ve TL toplamı kalemlerle uyuşmalıdır (0,05 tolerans). TRY belgede kur 1; döviz belgede KDV dahil TL toplamı / KDV dahil döviz toplamı otomatik uygulanır. Toplamlar değişince kur yenilenir. Kur yalnızca gösterimde 6 basamağa yuvarlanır; hesaplamada tam hassasiyet kullanılır. Eksik, sıfır veya geçersiz toplam aktarımı engeller. Bu oran faturanın efektif kurudur, resmî piyasa kuru değildir. Tarihî belgeye güncel kur uygulanmaz. Aktarım sırasında uygulama para birimi TRY olmalıdır.
 7. Onayla ve Fatura Formuna Aktar henüz stok değiştirmez. Tedarikçiyi seçin. Stoğa ekleme seçeneğini kontrol edip Alış Faturasını Onayla ile kaydedin. Yeni ürünlerin barkod/satış fiyatını tamamlayın.
 
 ## Koruma ve sınırlar

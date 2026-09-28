@@ -1,5 +1,5 @@
 /* MOSBARKOD PWA Service Worker */
-const CACHE = 'mosbarkod-cache-v1.15.13';
+const CACHE = 'mosbarkod-cache-v1.15.14';
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();

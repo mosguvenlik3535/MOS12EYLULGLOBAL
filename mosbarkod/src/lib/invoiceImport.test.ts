@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyInvoiceStock, duplicateInvoice, draftGross, parseInvoiceText, trNumber } from './invoiceImport';
+import { applyInvoiceStock, duplicateInvoice, draftGross, invoiceExchangeRate, parseInvoiceText, trNumber } from './invoiceImport';
 import type { Invoice, Product } from '../data';
 const text=`Fatura No: TEST2026000000001
 Fatura Tarihi: 28.09.2026 16:52
@@ -31,4 +31,14 @@ describe('invoice import',()=>{
  it('never uses substring matching for legacy lines',()=>{expect(applyInvoiceStock([product('1','Kablo Uzun')],invoice([{name:'Kablo',qty:3,cost:2}]))[0].stock).toBe(1);});
  it('creates a new product only when explicitly approved, without a made-up barcode',()=>{const out=applyInvoiceStock([],invoice([{name:'Yeni',productId:'new',createProduct:true,qty:10,cost:12,vatRate:20,unit:'adet',sourceCode:'SUP-123'}]));expect(out[0]).toMatchObject({id:'new',barcode:'',stock:10,p1:0,cost:12});expect(applyInvoiceStock([],invoice([{name:'Yeni',qty:10,cost:12}]))).toEqual([]);});
  it('uses discounted row amount as the cost basis, not listed unit price',()=>{const d=parseInvoiceText(text);d.rows=[{...d.rows[0],unitPrice:10,qty:10,net:80}];expect(draftGross(d.rows,1)).toBe(96);});
+});
+
+describe('automatic invoice exchange rate',()=>{
+ it('derives full-precision USD rate and reproduces gross TL total',()=>{const d=parseInvoiceText(text);const rate=invoiceExchangeRate(d.currency,d.totalTRY,d.total);expect(rate).toBe(5673.51/115.8);expect(rate!.toFixed(6)).toBe('48.994041');expect(draftGross(d.rows,rate!)).toBe(5673.51);});
+ it('recalculates from corrected totals without stale or manual rates',()=>{expect(invoiceExchangeRate('USD',4800,100)).toBe(48);expect(invoiceExchangeRate('USD',5000,100)).toBe(50);expect(invoiceExchangeRate('USD',5000,200)).toBe(25);});
+ it('uses the same formula for EUR and no conversion for TRY',()=>{expect(invoiceExchangeRate('EUR',6000,120)).toBe(50);expect(invoiceExchangeRate('TRY',0,120)).toBe(1);});
+ it('rejects missing, zero, negative, nonfinite totals and overflow',()=>{for(const [tl,fx] of [[0,1],[1,0],[-1,1],[1,-1],[NaN,1],[1,NaN],[Infinity,1],[1,Infinity],[Number.MAX_VALUE,Number.MIN_VALUE]])expect(invoiceExchangeRate('USD',tl,fx)).toBeNull();});
+ it('prefers VAT-inclusive totals over payable amounts regardless of position',()=>{const d=parseInvoiceText('Ödenecek Tutar 100,00 USD\nÖdenecek Tutar(TL) 4.000,00 TL\nVergiler Dahil Toplam Tutar 120,00 USD\nVergiler Dahil Toplam Tutar 6.000,00 TL');expect(d.total).toBe(120);expect(d.totalTRY).toBe(6000);expect(invoiceExchangeRate(d.currency,d.totalTRY,d.total)).toBe(50);});
+ it('does not confuse TL summary with foreign totals when TL appears first',()=>{const d=parseInvoiceText('Vergiler Dahil Toplam Tutar(TL) 5.673,51 TL\nVergiler Dahil Toplam Tutar 115,80 USD');expect(d.total).toBe(115.8);expect(d.totalTRY).toBe(5673.51);});
+ it('leaves missing TL total unresolved rather than guessing a live rate',()=>{const d=parseInvoiceText('Vergiler Dahil Toplam Tutar 115,80 USD');expect(d.totalTRY).toBe(0);expect(invoiceExchangeRate(d.currency,d.totalTRY,d.total)).toBeNull();});
 });
