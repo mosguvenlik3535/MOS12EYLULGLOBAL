@@ -413,14 +413,14 @@ ipcMain.handle('mos-smtp', async (_evt, payload) => await smtpSend(payload));
 
 ipcMain.handle('mos-cloud-http', async (_evt, req) => {
   try {
-    const { url, method = 'GET', headers = {}, body } = req || {};
+    const { url, method = 'GET', headers = {}, body, bodyEncoding, responseEncoding } = req || {};
     const res = await fetch(url, {
       method,
       headers,
-      body: body !== undefined ? body : undefined,
+      body: bodyEncoding==='base64' && body ? Buffer.from(body,'base64') : body,
       redirect: 'follow',
     });
-    return { status: res.status, body: await res.text() };
+    return { status: res.status, body: responseEncoding==='base64' ? Buffer.from(await res.arrayBuffer()).toString('base64') : await res.text() };
   } catch (e) {
     return { status: 0, body: String(e) };
   }

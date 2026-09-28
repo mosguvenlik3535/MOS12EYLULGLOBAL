@@ -1,3 +1,4 @@
+import { collectBackupFile, zipBackup, readBackupBytes, restoreBackupAttachments } from '../lib/backupArchive';
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '../utils/cn';
 import { Ic } from '../icons';
@@ -12,6 +13,7 @@ import {
   dataOnlyBackup,
   deleteBackup,
   downloadBackup,
+  downloadBackupFile,
   fullBackupData,
   humanBytes,
   listBackups,
@@ -309,11 +311,14 @@ export function AutoBackupCard({
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const noFolderPick = useNoFolderPick();
 
+  const [archiveBusy,setArchiveBusy]=useState(false);
+  const archiveLock=useRef(false);
+  const archiveAction=async (fn:()=>Promise<void>)=>{if(archiveLock.current)return;archiveLock.current=true;setArchiveBusy(true);try{await fn();}catch(e){toast(e instanceof Error?e.message:'Yedek işlemi başarısız','err');}finally{archiveLock.current=false;setArchiveBusy(false);}};
   const refresh = () => setBackups(listBackups());
   const usage = backupStorageUsage();
 
-  const makeSnapshot = () => {
-    const meta = createSnapshot(state, 'manual', cfg.keepDays);
+  const makeSnapshot = async () => {
+    const meta = await createSnapshot(state, 'manual', cfg.keepDays);
     if (meta) {
       onPatch({ autobackup: { ...cfg, lastRun: new Date().toISOString() } });
       refresh();
@@ -325,40 +330,40 @@ export function AutoBackupCard({
 
   /** Telefonda dosya indirmek zahmetli — yedeği doğrudan WhatsApp / Drive vb. paylaş. */
   const shareFull = async () => {
-    const json = JSON.stringify(fullBackupData(state));
-    const file = new File([json], `mosbarkod-yedek-${todayKey()}.json`, { type: 'application/json' });
+    const bytes = await zipBackup(await collectBackupFile(fullBackupData(state),'full'));
+    const file = new File([bytes], `mosbarkod-yedek-${todayKey()}.zip`, { type: 'application/zip' });
     const r = await shareOrDownload([file], 'MOSBARKOD Yedek', `MOSBARKOD tam yedek — ${todayKey()}`);
     if (r.cancelled) return;
     toast(r.via === 'share' ? 'Yedek paylaşıldı (WhatsApp, Drive, e-posta…)' : 'Yedek indirildi');
   };
 
-  const downloadFull = () => {
-    downloadBackup(`mosbarkod-yedek-${todayKey()}.json`, fullBackupData(state), 'full');
+  const downloadFull = async () => {
+    await downloadBackup(`mosbarkod-yedek-${todayKey()}.json`, fullBackupData(state), 'full');
     toast('Tam yedek indirildi');
   };
-  const downloadData = () => {
-    downloadBackup(`mosbarkod-veri-${todayKey()}.json`, dataOnlyBackup(state), 'data');
+  const downloadData = async () => {
+    await downloadBackup(`mosbarkod-veri-${todayKey()}.json`, dataOnlyBackup(state), 'data');
     toast('Veri yedeği indirildi');
   };
-  const downloadSettings = () => {
-    downloadBackup(`mosbarkod-ayarlar-${todayKey()}.json`, settingsOnlyBackup(state), 'settings');
+  const downloadSettings = async () => {
+    await downloadBackup(`mosbarkod-ayarlar-${todayKey()}.json`, settingsOnlyBackup(state), 'settings');
     toast('Ayar yedeği indirildi');
   };
 
-  const downloadSnapshot = (m: BackupMeta) => {
-    const file = readBackup(m.id);
+  const downloadSnapshot = async (m: BackupMeta) => {
+    const file = await readBackup(m.id);
     if (!file) {
       toast('Yedek okunamadı — silinmiş olabilir', 'err');
       refresh();
       return;
     }
     const fname = `mosbarkod-${m.createdAt.slice(0, 16).replace(/[:T]/g, '-')}.json`;
-    downloadBackup(fname, file.data, file.scope ?? 'full');
+    await downloadBackupFile(fname,file);
   };
 
-  const confirmRestore = () => {
+  const confirmRestore = async () => {
     if (!restoreId) return;
-    const file = readBackup(restoreId);
+    const file = await readBackup(restoreId);
     if (!file) {
       toast('Yedek okunamadı — silinmiş olabilir', 'err');
       setRestoreId(null);
@@ -371,30 +376,26 @@ export function AutoBackupCard({
       setRestoreId(null);
       return;
     }
+    await restoreBackupAttachments(parsed);
     onRestore(parsed.data);
     setRestoreId(null);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (!deleteId) return;
-    deleteBackup(deleteId);
+    await deleteBackup(deleteId);
     refresh();
     setDeleteId(null);
     toast('Yedek silindi');
   };
 
-  const onImportFile = (f: File) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const parsed = parseBackupFile(String(reader.result), state);
-      if (parsed.ok) {
-        onRestore(parsed.data);
-        refresh();
-      } else {
-        toast(parsed.error, 'err');
-      }
-    };
-    reader.readAsText(f);
+  const onImportFile = async (f: File) => {
+    try {
+      const parsed = parseBackupFile(await readBackupBytes(new Uint8Array(await f.arrayBuffer())),state);
+      if(!parsed.ok){toast(parsed.error,'err');return;}
+      if(!window.confirm('Yedekteki veriler mevcut kayıtların yerine yüklenecek. Devam edilsin mi?'))return;
+      await restoreBackupAttachments(parsed);onRestore(parsed.data);refresh();
+    }catch(e){toast(e instanceof Error?e.message:'Yedek yüklenemedi','err');}
   };
 
   return (
@@ -405,6 +406,7 @@ export function AutoBackupCard({
       desc="Ürün, satış, stok, müşteri, veresiye, kasa, fatura, personel, ayar ve entegrasyon verilerinizin tamamını sağlama imzalı arşivler halinde kaydeder."
       right={<Toggle on={cfg.enabled} onChange={(b) => onPatch({ autobackup: { ...cfg, enabled: b } })} />}
     >
+      <p className="mb-2 text-sm text-mut2">{archiveBusy?'Yedek işlemi sürüyor…':'ZIP yedeği PDF ve fatura fotoğraflarını içerir. Eski JSON yedekleri de yüklenebilir. Yerel arşiv cihazda kalır; cihaz kaybına karşı indirin veya buluta gönderin.'}</p>
       <div className="grid gap-2.5 sm:grid-cols-2">
         <Field label="Yedekleme Sıklığı">
           <Sel value={String(cfg.interval)} onChange={(e) => onPatch({ autobackup: { ...cfg, interval: Number(e.target.value) } })}>
@@ -474,19 +476,19 @@ export function AutoBackupCard({
           </div>
         )}
         <div className="flex flex-wrap gap-2">
-          <Btn v="ghost" className="border-blue/50 bg-blue/10 text-blue hover:bg-blue/20" onClick={makeSnapshot}>
+          <Btn v="ghost" className="border-blue/50 bg-blue/10 text-blue hover:bg-blue/20" onClick={()=>archiveAction(makeSnapshot)}>
             <Ic n="check" c="h-4 w-4" /> Şimdi Yedekle
           </Btn>
-          <Btn v="ghost" onClick={downloadFull}>
+          <Btn v="ghost" onClick={()=>archiveAction(downloadFull)}>
             <Ic n="download" c="h-4 w-4" /> Tam Yedek İndir
           </Btn>
-          <Btn v="ghost" className="border-mint/50 bg-mint/10 text-mint hover:bg-mint/20" onClick={() => void shareFull()}>
+          <Btn v="ghost" className="border-mint/50 bg-mint/10 text-mint hover:bg-mint/20" onClick={() => archiveAction(shareFull)}>
             <Ic n="phone" c="h-4 w-4" /> Yedek Paylaş (WhatsApp)
           </Btn>
-          <Btn v="ghost" onClick={downloadData} title="Ayarlar hariç tüm işletme verileri">
+          <Btn v="ghost" onClick={()=>archiveAction(downloadData)} title="Ayarlar hariç tüm işletme verileri">
             <Ic n="download" c="h-4 w-4" /> Sadece Veri
           </Btn>
-          <Btn v="ghost" onClick={downloadSettings} title="Yalnızca program ayarları">
+          <Btn v="ghost" onClick={()=>archiveAction(downloadSettings)} title="Yalnızca program ayarları">
             <Ic n="download" c="h-4 w-4" /> Sadece Ayarlar
           </Btn>
           <Btn v="ghost" onClick={() => importRef.current?.click()}>
@@ -496,11 +498,11 @@ export function AutoBackupCard({
         <input
           ref={importRef}
           type="file"
-          accept="application/json,.json"
+          accept="application/json,application/zip,.json,.zip"
           className="hidden"
           onChange={(e) => {
             const f = e.target.files?.[0];
-            if (f) onImportFile(f);
+            if (f) archiveAction(()=>onImportFile(f));
             e.target.value = '';
           }}
         />
@@ -544,7 +546,7 @@ export function AutoBackupCard({
                   <Btn v="subtle" className="px-2 py-1 text-[10px]" onClick={() => setRestoreId(m.id)} title="Bu yedeği geri yükle">
                     <Ic n="reset" c="h-3.5 w-3.5" /> Geri Yükle
                   </Btn>
-                  <Btn v="subtle" className="px-2 py-1 text-[10px]" onClick={() => downloadSnapshot(m)} title="İndir">
+                  <Btn v="subtle" className="px-2 py-1 text-[10px]" onClick={() => archiveAction(()=>downloadSnapshot(m))} title="İndir">
                     <Ic n="download" c="h-3.5 w-3.5" />
                   </Btn>
                   <Btn v="subtle" className="px-2 py-1 text-[10px] hover:text-red" onClick={() => setDeleteId(m.id)} title="Sil">
@@ -574,7 +576,7 @@ export function AutoBackupCard({
           msg="Mevcut tüm veriler bu yedekle değiştirilecek. Bu işlem geri alınamaz — devam edilsin mi?"
           label="Geri Yükle"
           onCancel={() => setRestoreId(null)}
-          onOk={confirmRestore}
+          onOk={()=>archiveAction(confirmRestore)}
         />
       )}
       {deleteId && (
@@ -583,7 +585,7 @@ export function AutoBackupCard({
           msg="Bu arşiv kalıcı olarak silinecek. Devam edilsin mi?"
           label="Sil"
           onCancel={() => setDeleteId(null)}
-          onOk={confirmDelete}
+          onOk={()=>archiveAction(confirmDelete)}
         />
       )}
     </Card>
@@ -671,7 +673,8 @@ export function CloudBackupCard({
         toast(parsed.error, 'err');
         return;
       }
-      onRestore(parsed.data);
+      await restoreBackupAttachments(parsed);
+    onRestore(parsed.data);
       setRestoreFile(null);
       setFiles([]);
     } catch (e) {
@@ -703,7 +706,7 @@ export function CloudBackupCard({
         <Field label="Şifreli Gönder">
           <Sel value={cfg.encrypt ? '1' : '0'} onChange={(e) => patch({ encrypt: e.target.value === '1' })}>
             <option value="1">Şifreli (AES-256 + gzip)</option>
-            <option value="0">Düz JSON</option>
+            <option value="0">Şifresiz ZIP (Belgeler dahil)</option>
           </Sel>
         </Field>
 

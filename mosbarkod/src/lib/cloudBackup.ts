@@ -1,5 +1,5 @@
 import type { AppState, Settings } from '../data';
-import { serializeBackup } from './backup';
+import { collectBackupFile, zipBackup, readBackupBytes } from './backupArchive';
 
 /**
  * Bulut yedekleme — Google Drive & Dropbox.
@@ -40,6 +40,8 @@ declare global {
         method?: string;
         headers?: Record<string, string>;
         body?: string;
+        bodyEncoding?: 'base64';
+        responseEncoding?: 'base64';
       }) => Promise<{ status: number; body: string }>;
     };
   }
@@ -57,6 +59,8 @@ async function httpRequest(req: {
   method?: string;
   headers?: Record<string, string>;
   body?: string;
+        bodyEncoding?: 'base64';
+        responseEncoding?: 'base64';
 }): Promise<HttpResponse> {
   const bridge = typeof window !== 'undefined' ? window.mosCloud?.http : undefined;
   if (bridge) {
@@ -65,9 +69,9 @@ async function httpRequest(req: {
   const res = await fetch(req.url, {
     method: req.method || 'GET',
     headers: req.headers,
-    body: req.body,
+    body: req.bodyEncoding==='base64' && req.body ? base64ToBytes(req.body) : req.body,
   });
-  return { status: res.status, body: await res.text() };
+  return { status: res.status, body: req.responseEncoding==='base64' ? bytesToBase64(new Uint8Array(await res.arrayBuffer())) : await res.text() };
 }
 
 function assertOk(r: HttpResponse, label: string): void {
@@ -176,17 +180,19 @@ function passOf(cfg: CloudCfg): string {
 }
 
 export async function packForCloud(data: AppState, cfg: CloudCfg): Promise<{ blob: Blob; name: string }> {
-  const json = serializeBackup(data, 'full');
+  const bytes = await zipBackup(await collectBackupFile(data, 'full'));
   const stamp = new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-');
   if (cfg.encrypt) {
-    const payload = await encryptCloudText(json, passOf(cfg));
+    const payload = await encryptCloudText('MOSZIP1:'+bytesToBase64(bytes), passOf(cfg));
     return { blob: new Blob([payload], { type: 'application/octet-stream' }), name: `mosbarkod-${stamp}.mosbc` };
   }
-  return { blob: new Blob([json], { type: 'application/json' }), name: `mosbarkod-${stamp}.json` };
+  return { blob: new Blob([bytes], { type: 'application/zip' }), name: `mosbarkod-${stamp}.zip` };
 }
 
 export async function unpackFromCloud(text: string, cfg: CloudCfg): Promise<string> {
-  return cfg.encrypt ? await decryptCloudText(text, passOf(cfg)) : text;
+  if(text.trim().startsWith('{'))return text;
+  const plain=cfg.encrypt ? await decryptCloudText(text, passOf(cfg)) : text;
+  return plain.startsWith('MOSZIP1:') ? await readBackupBytes(base64ToBytes(plain.slice(8))) : plain;
 }
 
 /* ---------- Google Drive ---------- */
@@ -236,15 +242,16 @@ async function googleFolderId(accessToken: string, name: string): Promise<string
   return cj.id ?? null;
 }
 
-async function googleUpload(accessToken: string, name: string, content: string, folderId: string | null) {
+async function googleUpload(accessToken: string, name: string, content: Uint8Array<ArrayBuffer>, folderId: string | null) {
   const boundary = `mosbarkod_${Math.random().toString(36).slice(2)}`;
   const meta = JSON.stringify({
     name,
     ...(folderId ? { parents: [folderId] } : {}),
   });
-  const body = `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${meta}\r\n` +
-    `--${boundary}\r\nContent-Type: application/octet-stream\r\n\r\n${content}\r\n` +
-    `--${boundary}--`;
+  const body = bytesToBase64(new Uint8Array(await new Blob([
+    `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${meta}\r\n--${boundary}\r\nContent-Type: application/octet-stream\r\n\r\n`,
+    content, `\r\n--${boundary}--`
+  ]).arrayBuffer()));
   const r = await httpRequest({
     url: DRIVE_UPLOAD,
     method: 'POST',
@@ -252,7 +259,7 @@ async function googleUpload(accessToken: string, name: string, content: string, 
       Authorization: `Bearer ${accessToken}`,
       'Content-Type': `multipart/related; boundary=${boundary}`,
     },
-    body,
+    body, bodyEncoding:'base64',
   });
   assertOk(r, 'Google Drive yükleme');
   return JSON.parse(r.body) as { id: string; name: string; size?: string };
@@ -286,7 +293,7 @@ async function dropboxEnsureFolder(cfg: CloudCfg): Promise<void> {
   assertOk(r, 'Dropbox klasör oluşturma');
 }
 
-async function dropboxUpload(cfg: CloudCfg, name: string, content: string) {
+async function dropboxUpload(cfg: CloudCfg, name: string, content: Uint8Array<ArrayBuffer>) {
   const path = dropboxPath(cfg, name);
   const r = await httpRequest({
     url: DROPBOX_UPLOAD,
@@ -296,7 +303,7 @@ async function dropboxUpload(cfg: CloudCfg, name: string, content: string) {
       'Content-Type': 'application/octet-stream',
       'Dropbox-API-Arg': JSON.stringify({ path, mode: 'overwrite', autorename: true, mute: true }),
     },
-    body: content,
+    body: bytesToBase64(content), bodyEncoding:'base64',
   });
   assertOk(r, 'Dropbox yükleme');
   return JSON.parse(r.body) as { name: string; size: number };
@@ -307,7 +314,7 @@ async function dropboxUpload(cfg: CloudCfg, name: string, content: string) {
 export async function cloudUpload(cfg: CloudCfg, data: AppState): Promise<{ ok: boolean; error?: string }> {
   try {
     const { blob, name } = await packForCloud(data, cfg);
-    const content = await blob.text();
+    const content = new Uint8Array(await blob.arrayBuffer());
     if (cfg.provider === 'gdrive') {
       const token = await googleAccessToken(cfg);
       const folderId = await googleFolderId(token, cfg.folder);
@@ -390,13 +397,15 @@ export async function cloudDownloadText(cfg: CloudCfg, file: CloudFile): Promise
     const r = await httpRequest({
       url: `${DRIVE_FILES}/${encodeURIComponent(file.id)}?alt=media`,
       headers: { Authorization: `Bearer ${token}` },
+      responseEncoding: file.name.endsWith('.zip')?'base64':undefined,
     });
     assertOk(r, 'Google Drive indirme');
-    return r.body;
+    return file.name.endsWith('.zip')?await readBackupBytes(base64ToBytes(r.body)):r.body;
   }
   if (cfg.provider === 'dropbox') {
     const r = await httpRequest({
       url: DROPBOX_DOWNLOAD,
+      responseEncoding: file.name.endsWith('.zip')?'base64':undefined,
       method: 'POST',
       headers: {
         Authorization: `Bearer ${cfg.dropboxToken}`,
@@ -405,7 +414,7 @@ export async function cloudDownloadText(cfg: CloudCfg, file: CloudFile): Promise
       },
     });
     assertOk(r, 'Dropbox indirme');
-    return r.body;
+    return file.name.endsWith('.zip')?await readBackupBytes(base64ToBytes(r.body)):r.body;
   }
   throw new Error('Sağlayıcı seçilmedi');
 }

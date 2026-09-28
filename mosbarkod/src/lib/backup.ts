@@ -1,3 +1,5 @@
+import { collectBackupFile, zipBackup, readBackupBytes } from './backupArchive';
+import { snapshotStore } from './backupStore';
 import { defaultSettings, defaultState, type AppState, type Settings } from '../data';
 
 /**
@@ -5,7 +7,7 @@ import { defaultSettings, defaultState, type AppState, type Settings } from '../
  *
  * Özellikler:
  *  - Her yedek: tür, sürüm, tarih, checksum ve kapsam bilgisi taşır.
- *  - Otomatik yedekler localStorage'da dönen arşiv olarak tutulur (tek anahtar üzerine yazılmaz).
+ *  - Otomatik yedekler IndexedDB içinde ZIP olarak (küçük liste localStorage'da) dönen arşiv olarak tutulur (tek anahtar üzerine yazılmaz).
  *  - keepDays'e göre eski arşivler otomatik temizlenir; ayrıca MAX_SNAPSHOTS sınırı vardır.
  *  - İçe aktarma: eski düz JSON dışa aktarmaları da destekler, checksum doğrular.
  */
@@ -15,7 +17,6 @@ export const BACKUP_VERSION = 2;
 export const MAX_SNAPSHOTS = 30;
 
 const INDEX_KEY = 'mosbarkod_backup_index';
-const LATEST_KEY = 'mosbarkod_auto_backup'; // eski sürümle geriye dönük uyumluluk
 const SNAP_PREFIX = 'mosbarkod_backup_';
 
 export type BackupScope = 'full' | 'data' | 'settings';
@@ -38,6 +39,8 @@ export interface BackupFile {
   createdAt: string;
   checksum: string;
   data: Partial<AppState>;
+  attachments?: Record<string,string>;
+  attachmentChecksum?: string;
 }
 
 /* ---------- checksum (FNV-1a 32-bit) ---------- */
@@ -136,88 +139,27 @@ export const settingsOnlyBackup = (s: AppState): { settings: Settings } => ({ se
 
 /* ---------- anlık görüntü (snapshot) ---------- */
 
-export function createSnapshot(
-  data: AppState,
-  source: BackupSource,
-  keepDays: number
-): BackupMeta | null {
-  const createdAt = new Date().toISOString();
-  const file = buildBackupFile(data, 'full', createdAt);
-  const id = stampId(new Date(createdAt));
-  const text = JSON.stringify(file);
-  let ok = trySet(snapKey(id), text);
-  if (!ok) {
-    dropOldest(3); // kota dolduysa en eskileri düşürüp tekrar dene
-    ok = trySet(snapKey(id), text);
-  }
-  if (!ok) return null;
-  const meta: BackupMeta = {
-    id,
-    createdAt,
-    size: text.length,
-    checksum: file.checksum,
-    source,
-    scope: 'full',
-    version: BACKUP_VERSION,
-  };
-  const list = listBackups();
-  list.unshift(meta);
-  writeIndex(list);
-  if (source === 'auto') trySet(LATEST_KEY, text);
-  pruneBackups(keepDays);
-  return meta;
-}
-
-function dropOldest(n: number) {
-  const list = listBackups(); // en yeni önce
-  const targets = list.slice(-n);
-  for (const t of targets) {
-    try {
-      localStorage.removeItem(snapKey(t.id));
-    } catch {
-      /* ignore */
-    }
-  }
-  writeIndex(list.filter((m) => !targets.some((t) => t.id === m.id)));
+export async function createSnapshot(data: AppState, source: BackupSource, keepDays: number): Promise<BackupMeta | null> {
+ try {
+  const file=await collectBackupFile(data,'full');const bytes=await zipBackup(file);const id=stampId(new Date(file.createdAt));
+  await snapshotStore('put',id,bytes);
+  const meta:BackupMeta={id,createdAt:file.createdAt,size:bytes.length,checksum:file.checksum,source,scope:'full',version:3};
+  if(!trySet(INDEX_KEY,JSON.stringify([meta,...listBackups()]))){await snapshotStore('delete',id);return null;}
+  await pruneBackups(keepDays);return meta;
+ }catch{return null;}
 }
 
 /* ---------- okuma / geri yükleme ---------- */
 
-export function readBackup(id: string): BackupFile | null {
-  try {
-    const raw = localStorage.getItem(snapKey(id));
-    if (!raw) return null;
-    return JSON.parse(raw) as BackupFile;
-  } catch {
-    return null;
-  }
+export async function readBackup(id: string): Promise<BackupFile | null> {
+ try {const raw=localStorage.getItem(snapKey(id));if(raw)return JSON.parse(raw);const bytes=await snapshotStore('get',id);return bytes?JSON.parse(await readBackupBytes(bytes)):null;}catch{return null;}
 }
-
-export function deleteBackup(id: string) {
-  try {
-    localStorage.removeItem(snapKey(id));
-  } catch {
-    /* ignore */
-  }
-  writeIndex(readIndex().filter((m) => m.id !== id));
+export async function deleteBackup(id: string) {
+ await snapshotStore('delete',id);localStorage.removeItem(snapKey(id));writeIndex(readIndex().filter(m=>m.id!==id));
 }
-
-/* ---------- temizlik ---------- */
-
-export function pruneBackups(keepDays: number) {
-  const cutoff = Date.now() - Math.max(1, keepDays) * 86400000;
-  const list = readIndex().sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
-  const expired = list.filter((m) => new Date(m.createdAt).getTime() < cutoff);
-  const overflow = list.slice(MAX_SNAPSHOTS);
-  const toDelete = new Set([...expired, ...overflow].map((m) => m.id));
-  for (const id of toDelete) {
-    try {
-      localStorage.removeItem(snapKey(id));
-    } catch {
-      /* ignore */
-    }
-  }
-  writeIndex(list.filter((m) => !toDelete.has(m.id)));
+export async function pruneBackups(keepDays: number) {
+ const list=listBackups();const cutoff=Date.now()-Math.max(1,keepDays)*86400000;
+ for(const m of list.filter((m,i)=>i>=MAX_SNAPSHOTS||new Date(m.createdAt).getTime()<cutoff))await deleteBackup(m.id);
 }
 
 /* ---------- ayrıştırma / içe aktarma ---------- */
@@ -240,7 +182,7 @@ function normalizeArrays(partial: Partial<AppState>): AppState {
 }
 
 export type ParseResult =
-  | { ok: true; scope: BackupScope; data: AppState }
+  | { ok: true; scope: BackupScope; data: AppState; attachments?: Record<string,string> }
   | { ok: false; error: string };
 
 /**
@@ -267,6 +209,8 @@ export function parseBackupFile(text: string, current: AppState): ParseResult {
   if (obj.kind !== BACKUP_KIND) {
     return { ok: false, error: 'Bu dosya MOSBARKOD yedeği değil (tanınmayan tür)' };
   }
+  if(obj.version>3)return {ok:false,error:'Bu yedek daha yeni bir uygulama sürümü gerektiriyor'};
+  if(obj.version===3&&!obj.checksum)return {ok:false,error:'Yedek bütünlük bilgisi eksik'};
   if (!obj.data || typeof obj.data !== 'object') {
     return { ok: false, error: 'Yedek içeriği boş veya eksik' };
   }
@@ -279,6 +223,18 @@ export function parseBackupFile(text: string, current: AppState): ParseResult {
 
   const scope: BackupScope = obj.scope === 'data' || obj.scope === 'settings' ? obj.scope : 'full';
   const d = obj.data as Partial<AppState>;
+  let attachments: Record<string,string> | undefined;
+  if(obj.version>=3 && scope!=='settings' && obj.attachments===undefined)return {ok:false,error:'Yedekte fatura belgeleri bloğu eksik'};
+  if(obj.attachments!==undefined){
+    if(!obj.attachments||typeof obj.attachments!=='object'||Array.isArray(obj.attachments)||checksumOf(JSON.stringify(obj.attachments))!==obj.attachmentChecksum)return {ok:false,error:'Fatura belgeleri bütünlük kontrolü başarısız'};
+    const ids=new Set((Array.isArray(d.invoices)?d.invoices:[]).map(i=>i.id));
+    attachments=Object.create(null);
+    for(const [id,value] of Object.entries(obj.attachments)){
+      if(!ids.has(id)||typeof value!=='string'||!/^data:(application\/pdf|image\/(jpeg|png|webp|gif));base64,[A-Za-z0-9+/]*={0,2}$/.test(value))return {ok:false,error:'Yedekte geçersiz veya faturasız belge var'};
+      attachments![id]=value;
+    }
+  }
+
 
   // Sadece ayarlar: mevcut makinenin işletme verileri korunur, yalnızca ayarlar değişir.
   if (scope === 'settings') {
@@ -295,13 +251,15 @@ export function parseBackupFile(text: string, current: AppState): ParseResult {
   if (scope === 'data') {
     data.settings = current.settings;
   }
-  return { ok: true, scope, data };
+  return { ok: true, scope, data, attachments };
 }
 
 /* ---------- indirme ---------- */
 
 export function downloadText(filename: string, text: string) {
-  const blob = new Blob([text], { type: 'application/json' });
+  downloadBlob(filename,new Blob([text], { type: 'application/json' }));
+}
+export function downloadBlob(filename:string,blob:Blob) {
   /* Mobil (özellikle Android uygulaması): <a download> WebView'da çalışmayabilir.
      Web Share destekleniyorsa paylaşım penceresi açılır — kullanıcı dosyayı
      Dosyalar/Drive/WhatsApp'a kaydedebilir. Başarısız olursa klasik indirmeye düşülür. */
@@ -314,7 +272,7 @@ export function downloadText(filename: string, text: string) {
       share?: (data: { files?: File[]; title?: string }) => Promise<void>;
     };
     if ((native || coarse) && typeof nav.canShare === 'function' && typeof nav.share === 'function') {
-      const file = new File([blob], filename, { type: 'application/json' });
+      const file = new File([blob], filename, { type: blob.type });
       if (nav.canShare({ files: [file] })) {
         nav.share({ files: [file], title: filename }).catch(() => {
           /* kullanıcı vazgeçti — sessiz çık */
@@ -330,9 +288,12 @@ export function downloadText(filename: string, text: string) {
   a.href = url;
   a.download = filename;
   a.click();
-  URL.revokeObjectURL(url);
+  setTimeout(()=>URL.revokeObjectURL(url),60_000);
 }
 
-export function downloadBackup(filename: string, data: Partial<AppState>, scope: BackupScope) {
-  downloadText(filename, serializeBackup(data, scope));
+export async function downloadBackup(filename: string, data: Partial<AppState>, scope: BackupScope) {
+ const file=await collectBackupFile(data,scope);await downloadBackupFile(filename,file);
+}
+export async function downloadBackupFile(filename:string,file:BackupFile){
+ const bytes=await zipBackup(file);downloadBlob(filename.replace(/\.json$/i,'.zip'),new Blob([bytes],{type:'application/zip'}));
 }

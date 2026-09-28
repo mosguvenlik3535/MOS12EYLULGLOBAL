@@ -20,3 +20,7 @@ export async function readAttachment(file:File):Promise<string> {
 export async function deleteInvoiceAttachment(id?:string) {
  const db=await openDB();try {await new Promise<void>((resolve,reject)=>{const tx=db.transaction('files','readwrite');const store=tx.objectStore('files');if(id)store.delete(id);else store.clear();tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);});}finally{db.close();}
 }
+/** Atomic replacement: a quota/transaction failure keeps the old attachment archive. */
+export async function replaceInvoiceAttachments(files:Record<string,string>) {
+ const db=await openDB();try {await new Promise<void>((resolve,reject)=>{const tx=db.transaction('files','readwrite');const store=tx.objectStore('files');store.clear();for(const [id,data] of Object.entries(files))store.put(data,id);tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);});}finally{db.close();}
+}

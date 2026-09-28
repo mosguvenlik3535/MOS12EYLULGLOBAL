@@ -12,7 +12,7 @@
 - Aynı normalize tedarikçi adı + fatura numarası tekrar kaydedilmez. Farklı yazılmış tedarikçi unvanlarını tekleştirmek kullanıcının sorumluluğudur.
 - Stok aktarımı ürün ID'siyle yapılır; eski kayıtlar yalnızca benzersiz tam ada göre eşleştirilir. Alt dize eşleşmesi kaldırıldı.
 - Ek dosya kaydı başarısızsa yeni fatura/stock işlemi başlatılmaz. Belgeler IndexedDB'de, eski fotoğraflar okunabilir şekilde saklanır. Fatura silinirken ek de silinir; kasa sıfırlama belge arşivini temizler.
-- Ekler mevcut JSON/bulut yedeğine ve cihaz senkronizasyonuna dahil değildir. Belgeyi Aç / İndir üzerinden ayrıca yedekleyin. Tarayıcı verilerini silmek veya alan adı değiştirmek ekleri erişilemez kılar.
+- v1.15.13 itibarıyla ekler tam/veri ZIP yedeklerine, otomatik arşivlere ve bulut yedeklerine dahildir. ZIP içindeki backup.json belgeleri base64 olarak içerir. Cihazlar arası canlı senkronizasyon hâlâ ek dosyaları taşımaz. Tarayıcı verilerini silmek veya alan adı değiştirmek ekleri erişilemez kılar.
 - Belgeler dış servise gönderilmez. PDF işleyici/worker uygulamaya dahildir.
 - OCR yok: taranmış PDF ve fotoğraf eklenebilir ama otomatik okunmaz. Desteklenmeyen tablolar elle satır eklenerek tamamlanır. Her tedarikçi düzeni için hatasız okuma garantisi yoktur.
 - Testler paylaşılan ekran görüntülerinin metne geçirilmesi ve bunlardan oluşturulan yapay örnek PDF ile yapıldı. Orijinal kullanıcı PDF'sine erişilemedi. Dosya halka açık depoya eklenmedi.

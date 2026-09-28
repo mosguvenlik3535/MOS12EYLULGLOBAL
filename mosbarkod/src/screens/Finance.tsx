@@ -881,7 +881,7 @@ export function PurchaseScreen({
                 <input ref={imgRef} type="file" accept="application/pdf,image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) readImg(f); e.target.value = ''; }} />
                 {img?.startsWith('data:application/pdf') && <Btn disabled={documentBusy||savingInvoice} onClick={readPdf}>{documentBusy?'PDF okunuyor…':'Fatura Kalemlerini Oku'}</Btn>}
                 {img && <Btn onClick={()=>setViewImg(img)}>Belgeyi Aç / İndir</Btn>}
-                <p className="mt-2 text-xs text-mut2">En fazla 10 MB. Metin PDF: kalem okuma. Taranmış PDF/fotoğraf: yalnızca ek, OCR yok. Belgeler bu cihazda saklanır; mevcut JSON yedeğine dahil değildir, ayrıca indirin.</p>
+                <p className="mt-2 text-xs text-mut2">En fazla 10 MB. Metin PDF: kalem okuma. Taranmış PDF/fotoğraf: yalnızca ek, OCR yok. Belgeler bu cihazda saklanır; tam/veri ZIP yedeğine ve otomatik yedeğe dahildir.</p>
               </div>
 
               <div className="border-t border-line pt-3">

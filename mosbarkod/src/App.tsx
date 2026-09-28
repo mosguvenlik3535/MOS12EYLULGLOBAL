@@ -549,16 +549,19 @@ export default function App() {
   useEffect(() => {
     const { enabled, interval, keepDays } = state.settings.autobackup;
     if (!enabled) return;
-    const t = setInterval(() => {
+    let running=false;
+    const t = setInterval(async () => {
+      if(running)return;running=true;
       const nowIso = new Date().toISOString();
       try {
-        createSnapshot(stateRef.current, 'auto', keepDays);
+        const result=await createSnapshot(stateRef.current, 'auto', keepDays);
+        if(!result){toast('Otomatik yedek oluşturulamadı — belgeler ve depolama alanını kontrol edin','err');running=false;return;}
       } catch {
-        /* depolama dolu */
+        toast('Otomatik yedek başarısız', 'err');running=false;return;
       }
       const cloud = stateRef.current.settings.cloud;
       if (cloud && cloud.provider !== 'none' && cloud.enabled) {
-        cloudUpload(cloud, stateRef.current)
+        await cloudUpload(cloud, stateRef.current)
           .then((r) => {
             setState((s) => ({
               ...s,
@@ -580,6 +583,7 @@ export default function App() {
         ...s,
         settings: { ...s.settings, autobackup: { ...s.settings.autobackup, lastRun: nowIso } },
       }));
+      running=false;
     }, Math.max(1, interval) * 60000);
     return () => clearInterval(t);
   }, [state.settings.autobackup.enabled, state.settings.autobackup.interval, state.settings.autobackup.keepDays]);
