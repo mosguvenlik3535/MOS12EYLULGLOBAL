@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 import shutil
 import subprocess
+import time
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -41,8 +42,17 @@ for name in ['index.html', 'ozellikler.html']:
     path.write_text(text)
 
 # Download the exact public release artifacts and check against GitHub metadata.
-release = json.loads(subprocess.check_output(['gh','api',f'repos/{REPO}/releases/tags/v{VERSION}']))
-assets = {a['name']:a for a in release['assets']}
+# A version commit can start this workflow before parallel installer builds finish.
+# Wait for all required assets instead of publishing incomplete links or an empty ZIP.
+for attempt in range(80):
+    response = subprocess.run(['gh','api',f'repos/{REPO}/releases/tags/v{VERSION}'],capture_output=True)
+    release = json.loads(response.stdout) if response.returncode == 0 else {}
+    assets = {a['name']:a for a in release.get('assets',[])}
+    if all(name in assets for name in FILES): break
+    print(f'Waiting for v{VERSION} demo installers ({attempt+1}/80)',flush=True)
+    time.sleep(15)
+else:
+    raise RuntimeError('Demo installers are not ready; existing hosted package left unchanged.')
 dest = STAGE / 'indir' / f'v{VERSION}'
 dest.mkdir(parents=True,exist_ok=True)
 checksums=[]
