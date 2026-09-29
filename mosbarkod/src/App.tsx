@@ -29,7 +29,7 @@ import {
   type SyncStatus,
 } from './lib/sync';
 import LicenseGate, { getStoredLicense, getStoredLicenseAsync } from './components/LicenseGate';
-import { IS_DEMO, IS_PLAY, DEMO_MAX_SALES, FREE_MAX_PRODUCTS } from './lib/buildMode';
+import { IS_DEMO, IS_PLAY, demoSalesRemaining, FREE_MAX_PRODUCTS } from './lib/buildMode';
 import { initPlayBilling, isPlayBillingAvailable, isProActive } from './lib/playBilling';
 import ProUpsellModal from './components/ProUpsellModal';
 import LoginGate from './components/LoginGate';
@@ -298,7 +298,7 @@ export default function App() {
       }
     }
     setDemoBaseline(baseline);
-    if (state.sales.length - baseline >= DEMO_MAX_SALES) {
+    if (demoSalesRemaining(state.sales.length, baseline) === 0) {
       setDemoExpired(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1582,7 +1582,7 @@ export default function App() {
 
       {demo && !demoExpired && (
         <div className="pointer-events-none fixed left-1/2 top-[70px] z-[80] -translate-x-1/2 rounded-full border border-amber/50 bg-amber/90 px-3 py-1 font-mono text-[10px] font-black tracking-[0.2em] text-black shadow-lg">
-          DEMO SÜRÜM · {Math.max(0, DEMO_MAX_SALES - Math.max(0, state.sales.length - demoBaseline))} SATIŞ KALDI
+          DEMO SÜRÜM · {demoSalesRemaining(state.sales.length, demoBaseline)} SATIŞ KALDI
         </div>
       )}
       {IS_PLAY && !licensed && !pro && !proBannerOff && (

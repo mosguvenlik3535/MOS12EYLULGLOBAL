@@ -16,7 +16,7 @@ export const IS_DEMO = (import.meta.env.VITE_DEMO ?? '') === '1';
 export const IS_PLAY = (import.meta.env.VITE_PLAY ?? '') === '1';
 
 /** Demo sürümde izin verilen azami tamamlanmış satış sayısı. */
-export const DEMO_MAX_SALES = 25;
+export const DEMO_MAX_SALES = 1000;
 
 export const DEMO_LABEL = 'DEMO SÜRÜM';
 
@@ -39,3 +39,6 @@ export function appVersionLabel(demo = false): string {
   const suffix = IS_PLAY ? '-PLAY' : demo || IS_DEMO ? '-DEMO' : '-PRO';
   return `v${APP_VERSION}${suffix}`;
 }
+
+/** Remaining completed sales in the direct-download demo (not Play freemium). */
+export const demoSalesRemaining = (sales:number, baseline:number) => Math.max(0,DEMO_MAX_SALES-Math.max(0,sales-baseline));
