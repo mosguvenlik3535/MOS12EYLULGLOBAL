@@ -1,0 +1,32 @@
+name: Package public_html website
+on:
+  push:
+    branches:
+      - 'arena/01a0bfd3-mos12eylulglobal'
+      - main
+    paths:
+      - 'web/**'
+      - '.github/workflows/package-hosting.yml'
+permissions:
+  contents: write
+concurrency:
+  group: package-public-html
+  cancel-in-progress: false
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Assemble website and verify demo installers
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 web/scripts/package-hosting.py
+      - name: Publish ready-to-upload hosting ZIP
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=$(python3 -c "import json; print(json.load(open('mosbarkod/package.json'))['version'])")
+          gh release upload "v${VERSION}" "$HOME/.cache/mospos-hosting/MOSBARKOD-public_html.zip" --clobber

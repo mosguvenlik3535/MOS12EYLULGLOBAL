@@ -28,3 +28,10 @@ Platform logoları: Android/Apple/Linux SVG dosyaları Simple Icons paketinden (
 `ozellikler.html` programın sol menüsündeki 11 ekranı açıklar. Bölüm içerikleri programdaki mevcut davranış ve kurulum sınırlarını belirtir. İndirme kartlarında ilk kurulum Admin PIN'i 0000 gösterilir; değiştirilen kullanıcı PIN'ini etkilemez.
 
 GitHub dışı dağıtım önerisi ve yayın sırası `INDIRME_YAYINI.md` içindedir. Dosyalar yeni sunucuya yüklenip doğrulanana kadar çalışan GitHub bağlantıları korunur.
+
+## public_html için tek ZIP
+`python3 web/scripts/package-hosting.py` komutu kaynak siteyi değiştirmeden dağıtım paketi hazırlar. Çıktı: `~/.cache/mospos-hosting/MOSBARKOD-public_html.zip` (yaklaşık 205 MiB).
+
+Paketin kökünde index.html, ozellikler.html, gizlilik-politikasi.html, assets/ ve indir/ bulunur. Üç v1.15.19 demo dosyası resmi sürümden alınır; dosya boyutu ve varsa sağlayıcının SHA-256 özeti doğrulanır. Web sayfasındaki demo URL'leri aynı hostingdeki indir/ klasörüne çevrilir. Mac/Linux için iletişim bağlantısı; iPhone için mevcut harici PWA adresi korunur. Gizlilik metni yerel dosyadır. Hosting/DNS veya ödeme ayarları değiştirilmez.
+
+ZIP'i yalnızca MOSBARKOD.COM.TR için ayrılan public_html içine çıkarın; index.html doğrudan bu dizinde kalmalı. Mevcut dosyalar varsa önce yedekleyin. Çıkardıktan sonra sunucudaki ZIP'i silin. Paket, siteyle birlikte demo EXE/APK'leri de içerdiğinden yeniden yüklemeniz gerekmez.
