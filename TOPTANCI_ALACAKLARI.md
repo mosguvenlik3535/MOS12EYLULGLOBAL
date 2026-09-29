@@ -1,4 +1,4 @@
-# Toptancı alacakları — v1.15.16
+# Toptancı alacakları — v1.15.17
 
 **Veresiye Takip → Toptancı Alacakları**
 
@@ -7,8 +7,8 @@ Hesap: müşterilerinizin toptancıya doğrudan yaptığı ödemeler − KDV dah
 Örnek: 10.000 TL kart ödemesi − 7.500 TL ürün faturası = 2.500 TL toptancıdan alacağınız. Fatura tutarı daha yüksekse aradaki fark borcunuz olarak gösterilir. Toptancılar arası borç/alacak mahsuplaştırılmaz; genel özet bunları ayrı toplar.
 
 1. Toptancı adını yazın veya hesabını seçin. Aynı firma için aynı unvanı kullanın.
-2. **Müşteriden doğrudan ödeme:** tarih, TL tutarı, ödeme yapan müşteri, isteğe bağlı slip referansı ve açıklamayı girin. Kart numarası/CVV kaydetmeyin.
-3. **Ürün faturası:** mevcut alış faturasını seçin ya da fatura numarası, tarihi ve KDV dahil TL tutarını elle girin. Dövizli faturada TL karşılığını kullanın. Aynı toptancı ve fatura numarası veya aynı bağlı fatura ikinci kez eklenemez.
+2. **Müşteriden doğrudan ödeme:** tarih, seçilen hesap para birimindeki tutar, ödeme yapan müşteri, isteğe bağlı slip referansı ve açıklamayı girin. Kart numarası/CVV kaydetmeyin.
+3. **Ürün faturası:** mevcut alış faturasını seçin ya da fatura numarası, tarihi ve KDV dahil hesap para birimindeki tutarı elle girin. TL hesabında TL karşılığını; USD hesabında USD tutarını kullanın. Aynı toptancı ve fatura numarası veya aynı bağlı fatura ikinci kez eklenemez.
 4. Toptancı alacağınızı geri ödediğinde **Toptancıdan iade / alacağı kapatma** hareketi girin.
 5. Yanlış kayıtta **İptal** ile onay verin; kayıt silinmez, bakiye hesabından çıkarılır. İptal edilmiş hareketleri göstererek geçmişi inceleyebilirsiniz. Düzeltme için doğru hareketi yeniden girin.
 
@@ -23,8 +23,20 @@ Hesap: müşterilerinizin toptancıya doğrudan yaptığı ödemeler − KDV dah
 Doğrulama: bakiye, borç, iade, iptal, mükerrer fatura, eski yedek, ZIP ve ayar yedeği senaryoları; Chromium'da ödeme, fatura seçimi, yeniden açınca kalıcılık, iade/iptal ve diğer hesapların değişmemesi kontrol edildi.
 
 ## Alacağa karşı sonradan mal çekişi
-Toptancıyı seçip **Alacağımdan Ürün / Mal Çek** düğmesine basın. Tarih, fatura/irsaliye numarası ve KDV dahil TL tutarını girin veya kayıtlı alış faturasını seçin. **Mal Çekişini Kaydet ve Bakiyeden Düş** ile onaylayın.
+Toptancıyı seçip **Alacağımdan Ürün / Mal Çek** düğmesine basın. Tarih, fatura/irsaliye numarası ve KDV dahil hesap para birimindeki tutarı girin veya kayıtlı alış faturasını seçin. **Mal Çekişini Kaydet ve Bakiyeden Düş** ile onaylayın.
 
 Örnek: 10.000 TL ödeme − 7.500 TL ilk fatura = 2.500 TL alacak. Sonradan 1.000 TL mal çekişi kaydedilince kalan alacak 1.500 TL olur. Bir sonraki 500 TL çekişle 1.000 TL kalır. Alacağı aşan çekiş borç olarak gösterilir; kaydetmeden önce ön izlemede uyarılır.
 
 Mal çekişi, mevcut ürün faturası hareketinin açık isimli kullanım şeklidir; ayrı bir ikinci kesinti yapılmaz. Önceden kaydettiğiniz faturayı tekrar eklemeyin. İptal edilen çekişin tutarı bakiyeye geri gelir. Mevcut kayıtlar ve yedekler aynı hesapla çalışmayı sürdürür. Stok veya alış faturası ödeme durumu otomatik değiştirilmez.
+
+## TL, USD ve diğer para birimleri
+**Hesap para birimi** alanından TRY (TL), USD, EUR, GBP, BRL, SAR, RUB, CNY, PLN, RON, CHF, CAD, AUD veya AED seçin. Aynı toptancının TL ve USD hesapları ayrı kartlarda görünür. Genel özet de para birimlerine göre ayrıdır; örneğin 2.500 TL ile 380 USD toplanıp tek bir rakam yapılmaz.
+
+- Ödeme, mal çekişi, iade ve iptal yalnızca kaydın kendi para birimindeki bakiyeyi etkiler. 500 USD ödeme − 120 USD mal çekişi = 380 USD alacak.
+- Tüm tutarlar KDV dahil, doğrudan seçilen para biriminde ve iki ondalık hassasiyetle saklanır. Kurla TL'ye çevrilmez; genel uygulama para birimi veya kur değişince bu tutarlar değişmez.
+- Ödeme başka para birimindeyse (ör. TL kart ödemesi, USD toptancı hesabı) toptancıyla mutabık kaldığınız USD karşılığını girin. Asıl ödeme tutarı ve kullanılan kuru açıklamaya yazın. Otomatik kur dönüşümü veya para birimleri arası bakiye transferi yapılmaz.
+- Para birimi değiştirildiğinde form tutarı ve fatura seçimi temizlenir; eski rakam başka para birimiymiş gibi kaydedilmez.
+- Kayıtlı fatura seçerken TL hesap için TL genel toplam, USD/EUR vb. hesap için PDF'den aktarılmış aynı para birimindeki orijinal genel toplam kullanılır. Para birimine uygun tutarı olmayan fatura listelenmez; mutabık kaldığınız tutarı belge numarasıyla elle girebilirsiniz. Güncel kurdan tutar tahmin edilmez.
+- Aynı fatura TL ve USD hesaplarına ayrı ayrı düşülemez; mükerrer kontrolü para birimleri arasında da geçerlidir.
+- Eski, para birimi alanı olmayan kayıtlar TL sayılır; tutarları değiştirilmez. Eski bir kaydı döviz hesabına taşımak için yanlış kaydı iptal edip doğru para birimi ve mutabık tutarla yeniden girin; otomatik geçmiş kur dönüşümü yoktur.
+- Tam/veri ZIP ve bulut yedekleri kayıtların para birimini de korur.

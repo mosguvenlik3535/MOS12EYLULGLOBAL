@@ -1,6 +1,6 @@
 import { describe,it,expect } from 'vitest';
-import { supplierTotals,supplierEntryError,supplierKey,type SupplierCreditEntry } from './supplierCredit';
-import { defaultState } from '../data';
+import { SUPPLIER_CURRENCIES,supplierCurrency,supplierMoney,supplierInvoiceAmount,supplierTotals,supplierEntryError,supplierKey,type SupplierCreditEntry } from './supplierCredit';
+import { defaultState, setActiveCurrencyCode, type Invoice } from '../data';
 import { serializeBackup,parseBackupFile,dataOnlyBackup,settingsOnlyBackup } from './backup';
 const row=(patch:Partial<SupplierCreditEntry>={}):SupplierCreditEntry=>({id:'1',supplier:'Test Toptancı',date:'2026-09-29',type:'payment',amount:10000,customer:'Test müşteri',reference:'',note:'',...patch});
 describe('supplier credit ledger',()=>{
@@ -23,4 +23,15 @@ describe('subsequent goods withdrawals against receivables',()=>{
  it('shows debt when goods withdrawal exceeds available credit',()=>{expect(supplierTotals([...opening,row({type:'invoice',amount:3000,reference:'NEXT'})]).balance).toBe(-500);});
  it('restores credit on withdrawal cancellation',()=>{expect(supplierTotals([...opening,row({type:'invoice',amount:1000,reference:'NEXT',voided:true})]).balance).toBe(2500);});
  it('does not allow an existing purchase to be deducted again as a withdrawal',()=>{expect(supplierEntryError(row({type:'invoice',amount:7500,reference:'FIRST'}),opening)).not.toBe('');});
+});
+
+describe('native-currency supplier accounts',()=>{
+ it('keeps old TL entries separate from USD and EUR for the same supplier',()=>{const rows=[row({amount:2500}),row({currency:'USD',amount:500}),row({currency:'USD',type:'invoice',amount:120,reference:'US-1'}),row({currency:'EUR',amount:75})];expect(supplierTotals(rows).balance).toBe(2500);expect(supplierTotals(rows,'USD').balance).toBe(380);expect(supplierTotals(rows,'EUR').balance).toBe(75);expect(supplierCurrency(rows[0])).toBe('TRY');});
+ it('subtracts USD refund only from USD and ignores cancelled withdrawals',()=>{const rows=[row({amount:2500}),row({currency:'USD',amount:500}),row({currency:'USD',type:'refund',amount:50}),row({currency:'USD',type:'invoice',amount:120,voided:true})];expect(supplierTotals(rows,'USD').balance).toBe(450);expect(supplierTotals(rows,'TRY').balance).toBe(2500);});
+ it('does not net debt in one currency against credit in another',()=>{const rows=[row({currency:'USD',amount:500}),row({currency:'EUR',type:'invoice',amount:100})];expect(supplierTotals(rows,'USD').balance).toBe(500);expect(supplierTotals(rows,'EUR').balance).toBe(-100);});
+ it('accepts every listed currency and rejects unknown codes',()=>{for(const c of SUPPLIER_CURRENCIES)expect(supplierEntryError(row({currency:c.code}),[])).toBe('');expect(supplierEntryError(row({currency:'BAD'}),[])).not.toBe('');});
+ it('formats native amounts without app exchange-rate conversion',()=>{try{setActiveCurrencyCode('EUR');expect(supplierMoney(500,'USD')).toBe('500,00 USD');expect(supplierMoney(2500,'TRY')).toBe('2.500,00 TL');}finally{setActiveCurrencyCode('TRY');}});
+ it('uses only the recorded native foreign total when linking an imported invoice',()=>{const inv={total:5673.51,importSource:{currency:'USD',total:115.8,totalTRY:5673.51,exchangeRate:5673.51/115.8}} as Invoice;expect(supplierInvoiceAmount(inv,'USD')).toBe(115.8);expect(supplierInvoiceAmount(inv,'TRY')).toBe(5673.51);expect(supplierInvoiceAmount(inv,'EUR')).toBeNull();expect(supplierInvoiceAmount({total:1000} as Invoice,'USD')).toBeNull();expect(supplierInvoiceAmount({...inv,importSource:{...inv.importSource!,total:NaN}},'USD')).toBeNull();});
+ it('blocks deducting the same invoice again under a different currency',()=>{const e=row({currency:'USD',type:'invoice',reference:'A1',invoiceId:'bill1'});expect(supplierEntryError({...e,currency:'TRY',amount:5000},[e])).not.toBe('');expect(supplierEntryError({...e,currency:'TRY',amount:5000},[{...e,voided:true}])).toBe('');});
+ it('preserves multiple currencies and legacy entries in full and data backups',()=>{const s=defaultState();s.supplierCredits=[row(),row({currency:'USD',amount:500}),row({currency:'EUR',type:'invoice',amount:100})];for(const scope of ['full','data'] as const){const p=parseBackupFile(serializeBackup(scope==='full'?s:dataOnlyBackup(s),scope),s);expect(p.ok).toBe(true);if(p.ok){expect(p.data.supplierCredits).toEqual(s.supplierCredits);expect(supplierTotals(p.data.supplierCredits!,'USD').balance).toBe(500);expect(supplierTotals(p.data.supplierCredits!,'TRY').balance).toBe(10000);}}});
 });
