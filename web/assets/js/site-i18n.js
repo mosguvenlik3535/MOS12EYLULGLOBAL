@@ -17,7 +17,7 @@ function decorateLinks(){document.querySelectorAll('a[href]').forEach(a=>{const 
 async function useLanguage(lang,remember=true){
  if(!supported.includes(lang))lang='tr';const ticket=++serial;picker.disabled=true;
  try{
-  let data={};if(lang!=='tr'){const res=await fetch('assets/locales/'+lang+'.json');if(!res.ok)throw Error('language unavailable');const pack=await res.json();if(pack.locale!==lang||!pack.texts)throw Error('invalid language pack');data=pack.texts;}
+  let data={};if(lang!=='tr'){const res=await fetch('assets/locales/'+lang+'.json?v=7cfd8839eb5b');if(!res.ok)throw Error('language unavailable');const pack=await res.json();if(pack.locale!==lang||!pack.texts)throw Error('invalid language pack');data=pack.texts;}
   if(ticket!==serial)return;dictionary=data;current=lang;
   for(const [node,original] of texts){const trimmed=original.trim();node.data=original.replace(trimmed,()=>lookup(original));}
   for(const [el,attr,original] of attributes)el.setAttribute(attr,lookup(original));
