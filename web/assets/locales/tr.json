@@ -1,6 +1,6 @@
 {
   "locale": "tr",
-  "sourceHash": "e8bcce10f5ba7a92ac3add17407317525303c0a75baf3abf60b4edb08604f247",
+  "sourceHash": "4feaee1ccacbcdb984eb6dd1a5d3e3b7e74373876a3994943ce27da202d3a5af",
   "translation": "Original",
   "texts": {
     "$ USD": "$ USD",
@@ -180,6 +180,7 @@
     "Menüyü aç": "Menüyü aç",
     "Menüyü kapat": "Menüyü kapat",
     "Merak edilenler": "Merak edilenler",
+    "Mint ışıklı barkod okuyucu ve termal fiş yazıcı": "Mint ışıklı barkod okuyucu ve termal fiş yazıcı",
     "Mobil bağlantı ve rapor gönderimi": "Mobil bağlantı ve rapor gönderimi",
     "Mobil hızlı satış ekranı": "Mobil hızlı satış ekranı",
     "Mobil lisanslar bu fiyata dahil değildir. KDV tutarı ve ödenecek toplam satın alma öncesinde bildirilir.": "Mobil lisanslar bu fiyata dahil değildir. KDV tutarı ve ödenecek toplam satın alma öncesinde bildirilir.",
@@ -253,6 +254,7 @@
     "Telefon veya WhatsApp üzerinden aldığınız siparişi müşteri adı, telefon, adres ve notuyla kaydedin. Ürünleri sipariş sepetine ekleyin.": "Telefon veya WhatsApp üzerinden aldığınız siparişi müşteri adı, telefon, adres ve notuyla kaydedin. Ürünleri sipariş sepetine ekleyin.",
     "Telefonumdaki ve bilgisayarımdaki veriler aynı mı?": "Telefonumdaki ve bilgisayarımdaki veriler aynı mı?",
     "Temel satış ve stok işlemleri cihazda çalışır. İndirme, çevrimiçi hizmetler, güncel kur alma ve bulut yedekleme için internet gerekir. Cihaz arızasına karşı yedeklerinizi düzenli olarak dışarı aktarın.": "Temel satış ve stok işlemleri cihazda çalışır. İndirme, çevrimiçi hizmetler, güncel kur alma ve bulut yedekleme için internet gerekir. Cihaz arızasına karşı yedeklerinizi düzenli olarak dışarı aktarın.",
+    "Temsili donanım görselidir; cihazlar yazılım lisansına dahil değildir.": "Temsili donanım görselidir; cihazlar yazılım lisansına dahil değildir.",
     "Temsili haftalık satış grafiği": "Temsili haftalık satış grafiği",
     "Teslimatta ödeme": "Teslimatta ödeme",
     "Tezgâhın arkasındaki en güçlü yardımcınız.": "Tezgâhın arkasındaki en güçlü yardımcınız.",

@@ -44,3 +44,6 @@ Ana sayfa ve ayrıntılı özellikler sayfası Türkçe, İngilizce, Almanca, Fr
 `python web/scripts/check-locales.py` 14 dilin tüm anahtarlarını kontrol eder. Kaynak değişirse `translate-site.py --catalog` (beautifulsoup4 gerekir) kataloğu yeniler; `translate-site.py` eksik çevirileri üretir. Eksik dil dosyaları yayın ve hosting paketini durdurur.
 
 Uygulamanın görünen marka adı MOS BARCODE'dur. Veri anahtarları, Android paket kimliği ve eski teknik kurulum dosyası adları mevcut kayıt/lisans uyumluluğu için korunur. Uygulama gizlilik belgesi mevcut TR/EN metnini kullanır.
+
+## Özellikler sayfasındaki donanım sunumu
+`assets/img/hardware-mint.webp`: marka/model iddiası olmayan, üretilmiş temsili barkod okuyucu ve termal fiş yazıcı görseli. Hero alanında masaüstünde metnin yanında; telefonda altında görünür. Mint aydınlatma mevcut koyu yeşil zemine karışır. Cihazların yazılım lisansına dahil olmadığı notu ve görsel açıklaması 14 dilde bulunur. WebP 1024×1024, yaklaşık 45 KB; orijinal büyük PNG dağıtıma dahil değildir.

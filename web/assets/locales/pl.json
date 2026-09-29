@@ -1,6 +1,6 @@
 {
   "locale": "pl",
-  "sourceHash": "e8bcce10f5ba7a92ac3add17407317525303c0a75baf3abf60b4edb08604f247",
+  "sourceHash": "4feaee1ccacbcdb984eb6dd1a5d3e3b7e74373876a3994943ce27da202d3a5af",
   "translation": "Build-time automatic translation",
   "texts": {
     "$ USD": "$ USD",
@@ -180,6 +180,7 @@
     "Menüyü aç": "otwórz menu",
     "Menüyü kapat": "zamknij menu",
     "Merak edilenler": "Ciekawostki",
+    "Mint ışıklı barkod okuyucu ve termal fiş yazıcı": "Skaner kodów kreskowych i termiczna drukarka paragonów z miętowym oświetleniem",
     "Mobil bağlantı ve rapor gönderimi": "Połączenie mobilne i wysyłanie raportów",
     "Mobil hızlı satış ekranı": "Mobilny ekran szybkiej sprzedaży",
     "Mobil lisanslar bu fiyata dahil değildir. KDV tutarı ve ödenecek toplam satın alma öncesinde bildirilir.": "Licencje mobilne nie są wliczone w cenę. Kwota podatku VAT i całkowita kwota do zapłaty zostaną podane przed zakupem.",
@@ -253,6 +254,7 @@
     "Telefon veya WhatsApp üzerinden aldığınız siparişi müşteri adı, telefon, adres ve notuyla kaydedin. Ürünleri sipariş sepetine ekleyin.": "Zapisz zamówienie otrzymane przez telefon lub WhatsApp z nazwą klienta, numerem telefonu, adresem i notatką. Dodaj produkty do koszyka zamówień.",
     "Telefonumdaki ve bilgisayarımdaki veriler aynı mı?": "Czy dane na moim telefonie i komputerze są takie same?",
     "Temel satış ve stok işlemleri cihazda çalışır. İndirme, çevrimiçi hizmetler, güncel kur alma ve bulut yedekleme için internet gerekir. Cihaz arızasına karşı yedeklerinizi düzenli olarak dışarı aktarın.": "Podstawowe operacje sprzedażowe i magazynowe uruchamiane są na urządzeniu. Internet wymagany do pobierania plików, usług online, aktualnego kursu wymiany i tworzenia kopii zapasowych w chmurze. Eksportuj regularnie swoje kopie zapasowe na wypadek awarii urządzenia.",
+    "Temsili donanım görselidir; cihazlar yazılım lisansına dahil değildir.": "Poglądowa ilustracja sprzętu; urządzenia nie są objęte licencją oprogramowania.",
     "Temsili haftalık satış grafiği": "Reprezentatywny tygodniowy wykres sprzedaży",
     "Teslimatta ödeme": "Płatność przy odbiorze",
     "Tezgâhın arkasındaki en güçlü yardımcınız.": "Twój najpotężniejszy asystent za ladą.",

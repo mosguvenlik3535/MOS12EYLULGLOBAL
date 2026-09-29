@@ -1,6 +1,6 @@
 {
   "locale": "el",
-  "sourceHash": "e8bcce10f5ba7a92ac3add17407317525303c0a75baf3abf60b4edb08604f247",
+  "sourceHash": "4feaee1ccacbcdb984eb6dd1a5d3e3b7e74373876a3994943ce27da202d3a5af",
   "translation": "Build-time automatic translation",
   "texts": {
     "$ USD": "$ USD",
@@ -180,6 +180,7 @@
     "Menüyü aç": "ανοιχτό μενού",
     "Menüyü kapat": "κλείσιμο μενού",
     "Merak edilenler": "Περιέργειες",
+    "Mint ışıklı barkod okuyucu ve termal fiş yazıcı": "Σαρωτής γραμμωτού κώδικα και θερμικός εκτυπωτής αποδείξεων με φωτισμό μέντας",
     "Mobil bağlantı ve rapor gönderimi": "Σύνδεση με κινητό και αποστολή αναφορών",
     "Mobil hızlı satış ekranı": "Οθόνη γρήγορης πώλησης για κινητά",
     "Mobil lisanslar bu fiyata dahil değildir. KDV tutarı ve ödenecek toplam satın alma öncesinde bildirilir.": "Οι άδειες κινητής τηλεφωνίας δεν περιλαμβάνονται σε αυτήν την τιμή. Το ποσό του ΦΠΑ και το συνολικό πληρωτέο ποσό θα γνωστοποιηθούν πριν από την αγορά.",
@@ -253,6 +254,7 @@
     "Telefon veya WhatsApp üzerinden aldığınız siparişi müşteri adı, telefon, adres ve notuyla kaydedin. Ürünleri sipariş sepetine ekleyin.": "Αποθηκεύστε την παραγγελία που λάβατε μέσω τηλεφώνου ή WhatsApp με όνομα πελάτη, αριθμό τηλεφώνου, διεύθυνση και σημείωση. Προσθέστε τα προϊόντα στο καλάθι παραγγελιών.",
     "Telefonumdaki ve bilgisayarımdaki veriler aynı mı?": "Τα δεδομένα του τηλεφώνου και του υπολογιστή μου είναι τα ίδια;",
     "Temel satış ve stok işlemleri cihazda çalışır. İndirme, çevrimiçi hizmetler, güncel kur alma ve bulut yedekleme için internet gerekir. Cihaz arızasına karşı yedeklerinizi düzenli olarak dışarı aktarın.": "Οι βασικές λειτουργίες πωλήσεων και αποθεμάτων εκτελούνται στη συσκευή. Απαιτείται Διαδίκτυο για λήψεις, διαδικτυακές υπηρεσίες, ενημερωμένη συναλλαγματική ισοτιμία και δημιουργία αντιγράφων ασφαλείας cloud. Εξάγετε τακτικά τα αντίγραφα ασφαλείας σας σε περίπτωση βλάβης της συσκευής.",
+    "Temsili donanım görselidir; cihazlar yazılım lisansına dahil değildir.": "Ενδεικτική απεικόνιση εξοπλισμού· οι συσκευές δεν περιλαμβάνονται στην άδεια λογισμικού.",
     "Temsili haftalık satış grafiği": "Αντιπροσωπευτικό εβδομαδιαίο διάγραμμα πωλήσεων",
     "Teslimatta ödeme": "Πληρωμή κατά την παράδοση",
     "Tezgâhın arkasındaki en güçlü yardımcınız.": "Ο πιο ισχυρός βοηθός σας πίσω από τον πάγκο.",

@@ -1,6 +1,6 @@
 {
   "locale": "pt",
-  "sourceHash": "e8bcce10f5ba7a92ac3add17407317525303c0a75baf3abf60b4edb08604f247",
+  "sourceHash": "4feaee1ccacbcdb984eb6dd1a5d3e3b7e74373876a3994943ce27da202d3a5af",
   "translation": "Build-time automatic translation",
   "texts": {
     "$ USD": "$USD",
@@ -180,6 +180,7 @@
     "Menüyü aç": "abrir menu",
     "Menüyü kapat": "fechar menu",
     "Merak edilenler": "Curiosidades",
+    "Mint ışıklı barkod okuyucu ve termal fiş yazıcı": "Leitor de código de barras e impressora térmica de recibos com iluminação verde-menta",
     "Mobil bağlantı ve rapor gönderimi": "Conexão móvel e envio de relatórios",
     "Mobil hızlı satış ekranı": "Tela de vendas rápidas para celular",
     "Mobil lisanslar bu fiyata dahil değildir. KDV tutarı ve ödenecek toplam satın alma öncesinde bildirilir.": "Licenças móveis não estão incluídas neste preço. O valor do IVA e o total a pagar serão informados antes da compra.",
@@ -253,6 +254,7 @@
     "Telefon veya WhatsApp üzerinden aldığınız siparişi müşteri adı, telefon, adres ve notuyla kaydedin. Ürünleri sipariş sepetine ekleyin.": "Salve o pedido que você recebeu por telefone ou WhatsApp com nome do cliente, telefone, endereço e nota. Adicione os produtos ao carrinho de pedidos.",
     "Telefonumdaki ve bilgisayarımdaki veriler aynı mı?": "Os dados do meu telefone e do meu computador são iguais?",
     "Temel satış ve stok işlemleri cihazda çalışır. İndirme, çevrimiçi hizmetler, güncel kur alma ve bulut yedekleme için internet gerekir. Cihaz arızasına karşı yedeklerinizi düzenli olarak dışarı aktarın.": "As operações básicas de vendas e estoque são executadas no dispositivo. Internet necessária para downloads, serviços online, taxa de câmbio atualizada e backup na nuvem. Exporte seus backups regularmente em caso de falha do dispositivo.",
+    "Temsili donanım görselidir; cihazlar yazılım lisansına dahil değildir.": "Imagem ilustrativa do hardware; os dispositivos não estão incluídos na licença do software.",
     "Temsili haftalık satış grafiği": "Gráfico representativo de vendas semanais",
     "Teslimatta ödeme": "Pagamento na entrega",
     "Tezgâhın arkasındaki en güçlü yardımcınız.": "Seu assistente mais poderoso atrás do balcão.",

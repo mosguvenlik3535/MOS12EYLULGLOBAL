@@ -1,6 +1,6 @@
 {
   "locale": "en",
-  "sourceHash": "e8bcce10f5ba7a92ac3add17407317525303c0a75baf3abf60b4edb08604f247",
+  "sourceHash": "4feaee1ccacbcdb984eb6dd1a5d3e3b7e74373876a3994943ce27da202d3a5af",
   "translation": "Build-time automatic translation",
   "texts": {
     "$ USD": "$ USD",
@@ -180,6 +180,7 @@
     "Menüyü aç": "open menu",
     "Menüyü kapat": "close menu",
     "Merak edilenler": "Curiosities",
+    "Mint ışıklı barkod okuyucu ve termal fiş yazıcı": "Barcode scanner and thermal receipt printer with mint lighting",
     "Mobil bağlantı ve rapor gönderimi": "Mobile connection and report sending",
     "Mobil hızlı satış ekranı": "Mobile fast sales screen",
     "Mobil lisanslar bu fiyata dahil değildir. KDV tutarı ve ödenecek toplam satın alma öncesinde bildirilir.": "Mobile licenses are not included in this price. The VAT amount and the total payable will be notified prior to purchase.",
@@ -253,6 +254,7 @@
     "Telefon veya WhatsApp üzerinden aldığınız siparişi müşteri adı, telefon, adres ve notuyla kaydedin. Ürünleri sipariş sepetine ekleyin.": "Save the order you received via phone or WhatsApp with customer name, phone number, address and note. Add the products to the order cart.",
     "Telefonumdaki ve bilgisayarımdaki veriler aynı mı?": "Is the data on my phone and computer the same?",
     "Temel satış ve stok işlemleri cihazda çalışır. İndirme, çevrimiçi hizmetler, güncel kur alma ve bulut yedekleme için internet gerekir. Cihaz arızasına karşı yedeklerinizi düzenli olarak dışarı aktarın.": "Basic sales and inventory operations run on the device. Internet required for downloads, online services, up-to-date exchange rate and cloud backup. Export your backups regularly in case of device failure.",
+    "Temsili donanım görselidir; cihazlar yazılım lisansına dahil değildir.": "Illustrative hardware image; devices are not included in the software license.",
     "Temsili haftalık satış grafiği": "Representative weekly sales chart",
     "Teslimatta ödeme": "Payment on delivery",
     "Tezgâhın arkasındaki en güçlü yardımcınız.": "Your most powerful assistant behind the counter.",

@@ -1,6 +1,6 @@
 {
   "locale": "zh",
-  "sourceHash": "e8bcce10f5ba7a92ac3add17407317525303c0a75baf3abf60b4edb08604f247",
+  "sourceHash": "4feaee1ccacbcdb984eb6dd1a5d3e3b7e74373876a3994943ce27da202d3a5af",
   "translation": "Build-time automatic translation",
   "texts": {
     "$ USD": "$ 美元",
@@ -180,6 +180,7 @@
     "Menüyü aç": "打开菜单",
     "Menüyü kapat": "关闭菜单",
     "Merak edilenler": "好奇心",
+    "Mint ışıklı barkod okuyucu ve termal fiş yazıcı": "薄荷绿灯光下的条码扫描器和热敏小票打印机",
     "Mobil bağlantı ve rapor gönderimi": "移动连接和报告发送",
     "Mobil hızlı satış ekranı": "手机快销屏",
     "Mobil lisanslar bu fiyata dahil değildir. KDV tutarı ve ödenecek toplam satın alma öncesinde bildirilir.": "此价格不包含移动许可证。增值税金额和应付总额将在购买前告知。",
@@ -253,6 +254,7 @@
     "Telefon veya WhatsApp üzerinden aldığınız siparişi müşteri adı, telefon, adres ve notuyla kaydedin. Ürünleri sipariş sepetine ekleyin.": "保存您通过电话或 WhatsApp 收到的订单，其中包含客户姓名、电话号码、地址和备注。将产品添加到订单购物车。",
     "Telefonumdaki ve bilgisayarımdaki veriler aynı mı?": "手机和电脑上的数据一样吗？",
     "Temel satış ve stok işlemleri cihazda çalışır. İndirme, çevrimiçi hizmetler, güncel kur alma ve bulut yedekleme için internet gerekir. Cihaz arızasına karşı yedeklerinizi düzenli olarak dışarı aktarın.": "基本的销售和库存操作在设备上运行。下载、在线服务、最新汇率和云备份需要互联网。定期导出备份，以防设备出现故障。",
+    "Temsili donanım görselidir; cihazlar yazılım lisansına dahil değildir.": "硬件示意图；软件许可证不包含这些设备。",
     "Temsili haftalık satış grafiği": "代表性周销售图表",
     "Teslimatta ödeme": "货到付款",
     "Tezgâhın arkasındaki en güçlü yardımcınız.": "您柜台后最得力的助手。",

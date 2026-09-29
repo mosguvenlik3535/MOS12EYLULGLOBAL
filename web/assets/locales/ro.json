@@ -1,6 +1,6 @@
 {
   "locale": "ro",
-  "sourceHash": "e8bcce10f5ba7a92ac3add17407317525303c0a75baf3abf60b4edb08604f247",
+  "sourceHash": "4feaee1ccacbcdb984eb6dd1a5d3e3b7e74373876a3994943ce27da202d3a5af",
   "translation": "Build-time automatic translation",
   "texts": {
     "$ USD": "$ USD",
@@ -180,6 +180,7 @@
     "Menüyü aç": "meniu deschis",
     "Menüyü kapat": "închide meniul",
     "Merak edilenler": "Curiozități",
+    "Mint ışıklı barkod okuyucu ve termal fiş yazıcı": "Cititor de coduri de bare și imprimantă termică de bonuri cu iluminare verde-mentă",
     "Mobil bağlantı ve rapor gönderimi": "Conexiune mobilă și trimitere rapoarte",
     "Mobil hızlı satış ekranı": "Ecran mobil de vânzări rapide",
     "Mobil lisanslar bu fiyata dahil değildir. KDV tutarı ve ödenecek toplam satın alma öncesinde bildirilir.": "Licențele mobile nu sunt incluse în acest preț. Suma TVA și totalul de plătit vor fi notificate înainte de cumpărare.",
@@ -253,6 +254,7 @@
     "Telefon veya WhatsApp üzerinden aldığınız siparişi müşteri adı, telefon, adres ve notuyla kaydedin. Ürünleri sipariş sepetine ekleyin.": "Salvați comanda primită prin telefon sau WhatsApp cu numele clientului, numărul de telefon, adresa și notă. Adăugați produsele în coșul de comandă.",
     "Telefonumdaki ve bilgisayarımdaki veriler aynı mı?": "Datele de pe telefon și computer sunt aceleași?",
     "Temel satış ve stok işlemleri cihazda çalışır. İndirme, çevrimiçi hizmetler, güncel kur alma ve bulut yedekleme için internet gerekir. Cihaz arızasına karşı yedeklerinizi düzenli olarak dışarı aktarın.": "Operațiunile de bază de vânzări și stocuri rulează pe dispozitiv. Este necesar internetul pentru descărcări, servicii online, curs de schimb actualizat și backup în cloud. Exportați-vă copiile de siguranță în mod regulat în caz de defecțiune a dispozitivului.",
+    "Temsili donanım görselidir; cihazlar yazılım lisansına dahil değildir.": "Imagine ilustrativă a echipamentelor; dispozitivele nu sunt incluse în licența software.",
     "Temsili haftalık satış grafiği": "Graficul reprezentativ al vânzărilor săptămânale",
     "Teslimatta ödeme": "Plata la livrare",
     "Tezgâhın arkasındaki en güçlü yardımcınız.": "Cel mai puternic asistent din spatele tejghelei.",

@@ -1,6 +1,6 @@
 {
   "locale": "ar",
-  "sourceHash": "e8bcce10f5ba7a92ac3add17407317525303c0a75baf3abf60b4edb08604f247",
+  "sourceHash": "4feaee1ccacbcdb984eb6dd1a5d3e3b7e74373876a3994943ce27da202d3a5af",
   "translation": "Build-time automatic translation",
   "texts": {
     "$ USD": "دولار أمريكي",
@@ -180,6 +180,7 @@
     "Menüyü aç": "فتح القائمة",
     "Menüyü kapat": "إغلاق القائمة",
     "Merak edilenler": "الفضول",
+    "Mint ışıklı barkod okuyucu ve termal fiş yazıcı": "ماسح باركود وطابعة إيصالات حرارية بإضاءة خضراء نعناعية",
     "Mobil bağlantı ve rapor gönderimi": "الاتصال بالموبايل وإرسال التقارير",
     "Mobil hızlı satış ekranı": "شاشة مبيعات سريعة للجوال",
     "Mobil lisanslar bu fiyata dahil değildir. KDV tutarı ve ödenecek toplam satın alma öncesinde bildirilir.": "لا يتم تضمين تراخيص الهاتف المحمول في هذا السعر. سيتم إخطار مبلغ ضريبة القيمة المضافة وإجمالي المبلغ المستحق قبل الشراء.",
@@ -253,6 +254,7 @@
     "Telefon veya WhatsApp üzerinden aldığınız siparişi müşteri adı, telefon, adres ve notuyla kaydedin. Ürünleri sipariş sepetine ekleyin.": "احفظ الطلب الذي تلقيته عبر الهاتف أو الواتس اب باسم العميل ورقم الهاتف والعنوان والملاحظة. أضف المنتجات إلى عربة الطلب.",
     "Telefonumdaki ve bilgisayarımdaki veriler aynı mı?": "هل البيانات الموجودة على هاتفي وجهاز الكمبيوتر هي نفسها؟",
     "Temel satış ve stok işlemleri cihazda çalışır. İndirme, çevrimiçi hizmetler, güncel kur alma ve bulut yedekleme için internet gerekir. Cihaz arızasına karşı yedeklerinizi düzenli olarak dışarı aktarın.": "يتم تشغيل عمليات المبيعات والمخزون الأساسية على الجهاز. مطلوب الإنترنت للتنزيلات والخدمات عبر الإنترنت وسعر الصرف المحدث والنسخ الاحتياطي السحابي. تصدير النسخ الاحتياطية الخاصة بك بانتظام في حالة فشل الجهاز.",
+    "Temsili donanım görselidir; cihazlar yazılım lisansına dahil değildir.": "صورة توضيحية للأجهزة؛ الأجهزة غير مشمولة في ترخيص البرنامج.",
     "Temsili haftalık satış grafiği": "مخطط مبيعات أسبوعي تمثيلي",
     "Teslimatta ödeme": "الدفع عند التسليم",
     "Tezgâhın arkasındaki en güçlü yardımcınız.": "أقوى مساعد لك خلف المنضدة.",

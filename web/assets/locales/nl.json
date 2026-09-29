@@ -1,6 +1,6 @@
 {
   "locale": "nl",
-  "sourceHash": "e8bcce10f5ba7a92ac3add17407317525303c0a75baf3abf60b4edb08604f247",
+  "sourceHash": "4feaee1ccacbcdb984eb6dd1a5d3e3b7e74373876a3994943ce27da202d3a5af",
   "translation": "Build-time automatic translation",
   "texts": {
     "$ USD": "$ USD",
@@ -180,6 +180,7 @@
     "Menüyü aç": "menu openen",
     "Menüyü kapat": "menu sluiten",
     "Merak edilenler": "Curiosa",
+    "Mint ışıklı barkod okuyucu ve termal fiş yazıcı": "Barcodescanner en thermische bonprinter met mintgroene verlichting",
     "Mobil bağlantı ve rapor gönderimi": "Mobiele verbinding en rapportverzending",
     "Mobil hızlı satış ekranı": "Mobiel snel verkoopscherm",
     "Mobil lisanslar bu fiyata dahil değildir. KDV tutarı ve ödenecek toplam satın alma öncesinde bildirilir.": "Mobiele licenties zijn niet bij deze prijs inbegrepen. Het BTW-bedrag en het totaalbedrag worden voorafgaand aan de aankoop meegedeeld.",
@@ -253,6 +254,7 @@
     "Telefon veya WhatsApp üzerinden aldığınız siparişi müşteri adı, telefon, adres ve notuyla kaydedin. Ürünleri sipariş sepetine ekleyin.": "Bewaar de bestelling die je via telefoon of WhatsApp hebt ontvangen met klantnaam, telefoonnummer, adres en notitie. Voeg de producten toe aan de bestelwagen.",
     "Telefonumdaki ve bilgisayarımdaki veriler aynı mı?": "Zijn de gegevens op mijn telefoon en computer hetzelfde?",
     "Temel satış ve stok işlemleri cihazda çalışır. İndirme, çevrimiçi hizmetler, güncel kur alma ve bulut yedekleme için internet gerekir. Cihaz arızasına karşı yedeklerinizi düzenli olarak dışarı aktarın.": "Basisverkoop- en inventarisbewerkingen worden op het apparaat uitgevoerd. Internet vereist voor downloads, online diensten, actuele wisselkoers en cloudback-up. Exporteer uw back-ups regelmatig in geval van een apparaatstoring.",
+    "Temsili donanım görselidir; cihazlar yazılım lisansına dahil değildir.": "Illustratieve hardwareafbeelding; apparaten zijn niet inbegrepen bij de softwarelicentie.",
     "Temsili haftalık satış grafiği": "Representatieve wekelijkse verkoopgrafiek",
     "Teslimatta ödeme": "Betaling bij levering",
     "Tezgâhın arkasındaki en güçlü yardımcınız.": "Jouw krachtigste assistent achter de balie.",

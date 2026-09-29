@@ -1,6 +1,6 @@
 {
   "locale": "de",
-  "sourceHash": "e8bcce10f5ba7a92ac3add17407317525303c0a75baf3abf60b4edb08604f247",
+  "sourceHash": "4feaee1ccacbcdb984eb6dd1a5d3e3b7e74373876a3994943ce27da202d3a5af",
   "translation": "Build-time automatic translation",
   "texts": {
     "$ USD": "$ USD",
@@ -180,6 +180,7 @@
     "Menüyü aç": "Menü öffnen",
     "Menüyü kapat": "Menü schließen",
     "Merak edilenler": "Kuriositäten",
+    "Mint ışıklı barkod okuyucu ve termal fiş yazıcı": "Barcodescanner und Thermobondrucker mit mintgrüner Beleuchtung",
     "Mobil bağlantı ve rapor gönderimi": "Mobile Verbindung und Berichtsversand",
     "Mobil hızlı satış ekranı": "Mobiler Schnellverkaufsbildschirm",
     "Mobil lisanslar bu fiyata dahil değildir. KDV tutarı ve ödenecek toplam satın alma öncesinde bildirilir.": "Mobile Lizenzen sind in diesem Preis nicht enthalten. Der Mehrwertsteuerbetrag und der zu zahlende Gesamtbetrag werden vor dem Kauf mitgeteilt.",
@@ -253,6 +254,7 @@
     "Telefon veya WhatsApp üzerinden aldığınız siparişi müşteri adı, telefon, adres ve notuyla kaydedin. Ürünleri sipariş sepetine ekleyin.": "Speichern Sie die Bestellung, die Sie per Telefon oder WhatsApp erhalten haben, mit Kundenname, Telefonnummer, Adresse und Notiz. Fügen Sie die Produkte dem Bestellkorb hinzu.",
     "Telefonumdaki ve bilgisayarımdaki veriler aynı mı?": "Sind die Daten auf meinem Telefon und meinem Computer identisch?",
     "Temel satış ve stok işlemleri cihazda çalışır. İndirme, çevrimiçi hizmetler, güncel kur alma ve bulut yedekleme için internet gerekir. Cihaz arızasına karşı yedeklerinizi düzenli olarak dışarı aktarın.": "Grundlegende Verkaufs- und Lagervorgänge werden auf dem Gerät ausgeführt. Internet erforderlich für Downloads, Online-Dienste, aktuellen Wechselkurs und Cloud-Backup. Exportieren Sie Ihre Backups regelmäßig im Falle eines Geräteausfalls.",
+    "Temsili donanım görselidir; cihazlar yazılım lisansına dahil değildir.": "Symbolische Hardware-Abbildung; Geräte sind nicht in der Softwarelizenz enthalten.",
     "Temsili haftalık satış grafiği": "Repräsentatives wöchentliches Verkaufsdiagramm",
     "Teslimatta ödeme": "Zahlung per Nachnahme",
     "Tezgâhın arkasındaki en güçlü yardımcınız.": "Ihr stärkster Assistent hinter der Theke.",

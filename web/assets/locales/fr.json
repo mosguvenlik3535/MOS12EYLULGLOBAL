@@ -1,6 +1,6 @@
 {
   "locale": "fr",
-  "sourceHash": "e8bcce10f5ba7a92ac3add17407317525303c0a75baf3abf60b4edb08604f247",
+  "sourceHash": "4feaee1ccacbcdb984eb6dd1a5d3e3b7e74373876a3994943ce27da202d3a5af",
   "translation": "Build-time automatic translation",
   "texts": {
     "$ USD": "$ USD",
@@ -180,6 +180,7 @@
     "Menüyü aç": "ouvrir le menu",
     "Menüyü kapat": "fermer le menu",
     "Merak edilenler": "Curiosités",
+    "Mint ışıklı barkod okuyucu ve termal fiş yazıcı": "Lecteur de codes-barres et imprimante thermique de tickets sous un éclairage vert menthe",
     "Mobil bağlantı ve rapor gönderimi": "Connexion mobile et envoi de rapports",
     "Mobil hızlı satış ekranı": "Écran de vente rapide mobile",
     "Mobil lisanslar bu fiyata dahil değildir. KDV tutarı ve ödenecek toplam satın alma öncesinde bildirilir.": "Les licences mobiles ne sont pas incluses dans ce prix. Le montant de la TVA et le total à payer seront communiqués avant l'achat.",
@@ -253,6 +254,7 @@
     "Telefon veya WhatsApp üzerinden aldığınız siparişi müşteri adı, telefon, adres ve notuyla kaydedin. Ürünleri sipariş sepetine ekleyin.": "Enregistrez la commande que vous avez reçue par téléphone ou WhatsApp avec le nom du client, son numéro de téléphone, son adresse et sa note. Ajoutez les produits au panier de commande.",
     "Telefonumdaki ve bilgisayarımdaki veriler aynı mı?": "Les données sur mon téléphone et sur mon ordinateur sont-elles les mêmes ?",
     "Temel satış ve stok işlemleri cihazda çalışır. İndirme, çevrimiçi hizmetler, güncel kur alma ve bulut yedekleme için internet gerekir. Cihaz arızasına karşı yedeklerinizi düzenli olarak dışarı aktarın.": "Les opérations de base de vente et d’inventaire s’exécutent sur l’appareil. Internet requis pour les téléchargements, les services en ligne, le taux de change à jour et la sauvegarde dans le cloud. Exportez régulièrement vos sauvegardes en cas de panne de l'appareil.",
+    "Temsili donanım görselidir; cihazlar yazılım lisansına dahil değildir.": "Illustration du matériel ; les appareils ne sont pas inclus dans la licence logicielle.",
     "Temsili haftalık satış grafiği": "Graphique des ventes hebdomadaires représentatif",
     "Teslimatta ödeme": "Paiement à la livraison",
     "Tezgâhın arkasındaki en güçlü yardımcınız.": "Votre assistant le plus puissant derrière le comptoir.",

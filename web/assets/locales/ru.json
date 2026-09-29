@@ -1,6 +1,6 @@
 {
   "locale": "ru",
-  "sourceHash": "e8bcce10f5ba7a92ac3add17407317525303c0a75baf3abf60b4edb08604f247",
+  "sourceHash": "4feaee1ccacbcdb984eb6dd1a5d3e3b7e74373876a3994943ce27da202d3a5af",
   "translation": "Build-time automatic translation",
   "texts": {
     "$ USD": "$ Доллар США",
@@ -180,6 +180,7 @@
     "Menüyü aç": "открыть меню",
     "Menüyü kapat": "закрыть меню",
     "Merak edilenler": "Курьезы",
+    "Mint ışıklı barkod okuyucu ve termal fiş yazıcı": "Сканер штрихкодов и термопринтер чеков с мятной подсветкой",
     "Mobil bağlantı ve rapor gönderimi": "Мобильная связь и отправка отчетов",
     "Mobil hızlı satış ekranı": "Мобильный экран быстрых продаж",
     "Mobil lisanslar bu fiyata dahil değildir. KDV tutarı ve ödenecek toplam satın alma öncesinde bildirilir.": "Мобильные лицензии не включены в эту цену. Сумма НДС и общая сумма к оплате будут сообщены перед покупкой.",
@@ -253,6 +254,7 @@
     "Telefon veya WhatsApp üzerinden aldığınız siparişi müşteri adı, telefon, adres ve notuyla kaydedin. Ürünleri sipariş sepetine ekleyin.": "Сохраните заказ, полученный по телефону или WhatsApp, указав имя клиента, номер телефона, адрес и примечание. Добавьте товары в корзину заказа.",
     "Telefonumdaki ve bilgisayarımdaki veriler aynı mı?": "Совпадают ли данные на моем телефоне и компьютере?",
     "Temel satış ve stok işlemleri cihazda çalışır. İndirme, çevrimiçi hizmetler, güncel kur alma ve bulut yedekleme için internet gerekir. Cihaz arızasına karşı yedeklerinizi düzenli olarak dışarı aktarın.": "На устройстве выполняются основные операции продаж и инвентаризации. Интернет необходим для загрузки, онлайн-сервисов, актуального курса обмена и облачного резервного копирования. Регулярно экспортируйте резервные копии на случай сбоя устройства.",
+    "Temsili donanım görselidir; cihazlar yazılım lisansına dahil değildir.": "Иллюстрация оборудования; устройства не входят в лицензию на программное обеспечение.",
     "Temsili haftalık satış grafiği": "Репрезентативный недельный график продаж",
     "Teslimatta ödeme": "Оплата при доставке",
     "Tezgâhın arkasındaki en güçlü yardımcınız.": "Ваш самый мощный помощник за прилавком.",
