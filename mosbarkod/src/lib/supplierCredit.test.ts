@@ -16,3 +16,11 @@ describe('supplier credit ledger',()=>{
  it('full and data backups preserve ledger without modifying other accounts',()=>{const s=defaultState();s.supplierCredits=[row()];for(const scope of ['full','data'] as const){const restored=parseBackupFile(serializeBackup(scope==='full'?s:dataOnlyBackup(s),scope),s);expect(restored.ok).toBe(true);if(restored.ok){expect(restored.data.supplierCredits).toEqual(s.supplierCredits);expect(restored.data.cashMoves).toEqual(s.cashMoves);expect(restored.data.customers).toEqual(s.customers);}}});
  it('old backups initialize empty ledger and settings restore preserves it',()=>{const old=defaultState();delete old.supplierCredits;const s=defaultState();s.supplierCredits=[row()];const restored=parseBackupFile(serializeBackup(old,'full'),s);expect(restored.ok&&restored.data.supplierCredits).toEqual([]);const settings=parseBackupFile(serializeBackup(settingsOnlyBackup(s),'settings'),s);expect(settings.ok&&settings.data.supplierCredits).toEqual(s.supplierCredits);});
 });
+
+describe('subsequent goods withdrawals against receivables',()=>{
+ const opening=[row(),row({type:'invoice',amount:7500,reference:'FIRST'})];
+ it('deducts successive goods withdrawals from the remaining receivable',()=>{const next=[...opening,row({type:'invoice',amount:1000,reference:'NEXT'})];expect(supplierTotals(next).balance).toBe(1500);expect(supplierTotals([...next,row({type:'invoice',amount:500,reference:'LAST'})]).balance).toBe(1000);});
+ it('shows debt when goods withdrawal exceeds available credit',()=>{expect(supplierTotals([...opening,row({type:'invoice',amount:3000,reference:'NEXT'})]).balance).toBe(-500);});
+ it('restores credit on withdrawal cancellation',()=>{expect(supplierTotals([...opening,row({type:'invoice',amount:1000,reference:'NEXT',voided:true})]).balance).toBe(2500);});
+ it('does not allow an existing purchase to be deducted again as a withdrawal',()=>{expect(supplierEntryError(row({type:'invoice',amount:7500,reference:'FIRST'}),opening)).not.toBe('');});
+});

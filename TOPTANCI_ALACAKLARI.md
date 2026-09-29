@@ -1,4 +1,4 @@
-# Toptancı alacakları — v1.15.15
+# Toptancı alacakları — v1.15.16
 
 **Veresiye Takip → Toptancı Alacakları**
 
@@ -21,3 +21,10 @@ Hesap: müşterilerinizin toptancıya doğrudan yaptığı ödemeler − KDV dah
 - Kasa/işletme hareketlerini sıfırlama bu defteri de temizler. Önce tam yedek alın.
 
 Doğrulama: bakiye, borç, iade, iptal, mükerrer fatura, eski yedek, ZIP ve ayar yedeği senaryoları; Chromium'da ödeme, fatura seçimi, yeniden açınca kalıcılık, iade/iptal ve diğer hesapların değişmemesi kontrol edildi.
+
+## Alacağa karşı sonradan mal çekişi
+Toptancıyı seçip **Alacağımdan Ürün / Mal Çek** düğmesine basın. Tarih, fatura/irsaliye numarası ve KDV dahil TL tutarını girin veya kayıtlı alış faturasını seçin. **Mal Çekişini Kaydet ve Bakiyeden Düş** ile onaylayın.
+
+Örnek: 10.000 TL ödeme − 7.500 TL ilk fatura = 2.500 TL alacak. Sonradan 1.000 TL mal çekişi kaydedilince kalan alacak 1.500 TL olur. Bir sonraki 500 TL çekişle 1.000 TL kalır. Alacağı aşan çekiş borç olarak gösterilir; kaydetmeden önce ön izlemede uyarılır.
+
+Mal çekişi, mevcut ürün faturası hareketinin açık isimli kullanım şeklidir; ayrı bir ikinci kesinti yapılmaz. Önceden kaydettiğiniz faturayı tekrar eklemeyin. İptal edilen çekişin tutarı bakiyeye geri gelir. Mevcut kayıtlar ve yedekler aynı hesapla çalışmayı sürdürür. Stok veya alış faturası ödeme durumu otomatik değiştirilmez.
