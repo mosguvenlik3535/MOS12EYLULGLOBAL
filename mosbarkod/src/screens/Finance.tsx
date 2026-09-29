@@ -1,3 +1,4 @@
+import SupplierCredit from '../components/SupplierCredit';
 import InvoiceImportModal from '../components/InvoiceImportModal';
 import InvoiceDocument from '../components/InvoiceDocument';
 import { duplicateInvoice as isDuplicatePurchase, type InvoiceDraft } from '../lib/invoiceImport';
@@ -1566,7 +1567,17 @@ function daysTo(date: string): number {
 
 /* ================= VERESİYE TAKİP ================= */
 
-export function CreditScreen({
+export function CreditScreen(props: {
+  customers: Customer[]; settings: Settings; addCustomer: (name:string,phone:string)=>string;
+  addPayment:(id:string,amount:number,note:string)=>void; removeClosed:()=>number; toast:Toast;
+  invoices:Invoice[]; supplierCredits: import('../lib/supplierCredit').SupplierCreditEntry[];
+  updateSupplierCredits:(update:(entries:import('../lib/supplierCredit').SupplierCreditEntry[])=>import('../lib/supplierCredit').SupplierCreditEntry[])=>void;
+}) {
+  const [tab,setTab]=useState('customer');
+  return <div className="h-full flex flex-col"><div className="flex gap-2 p-3 border-b border-line"><Btn v={tab==='customer'?'primary':'ghost'} onClick={()=>setTab('customer')}>Müşteri Veresiyeleri</Btn><Btn v={tab==='supplier'?'primary':'ghost'} onClick={()=>setTab('supplier')}>Toptancı Alacakları</Btn></div><div className="flex-1 min-h-0">{tab==='customer'?<CustomerCreditScreen {...props}/>:<SupplierCredit entries={props.supplierCredits} update={props.updateSupplierCredits} invoices={props.invoices} customers={props.customers} toast={props.toast}/>}</div></div>;
+}
+
+function CustomerCreditScreen({
   customers,
   settings,
   addCustomer,

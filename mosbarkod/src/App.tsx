@@ -1223,6 +1223,7 @@ export default function App() {
       customers: s.customers.map((c) => ({ ...c, balance: 0, entries: [] })),
       expenses: [],
       invoices: [],
+      supplierCredits: [],
       cashMoves: [],
       posCloses: [],
       imkart: { limit: 0, txns: [] },
@@ -1452,6 +1453,9 @@ export default function App() {
             />
           ) : view === 'credit' ? (
             <CreditScreen
+              invoices={state.invoices}
+              supplierCredits={state.supplierCredits || []}
+              updateSupplierCredits={(update) => setState(s => ({...s, supplierCredits:update(s.supplierCredits || [])}))}
               customers={state.customers}
               settings={state.settings}
               addCustomer={addCustomer}

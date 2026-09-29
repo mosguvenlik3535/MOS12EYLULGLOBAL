@@ -735,6 +735,7 @@ export interface StockCountSession {
 }
 
 export interface AppState {
+  supplierCredits?: import('./lib/supplierCredit').SupplierCreditEntry[];
   products: Product[];
   sales: Sale[];
   deliveries: DeliveryOrder[];
@@ -1331,6 +1332,7 @@ export const defaultState = (): AppState => {
     cashMoves: [],
     posCloses: [],
     stockCounts: [],
+    supplierCredits: [],
     settings: defaultSettings(),
   };
 };

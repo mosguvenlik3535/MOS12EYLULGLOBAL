@@ -172,6 +172,7 @@ function normalizeArrays(partial: Partial<AppState>): AppState {
   merged.deliveries = Array.isArray(merged.deliveries) ? merged.deliveries : [];
   merged.customers = Array.isArray(merged.customers) ? merged.customers : [];
   merged.expenses = Array.isArray(merged.expenses) ? merged.expenses : [];
+  merged.supplierCredits = Array.isArray(merged.supplierCredits) ? merged.supplierCredits : [];
   merged.invoices = Array.isArray(merged.invoices) ? merged.invoices : [];
   merged.staff = Array.isArray(merged.staff) ? merged.staff : [];
   merged.cashMoves = Array.isArray(merged.cashMoves) ? merged.cashMoves : [];
