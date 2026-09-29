@@ -1,33 +1,23 @@
-# MOSBARKODYAZILIM — Tanıtım Sitesi
+# MOSBARKOD.COM.TR — MOS POS satış sitesi
 
-Statik tanıtım sitesi (saf HTML + CSS + JS, derleme adımı yok). GitHub Pages ile yayınlanır.
+Statik HTML/CSS/JS; sunucu veya ödeme kartı verisi toplama yok. Masaüstü öncelikli, responsive Türkçe tasarım.
 
-## Yayın adresi
-`https://mosguvenlik3535.github.io/MOSBARKOD-WEB/` — özel alan adı bağlandıysa `https://alanadiniz.com`
+## Yayın
+Mevcut PWA adresini değiştirmeden Pages tanıtımı: https://mosguvenlik3535.github.io/MOS12EYLULGLOBAL/web/
 
-## Dosya düzeni
-```
-index.html               sayfanın kendisi
-assets/css/style.css     tema ve düzen
-assets/js/i18n.js        TR / EN / DE sözlük + dil değiştirme
-assets/js/main.js        menü, ekran görüntüsü kaydırma
-assets/img/              ekran görüntüleri, kapak görseli, uygulama simgesi
-CNAME                    özel alan adı (varsa)
-```
+`web/` içeriğini hostinginizin alan adı köküne (`public_html` veya sağlayıcınızın karşılığı) yükleyerek MOSBARKOD.COM.TR üzerinde sunabilirsiniz. HTTPS sertifikası ve DNS, alan adı/hosting panelinden yapılandırılmalıdır. Bu çalışma alan adının DNS veya hosting ayarlarını değiştirmez. Mevcut repo Pages kökünde PWA bulunduğu için körlemesine CNAME eklemeyin; aksi halde program adresini taşırsınız.
 
-## Özel alan adı (domain) bağlama
-1. Depo kökündeki `CNAME` dosyasına alan adını yazın (örn. `www.mosbarkod.com`), kaydedin.
-2. Alan adınızın DNS ayarlarında:
-   - **A kaydı** (kök alan adı için) → `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`
-   - veya **CNAME kaydı** (`www` için) → `mosguvenlik3535.github.io`
-3. GitHub → Depo → **Settings → Pages → Custom domain** alanına aynı adresi yazıp kaydedin.
-4. "Enforce HTTPS" seçeneğini açın (DNS yayılınca, genelde birkaç saat).
+Yerel ön izleme: `python3 -m http.server 8080 --bind 0.0.0.0 --directory web`
+
+## Satış ve indirmeler
+- Doğrudan Windows/Android demo paketleri v1.15.18: 25 tamamlanmış satış; kredi kartı istenmez.
+- macOS/Linux/PWA bağlantıları ayrı demo olarak sunulmaz; lisans gerekebilir.
+- Full Pro: kullanıcının talep ettiği tek seferlik/ömür boyu model. Fiyat uydurulmadı; WhatsApp üzerinden teklif talebi. Site ödeme almaz.
+- Cihaz sayısı, destek/güncelleme kapsamı ve lisans taşıma teklif aşamasında belirlenmelidir. Play Store aboneliği ayrı kanaldır; bu site programdaki Play Billing ayarlarını değiştirmez.
+- Masaüstü hero paneli temsili HTML görselleştirmedir; örnek rakamlar müşteri/performans iddiası değildir. Mobil ekranlar depodaki uygulama görüntüleridir.
+
+## Yayın öncesi ticari tamamlamalar
+Fiyat/KDV, satıcı ticari unvanı ve adresi, fatura/ödeme altyapısı, cihaz sınırı, destek ve yükseltme koşulları, satış/ön bilgilendirme/iade metinleri onaylanmalıdır. Bunlar olmadan otomatik ödeme açılmadı.
 
 ## Güncelleme
-`index.html` (metinler `data-i18n` ile) ve `assets/js/i18n.js` (sözlük) düzenlenir;
-`main` dalına gönderildiğinde Actions otomatik yayınlar (~1 dk).
-
-## Play Store mağaza girişi için gerekli adresler
-- Web sitesi: bu sitenin adresi
-- Gizlilik politikası: `https://mosguvenlik3535.github.io/MOS12EYLULGLOBAL/privacy-policy.html`
-- E-posta: m.ortayayla@gmail.com
+İndirme sürümü ve linkleri `index.html` içinde birlikte güncelleyin. Stiller `assets/css/style.css`, menü ve klavyeyle kullanılabilen ekran sekmeleri `assets/js/main.js` içindedir. Eski çeviri sözlüğü bu tasarımda yüklenmez; yeni metinlerin EN/DE sürümleri henüz hazırlanmadı.
