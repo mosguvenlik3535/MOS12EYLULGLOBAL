@@ -16,6 +16,7 @@ OUT = Path.home() / '.cache' / 'mospos-hosting'
 STAGE = OUT / 'public_html'
 FILES = [f'MOSBARKODYAZILIM-Demo-Setup-{VERSION}.exe',
          f'MOSBARKODYAZILIM-Demo-Portable-{VERSION}.exe', 'app-debug-demo.apk']
+subprocess.run(['python3',str(ROOT/'web/scripts/check-locales.py')],check=True)
 OUT.mkdir(parents=True, exist_ok=True)
 STAGE.mkdir(exist_ok=True)
 # Never include repository internals or developer documentation in the public site.

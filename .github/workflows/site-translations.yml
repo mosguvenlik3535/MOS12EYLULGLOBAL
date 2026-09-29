@@ -1,0 +1,33 @@
+name: Generate website language packs
+on:
+  push:
+    branches: ['arena/01a0bfd3-mos12eylulglobal']
+    paths:
+      - 'web/assets/locales/source.json'
+      - 'web/scripts/translate-site.py'
+      - '.github/workflows/site-translations.yml'
+permissions:
+  contents: write
+concurrency:
+  group: site-language-packs
+  cancel-in-progress: false
+jobs:
+  translate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: arena/01a0bfd3-mos12eylulglobal
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install beautifulsoup4==4.13.4
+      - run: python web/scripts/translate-site.py
+      - name: Save complete language packs on the session branch
+        run: |
+          git config user.name "MOS Website Builder"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add web/assets/locales/*.json
+          git diff --cached --quiet || git commit -m "Generate 14 static website language packs"
+          git push origin HEAD:arena/01a0bfd3-mos12eylulglobal

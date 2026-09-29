@@ -39,6 +39,9 @@ jobs:
         with:
           node-version: '22'
 
+      - name: Verify website language packs
+        run: python3 web/scripts/check-locales.py
+
       - name: Install dependencies
         working-directory: mosbarkod
         run: npm install
