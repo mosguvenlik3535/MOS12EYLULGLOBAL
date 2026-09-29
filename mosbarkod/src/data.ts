@@ -1174,7 +1174,7 @@ export const defaultSettings = (): Settings => ({
   phone: '',
   taxOffice: '',
   taxNo: '',
-  brandTitle: 'MOS POS',
+  brandTitle: 'MOS BARCODE',
   logoIcon: 'flame',
   customerLogo: '',
   receiptHeader: 'MOSBARKODYAZILIM - HOŞGELDİNİZ',

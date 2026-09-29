@@ -190,20 +190,20 @@ export default function App() {
   const [locale, setLocaleState] = useState<Locale>(() => loadLocale());
 
   const DOC_TITLES: Record<Locale, string> = {
-    tr: 'MOS POS: Barkod Satış ve Stok',
-    en: 'MOS POS: Sales & Inventory',
-    es: 'MOS POS: Sales & Inventory',
-    de: 'MOS POS: Sales & Inventory',
-    fr: 'MOS POS: Sales & Inventory',
-    it: 'MOS POS: Sales & Inventory',
-    pt: 'MOS POS: Sales & Inventory',
-    zh: 'MOS POS: Sales & Inventory',
-    pl: 'MOS POS: Sales & Inventory',
-    ro: 'MOS POS: Sales & Inventory',
-    el: 'MOS POS: Sales & Inventory',
-    nl: 'MOS POS: Sales & Inventory',
-    ar: 'MOS POS: Sales & Inventory',
-    ru: 'MOS POS: Sales & Inventory',
+    tr: 'MOS BARCODE: Barkod Satış ve Stok',
+    en: 'MOS BARCODE: Sales & Inventory',
+    es: 'MOS BARCODE: Sales & Inventory',
+    de: 'MOS BARCODE: Sales & Inventory',
+    fr: 'MOS BARCODE: Sales & Inventory',
+    it: 'MOS BARCODE: Sales & Inventory',
+    pt: 'MOS BARCODE: Sales & Inventory',
+    zh: 'MOS BARCODE: Sales & Inventory',
+    pl: 'MOS BARCODE: Sales & Inventory',
+    ro: 'MOS BARCODE: Sales & Inventory',
+    el: 'MOS BARCODE: Sales & Inventory',
+    nl: 'MOS BARCODE: Sales & Inventory',
+    ar: 'MOS BARCODE: Sales & Inventory',
+    ru: 'MOS BARCODE: Sales & Inventory',
   };
 
   const setLocale = (l: Locale) => {
@@ -1266,7 +1266,7 @@ export default function App() {
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-amber/50 bg-ink/90">
             <Ic n="flame" c="h-7 w-7 text-amber2" />
           </div>
-          <p className="font-mono text-[10.5px] tracking-[0.25em] text-mut2">MOS POS</p>
+          <p className="font-mono text-[10.5px] tracking-[0.25em] text-mut2">MOS BARCODE</p>
         </div>
       </div>
     );
@@ -1281,7 +1281,7 @@ export default function App() {
           setLicensed(true);
           setDemo(false);
           setDemoExpired(false);
-          toast('Lisans etkinleştirildi — MOS POS kullanıma hazır');
+          toast('Lisans etkinleştirildi — MOS BARCODE kullanıma hazır');
         }}
       />
     );
@@ -1291,7 +1291,7 @@ export default function App() {
     return (
       <LoginGate
         pins={state.settings.pins}
-        brandTitle={(!state.settings.brandTitle || state.settings.brandTitle === 'MOSBARKODYAZILIM' ? 'MOS POS' : state.settings.brandTitle)}
+        brandTitle={(!state.settings.brandTitle || ['MOSBARKODYAZILIM', 'MOS POS'].includes(state.settings.brandTitle) ? 'MOS BARCODE' : state.settings.brandTitle)}
         onSuccess={(id) => {
           setUser(id);
           setLoggedIn(true);
@@ -1346,7 +1346,7 @@ export default function App() {
           mode="switch"
           presetUser={switchUser}
           pins={state.settings.pins}
-          brandTitle={(!state.settings.brandTitle || state.settings.brandTitle === 'MOSBARKODYAZILIM' ? 'MOS POS' : state.settings.brandTitle)}
+          brandTitle={(!state.settings.brandTitle || ['MOSBARKODYAZILIM', 'MOS POS'].includes(state.settings.brandTitle) ? 'MOS BARCODE' : state.settings.brandTitle)}
           onCancel={() => setSwitchUser(null)}
           onSuccess={(id) => {
             setUser(id);

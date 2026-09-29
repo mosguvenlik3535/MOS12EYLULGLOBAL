@@ -19,7 +19,7 @@ async function useLanguage(lang,remember=true){
  try{
   let data={};if(lang!=='tr'){const res=await fetch('assets/locales/'+lang+'.json');if(!res.ok)throw Error('language unavailable');const pack=await res.json();if(pack.locale!==lang||!pack.texts)throw Error('invalid language pack');data=pack.texts;}
   if(ticket!==serial)return;dictionary=data;current=lang;
-  for(const [node,original] of texts){const trimmed=original.trim();node.data=original.replace(trimmed,lookup(original));}
+  for(const [node,original] of texts){const trimmed=original.trim();node.data=original.replace(trimmed,()=>lookup(original));}
   for(const [el,attr,original] of attributes)el.setAttribute(attr,lookup(original));
   document.documentElement.lang=lang;document.documentElement.dir=lang==='ar'?'rtl':'ltr';picker.value=lang;
   document.querySelector('#language-status').textContent='';document.querySelector('#language-status').classList.remove('language-warning');

@@ -1572,7 +1572,7 @@ const PHRASES_B: PhraseMap = {
   'Lütfen masaüstündeki 4 haneli kodu girin': { en: 'Please enter the 4-digit code from the desktop' },
   'olarak giriş yapıldı': { en: 'logged in as' },
   'olarak oturum açıldı': { en: 'session opened as' },
-  'Lisans etkinleştirildi — MOSBARKODYAZILIM kullanıma hazır': { en: 'License activated — MOSBARKODYAZILIM is ready' },
+  'Lisans etkinleştirildi — MOS BARCODE kullanıma hazır': { en: 'License activated — MOSBARKODYAZILIM is ready' },
   'POS Entegrasyonu lisansı etkinleştirildi': { en: 'POS Integration license activated' },
   'WhatsApp Cloud API gönderim isteği oluşturuldu': { en: 'WhatsApp Cloud API send request created' },
   '(simülasyon)': { en: '(simulation)' },

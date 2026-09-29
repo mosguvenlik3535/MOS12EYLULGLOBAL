@@ -1390,7 +1390,7 @@ export default function Pos(props: PosProps) {
     if (!popup || popup.closed) {
       setCfdOpen(true);
     } else {
-      popup.document.title = 'MOSBARKODYAZILIM — Müşteri Bilgi Ekranı';
+      popup.document.title = 'MOS BARCODE — Müşteri Bilgi Ekranı';
       popup.document.body.style.margin = '0';
       popup.document.body.style.background = '#070a0e';
       setCfdOpen(true);

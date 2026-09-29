@@ -466,7 +466,7 @@ function createWindow() {
     height: 768,
     minWidth: 1024,
     minHeight: 650,
-    title: 'MOS POS: Barkod Satış ve Stok',
+    title: 'MOS BARCODE: Barkod Satış ve Stok',
     backgroundColor: '#0a0e13',
     autoHideMenuBar: true,
     icon: path.join(ROOT, 'icons', 'icon-512.png'),

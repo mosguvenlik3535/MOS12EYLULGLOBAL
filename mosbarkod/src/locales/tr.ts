@@ -20,7 +20,7 @@ export const tr: TranslationTable = {
   'login.enterPin': 'PIN KODUNUZU GİRİN',
   'login.wrongPin': 'HATALI PIN',
   'login.ok': 'GİRİŞ BAŞARILI',
-  'login.title': 'MOSBARKODYAZILIM',
+  'login.title': 'MOS BARCODE',
   'login.subtitle': 'Kullanıcı seçimi ve 4 haneli PIN girişi',
   'login.cancel': 'Vazgeç',
   'login.admin': 'Admin Olarak Devam Et',
@@ -28,7 +28,7 @@ export const tr: TranslationTable = {
   'login.adminOnly': 'Bu bölüm yalnızca yönetici (Admin) hesabına açıktır. Kasiyer hesabınızla bu ekrana erişemezsiniz.',
 
   // POS lisans kilit
-  'poslock.title': 'MOSBARKODYAZILIM',
+  'poslock.title': 'MOS BARCODE',
   'poslock.subtitle': 'POS Entegrasyonu — Lisans Anahtarı Gerekli',
   'poslock.label': '8 Haneli Lisans Anahtarı',
   'poslock.placeholder': '••••••••',
@@ -118,7 +118,7 @@ export const tr: TranslationTable = {
   't.barcodeNotFound': 'Barkod bulunamadı: {code}',
   't.weightAdded': 'Tartım sepete eklendi: {w} {unit}',
   't.miscAdded': 'Mühtelif ürün eklendi: {name}',
-  't.licenseOk': 'Lisans etkinleştirildi — MOSBARKODYAZILIM kullanıma hazır',
+  't.licenseOk': 'Lisans etkinleştirildi — MOS BARCODE kullanıma hazır',
   't.posLockOk': 'POS Entegrasyonu lisansı etkinleştirildi',
   't.invalidLicense': 'Geçersiz lisans anahtarı',
   't.backupDownloaded': 'Yedek dosyası indirildi',

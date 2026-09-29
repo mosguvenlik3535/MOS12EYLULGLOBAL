@@ -249,7 +249,7 @@ function ProfitLossPrint({ data, period }: { data: ProfitLossData; period: strin
   return (
     <div id="profit-loss-print" className="rounded-xl bg-white p-6 font-sans text-[#101828]">
       <div className="border-b-2 border-[#101828] pb-4">
-        <div className="text-xl font-extrabold tracking-wide">MOSBARKODYAZILIM</div>
+        <div className="text-xl font-extrabold tracking-wide">MOS BARCODE</div>
         <div className="mt-1 text-sm font-bold">Kar / Zarar Analizi Dökümü</div>
         <div className="mt-1 text-xs text-[#475467]">Rapor dönemi: {period}</div>
         <div className="text-xs text-[#475467]">Oluşturulma: {new Date().toLocaleString('tr-TR')}</div>
@@ -472,7 +472,7 @@ export default function AnalyticsScreen({
 
   const exportProfitLossExcel = () => {
     const rows = [
-      ['MOSBARKODYAZILIM Kar / Zarar Analizi'],
+      ['MOS BARCODE Kar / Zarar Analizi'],
       ['Rapor dönemi', reportPeriod],
       [],
       ['Analiz Kalemi', 'Tutar (TL)', 'Açıklama'],

@@ -353,7 +353,7 @@ function LicenseCard() {
         <div className="mt-4 font-mono text-[9px] tracking-[0.24em] text-white/60">LİSANSLI YAZILIM</div>
       </div>
 
-      <div className="mt-5 font-mono text-[15px] font-bold tracking-[0.14em] text-amber2">MOSBARKODYAZILIM</div>
+      <div className="mt-5 font-mono text-[15px] font-bold tracking-[0.14em] text-amber2">MOS BARCODE</div>
       <div className="mt-1 text-[10px] text-mut2">Profesyonel Barkodlu Satış Çözümleri</div>
 
       <div className="mt-5 space-y-2 rounded-xl border border-white/70 bg-black/20 p-3 font-mono text-[9.5px]">
@@ -1098,7 +1098,7 @@ export default function SettingsScreen({
                   onClick={() => {
                     const popup = window.open('', 'mosbarkod_cfd_window', 'width=1100,height=720,menubar=no,toolbar=no,location=no');
                     if (popup) {
-                      popup.document.title = 'MOSBARKODYAZILIM — Müşteri Bilgi Ekranı';
+                      popup.document.title = 'MOS BARCODE — Müşteri Bilgi Ekranı';
                       popup.document.body.style.margin = '0';
                       popup.document.body.style.background = '#070a0e';
                     }

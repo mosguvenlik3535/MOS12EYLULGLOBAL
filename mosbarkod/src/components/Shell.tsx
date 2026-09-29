@@ -241,7 +241,7 @@ export function TopBar({
       <div className="flex items-center gap-2.5">
         <BrandLogo fallbackIcon={settings.logoIcon || 'flame'} imgClassName="h-9 w-auto max-w-[168px]" />
         <div className="hidden md:block">
-          <div className="font-mono text-[13px] font-bold tracking-[0.14em]">MOS POS</div>
+          <div className="font-mono text-[13px] font-bold tracking-[0.14em]">MOS BARCODE</div>
           <div className="font-mono text-[8.5px] tracking-[0.2em] text-mut2">
             BARKOD SATIŞ VE STOK
           </div>

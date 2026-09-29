@@ -13,6 +13,13 @@ function uiFiles(dir: string): string[] {
 }
 
 describe('Neutral application branding', () => {
+  it('uses MOS BARCODE for app metadata and default store branding', () => {
+    expect(read('index.html')).toContain('MOS BARCODE: Barkod Satış ve Stok');
+    expect(JSON.parse(read('public/manifest.webmanifest')).short_name).toBe('MOS BARCODE');
+    expect(read('src/data.ts')).toContain("brandTitle: 'MOS BARCODE'");
+    expect(read('capacitor.config.ts')).toContain("appName: 'MOS BARCODE'");
+    expect(read('src/App.tsx')).toContain("['MOSBARKODYAZILIM', 'MOS POS'].includes(state.settings.brandTitle)");
+  });
   it('does not display Turkish AI branding in UI or application metadata', () => {
     const files = [...uiFiles('src'), 'index.html', 'public/manifest.webmanifest',
       'public/gizlilik-politikasi.html', 'package.json', 'src/locales/tr.ts'];

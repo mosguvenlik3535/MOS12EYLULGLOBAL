@@ -20,7 +20,7 @@ export const en: TranslationTable = {
   'login.enterPin': 'ENTER YOUR PIN CODE',
   'login.wrongPin': 'WRONG PIN',
   'login.ok': 'LOGIN SUCCESSFUL',
-  'login.title': 'MOSBARKODYAZILIM',
+  'login.title': 'MOS BARCODE',
   'login.subtitle': 'Select user and enter 4-digit PIN',
   'login.cancel': 'Cancel',
   'login.admin': 'Continue as Admin',
@@ -28,7 +28,7 @@ export const en: TranslationTable = {
   'login.adminOnly': 'This section is only available to the Admin account. You cannot access this screen with your cashier account.',
 
   // POS license lock
-  'poslock.title': 'MOSBARKODYAZILIM',
+  'poslock.title': 'MOS BARCODE',
   'poslock.subtitle': 'POS Integration — License Key Required',
   'poslock.label': '8-Digit License Key',
   'poslock.placeholder': '••••••••',

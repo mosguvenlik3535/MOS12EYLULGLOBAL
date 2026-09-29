@@ -12,6 +12,8 @@ LANGS=['tr','en','de','fr','es','it','pt','nl','pl','ro','el','ru','ar','zh']
 EXTRA=['Menüyü aç','Menüyü kapat','Mobil hızlı satış ekranı','Ürün ve stok yönetimi ekranı','Gün sonu raporu ekranı']
 def catalog():
  keys=set(EXTRA)
+ version=json.loads((ROOT/'mosbarkod/package.json').read_text())['version']
+ keys.update([f'Doğrudan sitemizden indirilen demo paketleri: v{version}', 'macOS & Linux için bize yazın', 'Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.'])
  for name in ['index.html','ozellikler.html']:
   soup=BeautifulSoup((ROOT/'web'/name).read_text(),'html.parser')
   for node in soup.find_all(string=True):
@@ -30,7 +32,7 @@ def catalog():
 
 def translate_batch(items,lang):
  # Numbered delimiters retain paragraph boundaries across translation.
- query='\n\n'.join(f'[{i:04d}]\n{text}' for i,text in enumerate(items))
+ query='\n\n'.join(f'[{i:04d}]\n{text.replace("MOS BARCODE", "https://mosbarcode.invalid")}' for i,text in enumerate(items))
  url='https://translate.googleapis.com/translate_a/single?'+urllib.parse.urlencode({'client':'gtx','sl':'tr','tl':lang,'dt':'t','q':query})
  for retry in range(5):
   try:
@@ -45,6 +47,7 @@ def translate_batch(items,lang):
     text=translated[m.end():found[i+1].start() if i+1<len(found) else len(translated)].strip()
     if not text:raise ValueError('empty translation')
     # Preserve proper names and stable amount spellings across packs.
+    text=text.replace('https://mosbarcode.invalid','MOS BARCODE')
     text=re.sub(r'MOS\s*BARCODE','MOS BARCODE',text,flags=re.I)
     result.append(text)
    return result
@@ -59,6 +62,8 @@ def run():
   path=DIR/f'{lang}.json'
   existing=json.loads(path.read_text()) if path.exists() else {}
   texts=existing.get('texts',{})
+  overrides=ROOT/'web/scripts/site-overrides.json'
+  if overrides.exists(): texts.update(json.loads(overrides.read_text()).get(lang,{}))
   pending=[s for s in source if s not in texts]
   if lang=='tr':texts={s:s for s in source};pending=[]
   batches=[];batch=[];length=0

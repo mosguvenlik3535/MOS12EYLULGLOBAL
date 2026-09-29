@@ -12,4 +12,4 @@ function selectTab(tab){tabs.forEach(t=>{const active=t===tab;t.setAttribute('ar
 tabs.forEach((tab,i)=>{tab.addEventListener('click',()=>selectTab(tab));tab.addEventListener('keydown',e=>{let next;if(e.key==='ArrowRight')next=(i+1)%tabs.length;else if(e.key==='ArrowLeft')next=(i+tabs.length-1)%tabs.length;else if(e.key==='Home')next=0;else if(e.key==='End')next=tabs.length-1;else return;e.preventDefault();selectTab(tabs[next]);tabs[next].focus();});});
 document.querySelector('#year').textContent=new Date().getFullYear();
 
-document.addEventListener('site-language-changed',()=>{if(tabs.length){const selected=tabs.find(t=>t.getAttribute('aria-selected')==='true');if(selected)selectTab(selected);}});
+document.addEventListener('site-language-changed',()=>{closeMenu();if(tabs.length){const selected=tabs.find(t=>t.getAttribute('aria-selected')==='true');if(selected)selectTab(selected);}});

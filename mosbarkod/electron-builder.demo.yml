@@ -21,7 +21,7 @@ nsis:
   allowToChangeInstallationDirectory: true
   createDesktopShortcut: true
   createStartMenuShortcut: true
-  shortcutName: MOSBARKODYAZILIM Demo
+  shortcutName: MOS BARCODE Demo
   artifactName: MOSBARKODYAZILIM-Demo-Setup-${version}.${ext}
 portable:
   artifactName: MOSBARKODYAZILIM-Demo-Portable-${version}.${ext}

@@ -21,7 +21,7 @@ export const es: TranslationTable = {
   'login.enterPin': 'INGRESE SU PIN',
   'login.wrongPin': 'PIN INCORRECTO',
   'login.ok': 'INICIO DE SESIÓN EXITOSO',
-  'login.title': 'MOSBARKODYAZILIM',
+  'login.title': 'MOS BARCODE',
   'login.subtitle': 'Seleccione usuario e ingrese PIN de 4 dígitos',
   'login.cancel': 'Cancelar',
   'login.admin': 'Continuar como Admin',
@@ -32,7 +32,7 @@ export const es: TranslationTable = {
   'pos.payBtn': 'COBRAR',
   'pay.title': 'Cerrar Venta / Cobrar',
   'settings.language': 'Idioma',
-  'poslock.title': 'MOSBARKODYAZILIM',
+  'poslock.title': 'MOS BARCODE',
   'poslock.subtitle': 'Integración POS — Se requiere clave de licencia',
   'poslock.unlock': 'DESBLOQUEAR',
 };
