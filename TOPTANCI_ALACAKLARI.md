@@ -1,4 +1,4 @@
-# Toptancı alacakları — v1.15.17
+# Toptancı alacakları — v1.15.18
 
 **Veresiye Takip → Toptancı Alacakları**
 
@@ -40,3 +40,12 @@ Mal çekişi, mevcut ürün faturası hareketinin açık isimli kullanım şekli
 - Aynı fatura TL ve USD hesaplarına ayrı ayrı düşülemez; mükerrer kontrolü para birimleri arasında da geçerlidir.
 - Eski, para birimi alanı olmayan kayıtlar TL sayılır; tutarları değiştirilmez. Eski bir kaydı döviz hesabına taşımak için yanlış kaydı iptal edip doğru para birimi ve mutabık tutarla yeniden girin; otomatik geçmiş kur dönüşümü yoktur.
 - Tam/veri ZIP ve bulut yedekleri kayıtların para birimini de korur.
+
+## TL bakiyesi yanında yaklaşık USD karşılığı — v1.15.18
+TL hesap kartları, genel alacak/borç özeti, seçili bakiye ve çekiş sonrası bakiye yanında **(≈ … USD)** gösterilir. Hesap **TL bakiye ÷ 1 USD karşılığı TL** şeklindedir. USD ve diğer döviz hesaplarına ikinci bir karşılık eklenmez.
+
+Kur ExchangeRate-API'den, erişilemezse Frankfurter'den alınır. Ekran açılışında, açıkken 15 dakikada bir ve **USD Kurunu Yenile** düğmesiyle kontrol edilir. Kaynak, kaynağın kur tarihi ve son alınma zamanı gösterilir. Kaynaklar günlük/referans kur yayımlar; bu gösterim anlık banka alış/satış kotasyonu değildir.
+
+İnternet yoksa son doğrulanmış kur tarihiyle birlikte kullanılır; hata ve 48 saatten eski kur uyarısı gösterilir. Hiç doğrulanmış kur yoksa USD karşılığı hesaplanamadığı yazılır; gömülü tahmini kur kullanılmaz. Kur önbelleği cihaz yerelindedir. Toptancı, müşteri veya bakiye bilgileri kur servisine gönderilmez.
+
+Bu özellik yalnızca gösterimdir; kayıtlı tutarlar, mal çekişleri, TL/USD ayrı hesapları ve yedek verileri değiştirilmez. Fatura maliyetlerinde kullanılan tarihî kurla ilişkili değildir.
