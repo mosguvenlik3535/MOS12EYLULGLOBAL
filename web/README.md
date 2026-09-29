@@ -23,3 +23,8 @@ KDV oranı ve dahil toplam, satıcı ticari unvanı ve adresi, fatura/ödeme alt
 İndirme sürümü ve linkleri `index.html` içinde birlikte güncelleyin. Stiller `assets/css/style.css`, menü ve klavyeyle kullanılabilen ekran sekmeleri `assets/js/main.js` içindedir. Eski çeviri sözlüğü bu tasarımda yüklenmez; yeni metinlerin EN/DE sürümleri henüz hazırlanmadı.
 
 Platform logoları: Android/Apple/Linux SVG dosyaları Simple Icons paketinden (CC0, lisans assets/icons içinde); Windows dört bölmeli marka işareti. Markalar ilgili sahiplerine aittir; ortaklık iddiası yoktur.
+
+## Ayrıntılı özellikler ve indirme sunucusu
+`ozellikler.html` programın sol menüsündeki 11 ekranı açıklar. Bölüm içerikleri programdaki mevcut davranış ve kurulum sınırlarını belirtir. İndirme kartlarında ilk kurulum Admin PIN'i 0000 gösterilir; değiştirilen kullanıcı PIN'ini etkilemez.
+
+GitHub dışı dağıtım önerisi ve yayın sırası `INDIRME_YAYINI.md` içindedir. Dosyalar yeni sunucuya yüklenip doğrulanana kadar çalışan GitHub bağlantıları korunur.
