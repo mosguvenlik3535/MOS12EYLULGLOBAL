@@ -1,6 +1,6 @@
 {
   "locale": "ru",
-  "sourceHash": "4feaee1ccacbcdb984eb6dd1a5d3e3b7e74373876a3994943ce27da202d3a5af",
+  "sourceHash": "f5fd96286f7f3240b531f6a50f6b107086196ae423b0a4a7b6a499d510cb628b",
   "translation": "Build-time automatic translation",
   "texts": {
     "$ USD": "$ Доллар США",
@@ -361,6 +361,7 @@
     "●   Barkodlu satış": "●   Продажи со штрих-кодом",
     "◷   Raporlar": "◷   Отчеты",
     "✓ 1.000 satışlık demo": "✓ 1000 демонстраций продаж",
-    "✓ Kredi kartı gerekmez": "✓ Кредитная карта не требуется"
+    "✓ Kredi kartı gerekmez": "✓ Кредитная карта не требуется",
+    "POS entegrasyonu ayrıca yıllık ücrete tabidir.": "За интеграцию POS взимается отдельная ежегодная плата."
   }
 }

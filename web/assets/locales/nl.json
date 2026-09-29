@@ -1,6 +1,6 @@
 {
   "locale": "nl",
-  "sourceHash": "4feaee1ccacbcdb984eb6dd1a5d3e3b7e74373876a3994943ce27da202d3a5af",
+  "sourceHash": "f5fd96286f7f3240b531f6a50f6b107086196ae423b0a4a7b6a499d510cb628b",
   "translation": "Build-time automatic translation",
   "texts": {
     "$ USD": "$ USD",
@@ -361,6 +361,7 @@
     "●   Barkodlu satış": "●  Verkopen met streepjescode",
     "◷   Raporlar": "◷   Rapporten",
     "✓ 1.000 satışlık demo": "✓ 1.000 verkoopdemo's",
-    "✓ Kredi kartı gerekmez": "✓ Geen creditcard vereist"
+    "✓ Kredi kartı gerekmez": "✓ Geen creditcard vereist",
+    "POS entegrasyonu ayrıca yıllık ücrete tabidir.": "Voor POS-integratie geldt een aparte jaarlijkse vergoeding."
   }
 }

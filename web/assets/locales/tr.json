@@ -1,6 +1,6 @@
 {
   "locale": "tr",
-  "sourceHash": "4feaee1ccacbcdb984eb6dd1a5d3e3b7e74373876a3994943ce27da202d3a5af",
+  "sourceHash": "f5fd96286f7f3240b531f6a50f6b107086196ae423b0a4a7b6a499d510cb628b",
   "translation": "Original",
   "texts": {
     "$ USD": "$ USD",
@@ -361,6 +361,7 @@
     "●   Barkodlu satış": "●   Barkodlu satış",
     "◷   Raporlar": "◷   Raporlar",
     "✓ 1.000 satışlık demo": "✓ 1.000 satışlık demo",
-    "✓ Kredi kartı gerekmez": "✓ Kredi kartı gerekmez"
+    "✓ Kredi kartı gerekmez": "✓ Kredi kartı gerekmez",
+    "POS entegrasyonu ayrıca yıllık ücrete tabidir.": "POS entegrasyonu ayrıca yıllık ücrete tabidir."
   }
 }
