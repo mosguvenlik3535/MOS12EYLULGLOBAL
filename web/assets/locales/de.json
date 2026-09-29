@@ -200,6 +200,7 @@
     "PDF / fotoğraf arşivi": "PDF-/Fotoarchiv",
     "PDF, PNG, JPEG veya WebP belge ekleyin. Desteklenen metin içerikli PDF tablolarından kalemleri okuyup ürünlere eşleyin ya da yeni ürün oluşturmayı seçin.": "Fügen Sie PDF-, PNG-, JPEG- oder WebP-Dokumente hinzu. Lesen Sie Elemente aus unterstützten PDF-Texttabellen und ordnen Sie sie Produkten zu oder erstellen Sie neue Produkte.",
     "POS Entegrasyonu": "POS-Anbindung",
+    "POS entegrasyonu ayrıca yıllık ücrete tabidir.": "Für die POS-Integration fällt eine separate jährliche Gebühr an.",
     "POS takibi ve görünüm": "POS-Verfolgung und -Ansicht",
     "PROGRAMIN SOL MENÜSÜ": "LINKES MENÜ DES PROGRAMMS",
     "Paket Sipariş": "Lieferbestellungen",
@@ -361,7 +362,6 @@
     "●   Barkodlu satış": "●  Verkäufe mit Barcode",
     "◷   Raporlar": "◷   Berichte",
     "✓ 1.000 satışlık demo": "✓ 1.000 Verkaufsdemos",
-    "✓ Kredi kartı gerekmez": "✓ Keine Kreditkarte erforderlich",
-    "POS entegrasyonu ayrıca yıllık ücrete tabidir.": "Für die POS-Integration fällt eine separate jährliche Gebühr an."
+    "✓ Kredi kartı gerekmez": "✓ Keine Kreditkarte erforderlich"
   }
 }

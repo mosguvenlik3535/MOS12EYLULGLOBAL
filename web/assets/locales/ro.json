@@ -200,6 +200,7 @@
     "PDF / fotoğraf arşivi": "PDF / arhiva foto",
     "PDF, PNG, JPEG veya WebP belge ekleyin. Desteklenen metin içerikli PDF tablolarından kalemleri okuyup ürünlere eşleyin ya da yeni ürün oluşturmayı seçin.": "Adăugați documente PDF, PNG, JPEG sau WebP. Citiți articole din tabelele PDF cu text acceptat și mapați-le la produse sau alegeți să creați produse noi.",
     "POS Entegrasyonu": "Integrare POS",
+    "POS entegrasyonu ayrıca yıllık ücrete tabidir.": "Integrarea POS este supusă unei taxe anuale separate.",
     "POS takibi ve görünüm": "Urmărire și vizualizare POS",
     "PROGRAMIN SOL MENÜSÜ": "MENIU STÂNGA AL PROGRAMULUI",
     "Paket Sipariş": "Comenzi cu livrare",
@@ -361,7 +362,6 @@
     "●   Barkodlu satış": "●   Vânzări cu cod de bare",
     "◷   Raporlar": "◷   Rapoarte",
     "✓ 1.000 satışlık demo": "✓ 1.000 demo-uri de vânzări",
-    "✓ Kredi kartı gerekmez": "✓ Nu este necesar un card de credit",
-    "POS entegrasyonu ayrıca yıllık ücrete tabidir.": "Integrarea POS este supusă unei taxe anuale separate."
+    "✓ Kredi kartı gerekmez": "✓ Nu este necesar un card de credit"
   }
 }

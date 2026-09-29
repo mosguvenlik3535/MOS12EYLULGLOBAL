@@ -200,6 +200,7 @@
     "PDF / fotoğraf arşivi": "PDF / fotoğraf arşivi",
     "PDF, PNG, JPEG veya WebP belge ekleyin. Desteklenen metin içerikli PDF tablolarından kalemleri okuyup ürünlere eşleyin ya da yeni ürün oluşturmayı seçin.": "PDF, PNG, JPEG veya WebP belge ekleyin. Desteklenen metin içerikli PDF tablolarından kalemleri okuyup ürünlere eşleyin ya da yeni ürün oluşturmayı seçin.",
     "POS Entegrasyonu": "POS Entegrasyonu",
+    "POS entegrasyonu ayrıca yıllık ücrete tabidir.": "POS entegrasyonu ayrıca yıllık ücrete tabidir.",
     "POS takibi ve görünüm": "POS takibi ve görünüm",
     "PROGRAMIN SOL MENÜSÜ": "PROGRAMIN SOL MENÜSÜ",
     "Paket Sipariş": "Paket Sipariş",
@@ -361,7 +362,6 @@
     "●   Barkodlu satış": "●   Barkodlu satış",
     "◷   Raporlar": "◷   Raporlar",
     "✓ 1.000 satışlık demo": "✓ 1.000 satışlık demo",
-    "✓ Kredi kartı gerekmez": "✓ Kredi kartı gerekmez",
-    "POS entegrasyonu ayrıca yıllık ücrete tabidir.": "POS entegrasyonu ayrıca yıllık ücrete tabidir."
+    "✓ Kredi kartı gerekmez": "✓ Kredi kartı gerekmez"
   }
 }

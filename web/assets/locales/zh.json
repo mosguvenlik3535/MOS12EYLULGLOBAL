@@ -200,6 +200,7 @@
     "PDF / fotoğraf arşivi": "PDF/照片档案",
     "PDF, PNG, JPEG veya WebP belge ekleyin. Desteklenen metin içerikli PDF tablolarından kalemleri okuyup ürünlere eşleyin ya da yeni ürün oluşturmayı seçin.": "添加 PDF、PNG、JPEG 或 WebP 文档。从支持的文本 PDF 表中读取项目并将其映射到产品，或选择创建新产品。",
     "POS Entegrasyonu": "POS 集成",
+    "POS entegrasyonu ayrıca yıllık ücrete tabidir.": "POS 集成需另行支付年费。",
     "POS takibi ve görünüm": "POS 跟踪和查看",
     "PROGRAMIN SOL MENÜSÜ": "程序的左侧菜单",
     "Paket Sipariş": "配送订单",
@@ -361,7 +362,6 @@
     "●   Barkodlu satış": "● 带有条形码的销售",
     "◷   Raporlar": "◷ 报告",
     "✓ 1.000 satışlık demo": "✓ 1,000 个销售演示",
-    "✓ Kredi kartı gerekmez": "✓ 无需信用卡",
-    "POS entegrasyonu ayrıca yıllık ücrete tabidir.": "POS 集成需另行支付年费。"
+    "✓ Kredi kartı gerekmez": "✓ 无需信用卡"
   }
 }

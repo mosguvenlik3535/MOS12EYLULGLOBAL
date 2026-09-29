@@ -200,6 +200,7 @@
     "PDF / fotoğraf arşivi": "PDF / αρχείο φωτογραφιών",
     "PDF, PNG, JPEG veya WebP belge ekleyin. Desteklenen metin içerikli PDF tablolarından kalemleri okuyup ürünlere eşleyin ya da yeni ürün oluşturmayı seçin.": "Προσθέστε έγγραφα PDF, PNG, JPEG ή WebP. Διαβάστε στοιχεία από υποστηριζόμενους πίνακες PDF κειμένου και αντιστοιχίστε τα σε προϊόντα ή επιλέξτε να δημιουργήσετε νέα προϊόντα.",
     "POS Entegrasyonu": "Σύνδεση POS",
+    "POS entegrasyonu ayrıca yıllık ücrete tabidir.": "Η διασύνδεση POS υπόκειται σε ξεχωριστή ετήσια χρέωση.",
     "POS takibi ve görünüm": "Παρακολούθηση και προβολή POS",
     "PROGRAMIN SOL MENÜSÜ": "ΑΡΙΣΤΕΡΟ ΜΕΝΟΥ ΤΟΥ ΠΡΟΓΡΑΜΜΑΤΟΣ",
     "Paket Sipariş": "Παραγγελίες με παράδοση",
@@ -361,7 +362,6 @@
     "●   Barkodlu satış": "●   Πωλήσεις με γραμμωτό κώδικα",
     "◷   Raporlar": "◷   Αναφορές",
     "✓ 1.000 satışlık demo": "✓ 1.000 επιδείξεις εκπτώσεων",
-    "✓ Kredi kartı gerekmez": "✓ Δεν απαιτείται πιστωτική κάρτα",
-    "POS entegrasyonu ayrıca yıllık ücrete tabidir.": "Η διασύνδεση POS υπόκειται σε ξεχωριστή ετήσια χρέωση."
+    "✓ Kredi kartı gerekmez": "✓ Δεν απαιτείται πιστωτική κάρτα"
   }
 }

@@ -200,6 +200,7 @@
     "PDF / fotoğraf arşivi": "PDF / fotoarchief",
     "PDF, PNG, JPEG veya WebP belge ekleyin. Desteklenen metin içerikli PDF tablolarından kalemleri okuyup ürünlere eşleyin ya da yeni ürün oluşturmayı seçin.": "Voeg PDF-, PNG-, JPEG- of WebP-documenten toe. Lees items uit ondersteunde tekst-PDF-tabellen en wijs ze toe aan producten, of kies ervoor om nieuwe producten te maken.",
     "POS Entegrasyonu": "POS-integratie",
+    "POS entegrasyonu ayrıca yıllık ücrete tabidir.": "Voor POS-integratie geldt een aparte jaarlijkse vergoeding.",
     "POS takibi ve görünüm": "POS-tracking en -weergave",
     "PROGRAMIN SOL MENÜSÜ": "LINKERMENU VAN HET PROGRAMMA",
     "Paket Sipariş": "Bezorgbestellingen",
@@ -361,7 +362,6 @@
     "●   Barkodlu satış": "●  Verkopen met streepjescode",
     "◷   Raporlar": "◷   Rapporten",
     "✓ 1.000 satışlık demo": "✓ 1.000 verkoopdemo's",
-    "✓ Kredi kartı gerekmez": "✓ Geen creditcard vereist",
-    "POS entegrasyonu ayrıca yıllık ücrete tabidir.": "Voor POS-integratie geldt een aparte jaarlijkse vergoeding."
+    "✓ Kredi kartı gerekmez": "✓ Geen creditcard vereist"
   }
 }

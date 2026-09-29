@@ -200,6 +200,7 @@
     "PDF / fotoğraf arşivi": "PDF / أرشيف الصور",
     "PDF, PNG, JPEG veya WebP belge ekleyin. Desteklenen metin içerikli PDF tablolarından kalemleri okuyup ürünlere eşleyin ya da yeni ürün oluşturmayı seçin.": "أضف مستندات PDF أو PNG أو JPEG أو WebP. اقرأ العناصر من جداول PDF النصية المدعومة وقم بتعيينها إلى المنتجات، أو اختر إنشاء منتجات جديدة.",
     "POS Entegrasyonu": "تكامل نقاط البيع",
+    "POS entegrasyonu ayrıca yıllık ücrete tabidir.": "يخضع تكامل نقاط البيع لرسوم سنوية منفصلة.",
     "POS takibi ve görünüm": "تتبع وعرض نقاط البيع",
     "PROGRAMIN SOL MENÜSÜ": "القائمة اليسرى للبرنامج",
     "Paket Sipariş": "طلبات التوصيل",
@@ -361,7 +362,6 @@
     "●   Barkodlu satış": "●   المبيعات مع الباركود",
     "◷   Raporlar": "◷   التقارير",
     "✓ 1.000 satışlık demo": "✓ 1000 عرض توضيحي للمبيعات",
-    "✓ Kredi kartı gerekmez": "✓ لا حاجة لبطاقة الائتمان",
-    "POS entegrasyonu ayrıca yıllık ücrete tabidir.": "يخضع تكامل نقاط البيع لرسوم سنوية منفصلة."
+    "✓ Kredi kartı gerekmez": "✓ لا حاجة لبطاقة الائتمان"
   }
 }
