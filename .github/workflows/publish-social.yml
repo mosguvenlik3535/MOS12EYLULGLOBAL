@@ -11,8 +11,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Verify package
-        run: python3 -m zipfile -t marketing-media/MOS-BARCODE-Sosyal-Medya-4-Video.zip
+        run: |
+          python3 -m zipfile -t marketing-media/MOS-BARCODE-Sosyal-Medya-4-Video.zip
+          python3 -m zipfile -t marketing-media/MOS-BARCODE-Sessiz-45sn.zip
+          python3 -m zipfile -e marketing-media/MOS-BARCODE-Sessiz-45sn.zip /tmp/social-videos
       - name: Publish direct download
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload v1.15.20 marketing-media/MOS-BARCODE-Sosyal-Medya-4-Video.zip --clobber
+        run: gh release upload v1.15.20 marketing-media/*.zip /tmp/social-videos/*.mp4 --clobber
