@@ -69,6 +69,7 @@ jobs:
           if [ -d web ]; then
             mkdir -p _site/web
             tar -cf - -C web --exclude=.github . | tar -xf - -C _site/web
+            python3 web/scripts/prepare-pwa.py _site/web/uygulama
             echo "Tanıtım sitesi _site/web altına kopyalandı:"
             ls _site/web
           else

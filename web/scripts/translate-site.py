@@ -19,7 +19,7 @@ def catalog():
   for node in soup.find_all(string=True):
    if any(p.name in ['script','style','select','svg'] or p.has_attr('data-no-translate') for p in node.parents):continue
    text=str(node).strip()
-   if text and re.search(r'[^\W\d_]',text,re.UNICODE) and text not in ['html','MOS','BARCODE','M','PORTABLE','FULL PRO','MOSBARKOD.COM.TR']:
+   if text and re.search(r'[^\W\d_]',text,re.UNICODE) and text not in ['html','MOS','BARCODE','M','PORTABLE','FULL PRO','MOSBARKOD.COM.TR','MOSBARCODE.COM.TR']:
     keys.add(text)
   for el in soup.select('[alt],[aria-label],[title],meta[name="description"],meta[property="og:title"],meta[property="og:description"]'):
    if el.has_attr('data-no-translate') or el.find_parent(attrs={'data-no-translate':True}):continue

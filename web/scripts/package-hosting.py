@@ -8,6 +8,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import time
+import sys
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -19,7 +20,8 @@ FILES = [f'MOSBARKODYAZILIM-Demo-Setup-{VERSION}.exe',
          f'MOSBARKODYAZILIM-Demo-Portable-{VERSION}.exe', 'app-debug-demo.apk']
 subprocess.run(['python3',str(ROOT/'web/scripts/check-locales.py')],check=True)
 OUT.mkdir(parents=True, exist_ok=True)
-STAGE.mkdir(exist_ok=True)
+if STAGE.exists(): shutil.rmtree(STAGE)
+STAGE.mkdir()
 # Never include repository internals or developer documentation in the public site.
 for name in ['index.html', 'ozellikler.html']:
     shutil.copy2(ROOT / 'web' / name, STAGE / name)
@@ -40,6 +42,32 @@ for name in ['index.html', 'ozellikler.html']:
     text = text.replace('Bu bağlantılar demo paketi değildir; lisans gerekebilir. Mac paketleri notarize değildir.',
                         'Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.')
     path.write_text(text)
+
+# Include the licensed PWA; never enable the demo build flag here.
+subprocess.run(['python3',str(ROOT/'web/scripts/prepare-pwa.py'),str(STAGE/'uygulama')],check=True)
+instructions="""MOS BARCODE — Dil + iPhone/PWA güncellemesi
+ZIP içeriğini mevcut public_html içine çıkarın; aynı adlı site dosyalarını değiştirin.
+Mevcut indir/ klasörünü SİLMEYİN: bu güncellemede EXE/APK dosyaları yoktur.
+iPhone: https://www.mosbarcode.com.tr/uygulama/ adresini Safari ile açın,
+Paylaş > Ana Ekrana Ekle seçeneğini kullanın. HTTPS gereklidir.
+Lisans şartları değişmez; bu PWA sınırsız ücretsiz demo değildir.
+ÖNEMLİ: GitHub ve kendi domaininiz farklı veri alanlarıdır. Eski uygulamada
+önce tam ZIP yedek alın, yeni adreste geri yükleyip kontrol edin. Eski kaydı
+kontrol etmeden silmeyin. Lisansın yeni adreste yeniden etkinleştirilmesi gerekebilir.
+www ve www olmayan adresler de farklı veri alanlarıdır: PWA için hep www kullanın.
+Çeviri iyileştirmeleri site içindir; uygulamanın dil paketleri değiştirilmemiştir.
+"""
+(STAGE/'GUNCELLEME-OKU.txt').write_text(instructions)
+patch=OUT/'MOSBARCODE-dil-PWA-guncelleme.zip'
+with zipfile.ZipFile(patch,'w',compression=zipfile.ZIP_DEFLATED) as z:
+    for file in sorted(STAGE.rglob('*')):
+        if file.is_file(): z.write(file,file.relative_to(STAGE))
+with zipfile.ZipFile(patch) as z:
+    assert z.testzip() is None
+    assert 'uygulama/index.html' in z.namelist()
+    assert not any(n.startswith('indir/') or n.endswith(('.exe','.apk')) for n in z.namelist())
+print('Update ready:',patch,patch.stat().st_size)
+if '--patch-only' in sys.argv: sys.exit(0)
 
 # Download the exact public release artifacts and check against GitHub metadata.
 # A version commit can start this workflow before parallel installer builds finish.

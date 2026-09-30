@@ -1,6 +1,6 @@
 {
   "locale": "tr",
-  "sourceHash": "f5fd96286f7f3240b531f6a50f6b107086196ae423b0a4a7b6a499d510cb628b",
+  "sourceHash": "77b6d2f04a1d195a663217a78c87b4ba8b2dee5ed24bab745f772ae2bce7a0d6",
   "translation": "Original",
   "texts": {
     "$ USD": "$ USD",
@@ -50,7 +50,6 @@
     "Bir program.": "Bir program.",
     "Birden fazla çalışma alanı": "Birden fazla çalışma alanı",
     "Bu akışı ücretsiz demoda keşfedin ↗": "Bu akışı ücretsiz demoda keşfedin ↗",
-    "Bu bağlantılar demo paketi değildir; lisans gerekebilir. Mac paketleri notarize değildir.": "Bu bağlantılar demo paketi değildir; lisans gerekebilir. Mac paketleri notarize değildir.",
     "Bu ekranın kayıt oluşturması, gerçek ulaşım kartına bakiye yükleyen bir kurum bağlantısı olduğu anlamına gelmez. Kurumsal yetki ve cihaz gereksinimleri ayrıca doğrulanmalıdır.": "Bu ekranın kayıt oluşturması, gerçek ulaşım kartına bakiye yükleyen bir kurum bağlantısı olduğu anlamına gelmez. Kurumsal yetki ve cihaz gereksinimleri ayrıca doğrulanmalıdır.",
     "Bu hafta ▾": "Bu hafta ▾",
     "Bu sitede sunulan iPhone seçeneği PWA’dır. Safari üzerinden uygulamayı açıp Paylaş → Ana Ekrana Ekle yolunu kullanabilirsiniz. Bu bağlantı bir App Store indirmesi değildir.": "Bu sitede sunulan iPhone seçeneği PWA’dır. Safari üzerinden uygulamayı açıp Paylaş → Ana Ekrana Ekle yolunu kullanabilirsiniz. Bu bağlantı bir App Store indirmesi değildir.",
@@ -163,7 +162,8 @@
     "Maaş ve avans": "Maaş ve avans",
     "Maaş veya avans ödemesini tutar ve açıklamayla kaydedin. İlgili ayın toplam maaş yükünü ve yapılan ödemeleri inceleyin.": "Maaş veya avans ödemesini tutar ve açıklamayla kaydedin. İlgili ayın toplam maaş yükünü ve yapılan ödemeleri inceleyin.",
     "Mac, Linux veya iPhone mu kullanıyorsunuz? Kurulum seçeneklerini birlikte belirleyelim.": "Mac, Linux veya iPhone mu kullanıyorsunuz? Kurulum seçeneklerini birlikte belirleyelim.",
-    "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.": "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.",
+    "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA bu sitede çalışır; lisans gerekebilir. Mac paketleri notarize değildir.": "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA bu sitede çalışır; lisans gerekebilir. Mac paketleri notarize değildir.",
+    "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.": "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA bu sitede çalışır; lisans gerekebilir. Mac paketleri notarize değildir.",
     "Maliyet ve fiyatlar": "Maliyet ve fiyatlar",
     "Manav": "Manav",
     "Marka/model ve bağlantı tipi seçeneklerini belirleyin. IP/port, seri port veya ilgili API ayarlarını cihazınıza göre düzenleyin.": "Marka/model ve bağlantı tipi seçeneklerini belirleyin. IP/port, seri port veya ilgili API ayarlarını cihazınıza göre düzenleyin.",

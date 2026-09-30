@@ -49,3 +49,19 @@ Uygulamanın görünen marka adı MOS BARCODE'dur. Veri anahtarları, Android pa
 `assets/img/hardware-mint.webp`: marka/model iddiası olmayan, üretilmiş temsili barkod okuyucu ve termal fiş yazıcı görseli. Başlığın yanında kompakt görünür: geniş masaüstünde 512 px (önceki 128 px ölçünün dört katı), dar ekranlarda uyarlanabilir genişlik; ayrı bir satır açıp hero alanını uzatmaz. Mint aydınlatma mevcut koyu yeşil zemine karışır. Cihazların yazılım lisansına dahil olmadığı notu ve görsel açıklaması 14 dilde bulunur. WebP 1024×1024, yaklaşık 45 KB; orijinal büyük PNG dağıtıma dahil değildir.
 
 POS Entegrasyonu bölümünde küçük bir notla ayrı yıllık ücret bilgisi gösterilir; not 14 dilde mevcuttur.
+
+## Dil + aynı hostingde PWA güncellemesi
+`npm ci --prefix mosbarkod && npm run build --prefix mosbarkod` sonrasında
+`python3 web/scripts/package-hosting.py --patch-only` yaklaşık 4 MB güncelleme ZIP'i
+üretir. Normal paketleme hem bu küçük ZIP'i hem demo dosyalarını içeren tam ZIP'i üretir.
+`MOSBARCODE-dil-PWA-guncelleme.zip` mevcut public_html üzerine çıkarılır; `indir/`
+klasörüne dokunmaz. Üretim/lisanslı PWA `uygulama/` altında bulunur, demo bayrağı açılmaz.
+HTTPS gerekir. Service worker yalnız uygulama klasörünü ve kendi sürümlü cache'lerini
+yönetir. GitHub, www ve çıplak alan adı ayrı tarayıcı veri alanlarıdır: önce tam ZIP
+veri yedeği alın, aynı www adresini kullanın, yeni PWA'da geri yüklemeyi doğrulayın.
+Lisansın yeniden etkinleştirilmesi gerekebilir. Veri/lisans otomatik taşınmaz.
+
+Dil düzenlemesi: 14 dilde hafta günleri, satış/fiş/dolum terimleri, SSS ve başlıca
+sloganlar; İngilizcede ek arayüz ve tanıtım metni düzeltmeleri. Kalıcı düzeltmeler
+`site-overrides.json` içinde tutulur. Tüm metinler profesyonel olarak onaylanmış
+çeviri değildir; bu güncelleme uygulama içi dil paketlerini değiştirmez.

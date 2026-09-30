@@ -21,13 +21,24 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build licensed hosting PWA
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+          VITE_DEMO: '0'
+          VITE_PLAY: '0'
+        run: npm ci --prefix mosbarkod && npm run build --prefix mosbarkod
       - name: Assemble website and verify demo installers
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python3 web/scripts/package-hosting.py
+      - name: Verify update ZIP
+        run: python3 web/scripts/check-hosting.py
       - name: Publish ready-to-upload hosting ZIP
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION=$(python3 -c "import json; print(json.load(open('mosbarkod/package.json'))['version'])")
-          gh release upload "v${VERSION}" "$HOME/.cache/mospos-hosting/MOSBARKOD-public_html.zip" --clobber
+          gh release upload "v${VERSION}" "$HOME/.cache/mospos-hosting/MOSBARKOD-public_html.zip" "$HOME/.cache/mospos-hosting/MOSBARCODE-dil-PWA-guncelleme.zip" --clobber
