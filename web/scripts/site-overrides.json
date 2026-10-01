@@ -130,7 +130,14 @@
     "ÖNE ÇIKAN ÖZELLİK": "FEATURE HIGHLIGHT",
     "Bu ekrandaki özellikler": "Features on this screen",
     "Orijinal PNG’yi aç ↗": "Open original PNG ↗",
-    "Orijinal tam sürümden alınmış gerçek ekran. Örnek veriler kullanılmıştır; arayüz Türkçedir.": "Actual screenshot from the original full version, using sample data. The interface is in Turkish."
+    "Orijinal tam sürümden alınmış gerçek ekran. Örnek veriler kullanılmıştır; arayüz Türkçedir.": "Actual screenshot from the original full version, using sample data. The interface is in Turkish.",
+    "14 dilde kullanım. 14 ülke için vergi hesaplama.": "Use 14 languages. Calculate tax for 14 countries.",
+    "MOS BARCODE’u 14 farklı dilde kullanın. Seçilen dil/ülke profiline ve kayıtlı oranlara göre satış, alış faturası ve masraf kayıtlarındaki KDV/VAT tutarlarını otomatik hesaplayın.": "Use MOS BARCODE in 14 languages. Automatically calculate VAT on sales, purchase invoices and expense records using the selected language/country profile and configured rates.",
+    "Hesaplamalar programdaki ülke profilleri ve girilen verilere dayanır. Güncel mevzuatı ve ürüne uygun vergi oranını doğrulayın; mali müşavir kontrolünün yerine geçmez.": "Calculations use the country profiles in the application and the data entered. Verify current regulations and the tax rate applicable to each product; this does not replace an accountant’s review.",
+    "İŞLETMENİZİN DİLİNE UYUM SAĞLAR": "ADAPTS TO YOUR BUSINESS LANGUAGE",
+    "Dil desteği": "Supported languages",
+    "Ülke vergi profili": "Country tax profiles",
+    "Dil ve vergi özelliklerini inceleyin ↗": "Explore language and tax features ↗"
   },
   "de": {
     "Alış Faturası": "Einkaufsrechnungen",

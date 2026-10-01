@@ -20,7 +20,7 @@ if('IntersectionObserver' in window){
   const heading=link.closest('.module-detail').querySelector('h2').textContent;
   image.src=link.href;image.alt=heading;title.textContent=heading;original.href=link.dataset.original||link.href;
   details.replaceChildren();
-  for(const block of link.closest('.module-detail').querySelectorAll(':scope > .module-highlight,:scope > .module-breakdown,:scope > .module-note,:scope > .integration-fee')){
+  for(const block of link.closest('.module-detail').querySelectorAll(':scope > .module-highlight,:scope > .global-coverage-note,:scope > .module-breakdown,:scope > .module-note,:scope > .integration-fee')){
    const copy=block.cloneNode(true);copy.removeAttribute('id');copy.querySelectorAll('[id]').forEach(el=>el.removeAttribute('id'));details.append(copy);
   }
   viewer.scrollTop=0;

@@ -89,3 +89,10 @@ build-time çeviri hattından geçer. Tam profesyonel çeviri onayı değildir.
 `refresh-assets.py` dil/CSS/JS önbellek anahtarlarını günceller. Yayın ve paketleme,
 eksik dil anahtarlarını tamamlamadan ve doğrulamadan devam etmez. POS yıllık ücret,
 donanım uyumu, PDF/OCR ve yedekleme sınırları açıklamalarda korunur.
+
+## 14 dil / 14 ülke vergi profili
+Ana sayfada özellikler bölümünden önce belirgin bir tanıtım alanı, Ayarlar bölümünde
+ayrıntı notu bulunur. Sayılar uygulamanın locales/i18n ve countryVat.ts profilleriyle
+eşleşir. Ülke profili mevcut uygulamada dil seçimine bağlıdır; ülkeye ait kayıtlı
+oranlar ve girilen veriler kullanılır. Otomatik mevzuat güncellemesi veya resmî mali
+uyumluluk garantisi verilmez. Yeni tanıtım metinleri 14 dil paketine dahildir.
