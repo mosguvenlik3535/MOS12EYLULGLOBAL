@@ -92,10 +92,16 @@ for filename in FILES:
         digest=asset.get('digest')
         with file.open('rb') as handle: actual=hashlib.file_digest(handle,'sha256').hexdigest()
         return not digest or digest=='sha256:'+actual
-    if not verified():
-        result=subprocess.run(['gh','release','download',f'v{VERSION}','--repo',REPO,'--pattern',filename,'--dir',str(dest),'--clobber'],capture_output=True)
-        if result.returncode: raise RuntimeError('Release download failed (network/access): '+filename)
-    if not verified(): raise RuntimeError('Release verification failed: '+filename)
+    for download_attempt in range(3):
+        if verified(): break
+        try:
+            subprocess.run(['gh','release','download',f'v{VERSION}','--repo',REPO,'--pattern',filename,'--dir',str(dest),'--clobber'],capture_output=True,timeout=180)
+        except subprocess.TimeoutExpired:
+            pass
+        if verified(): break
+        print(f'Retrying verified installer download: {filename} ({download_attempt+1}/3)',flush=True)
+        time.sleep(3*(download_attempt+1))
+    if not verified(): raise RuntimeError('Release download/verification failed after retries: '+filename)
     with file.open('rb') as handle: digest=hashlib.file_digest(handle,'sha256').hexdigest()
     checksums.append(f'{digest}  {filename}')
     print('Verified:',filename, file.stat().st_size)
