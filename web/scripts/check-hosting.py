@@ -13,6 +13,14 @@ with zipfile.ZipFile(archive) as z:
     for page in ['index.html','ozellikler.html']:
         for asset,digest in re.findall(r'(assets/(?:css|js)/[^"?]+)\?v=([a-f0-9]+)',z.read(page).decode()):
             assert hashlib.sha256(z.read(asset)).hexdigest().startswith(digest),asset
+    features=z.read('ozellikler.html').decode()
+    for module in ['sales','delivery','imkart','pos-integration','stock','purchase','credit','expense','staff','cash','settings']:
+        assert f'assets/img/screens/{module}.webp' in names
+        assert f'assets/img/screens/{module}-preview.webp' in names
+        assert f'href="assets/img/screens/{module}.webp"' in features
+    assert features.count('class="module-screenshot"')==11
+    assert 'id="screen-viewer"' in features
+    assert 'POS entegrasyonu ayrıca yıllık ücrete tabidir.' in features
     manifest=json.loads(z.read('uygulama/manifest.webmanifest'))
     assert manifest['scope']==manifest['start_url']=='./'
     sw=z.read('uygulama/sw.js').decode()

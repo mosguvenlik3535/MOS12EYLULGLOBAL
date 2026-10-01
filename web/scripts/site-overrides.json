@@ -71,7 +71,14 @@
     "Ömür boyu yanınızda olsun.": "Use it for a lifetime.",
     "Dolum hareketlerinizi ve kullanılabilir limitinizi kayıt altında tutun.": "Track top-ups and your available balance.",
     "Dolum ve depozito hareketlerini tarihleriyle görüntüleyin.": "View dated top-up and deposit records.",
-    "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.": "Contact us for Mac/Linux installation. iPhone/PWA runs on this website and may require a license. Mac packages are not notarized."
+    "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.": "Contact us for Mac/Linux installation. iPhone/PWA runs on this website and may require a license. Mac packages are not notarized.",
+    "Gerçek uygulama ekranı; örnek verilerle gösterilmiştir. Görseller Türkçe arayüze aittir.": "Actual application screen with sample data. Screenshots show the Turkish interface.",
+    "Görseli büyüt ↗": "Enlarge screenshot ↗",
+    "Program ekranı": "Application screen",
+    "Kapat ×": "Close ×",
+    "Önceki ekran": "Previous screen",
+    "Tam boyutta aç ↗": "Open full size ↗",
+    "Sonraki ekran": "Next screen"
   },
   "de": {
     "Alış Faturası": "Einkaufsrechnungen",
@@ -111,7 +118,14 @@
     "Dolum kaydı": "Aufladungen erfassen",
     "Merak edilenler": "Häufige Fragen",
     "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA bu sitede çalışır; lisans gerekebilir. Mac paketleri notarize değildir.": "Kontaktieren Sie uns zur Mac/Linux-Installation. Die iPhone/PWA-App läuft auf dieser Website und erfordert möglicherweise eine Lizenz. Mac-Pakete sind nicht notarisiert.",
-    "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.": "Kontaktieren Sie uns zur Mac/Linux-Installation. Die iPhone/PWA-App läuft auf dieser Website und erfordert möglicherweise eine Lizenz. Mac-Pakete sind nicht notarisiert."
+    "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.": "Kontaktieren Sie uns zur Mac/Linux-Installation. Die iPhone/PWA-App läuft auf dieser Website und erfordert möglicherweise eine Lizenz. Mac-Pakete sind nicht notarisiert.",
+    "Gerçek uygulama ekranı; örnek verilerle gösterilmiştir. Görseller Türkçe arayüze aittir.": "Originaler Anwendungsbildschirm mit Beispieldaten. Die Screenshots zeigen die türkische Oberfläche.",
+    "Görseli büyüt ↗": "Screenshot vergrößern ↗",
+    "Program ekranı": "Anwendungsbildschirm",
+    "Kapat ×": "Schließen ×",
+    "Önceki ekran": "Vorheriger Bildschirm",
+    "Tam boyutta aç ↗": "In voller Größe öffnen ↗",
+    "Sonraki ekran": "Nächster Bildschirm"
   },
   "fr": {
     "Alış Faturası": "Factures d’achat",
@@ -152,7 +166,14 @@
     "Dolum kaydı": "Enregistrement des rechargements",
     "Merak edilenler": "Questions fréquentes",
     "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA bu sitede çalışır; lisans gerekebilir. Mac paketleri notarize değildir.": "Contactez-nous pour l’installation sur Mac/Linux. L’application iPhone/PWA fonctionne sur ce site et peut nécessiter une licence. Les paquets Mac ne sont pas notariés.",
-    "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.": "Contactez-nous pour l’installation sur Mac/Linux. L’application iPhone/PWA fonctionne sur ce site et peut nécessiter une licence. Les paquets Mac ne sont pas notariés."
+    "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.": "Contactez-nous pour l’installation sur Mac/Linux. L’application iPhone/PWA fonctionne sur ce site et peut nécessiter une licence. Les paquets Mac ne sont pas notariés.",
+    "Gerçek uygulama ekranı; örnek verilerle gösterilmiştir. Görseller Türkçe arayüze aittir.": "Écran réel de l’application avec des données d’exemple. Les captures montrent l’interface en turc.",
+    "Görseli büyüt ↗": "Agrandir la capture ↗",
+    "Program ekranı": "Écran de l’application",
+    "Kapat ×": "Fermer ×",
+    "Önceki ekran": "Écran précédent",
+    "Tam boyutta aç ↗": "Ouvrir en taille réelle ↗",
+    "Sonraki ekran": "Écran suivant"
   },
   "es": {
     "Alış Faturası": "Facturas de compra",
@@ -195,7 +216,14 @@
     "Dolum kaydı": "Registro de recargas",
     "Merak edilenler": "Preguntas frecuentes",
     "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA bu sitede çalışır; lisans gerekebilir. Mac paketleri notarize değildir.": "Contáctenos para instalar en Mac/Linux. La aplicación iPhone/PWA funciona en este sitio y puede requerir licencia. Los paquetes Mac no están notarizados.",
-    "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.": "Contáctenos para instalar en Mac/Linux. La aplicación iPhone/PWA funciona en este sitio y puede requerir licencia. Los paquetes Mac no están notarizados."
+    "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.": "Contáctenos para instalar en Mac/Linux. La aplicación iPhone/PWA funciona en este sitio y puede requerir licencia. Los paquetes Mac no están notarizados.",
+    "Gerçek uygulama ekranı; örnek verilerle gösterilmiştir. Görseller Türkçe arayüze aittir.": "Pantalla real de la aplicación con datos de ejemplo. Las capturas muestran la interfaz en turco.",
+    "Görseli büyüt ↗": "Ampliar captura ↗",
+    "Program ekranı": "Pantalla de la aplicación",
+    "Kapat ×": "Cerrar ×",
+    "Önceki ekran": "Pantalla anterior",
+    "Tam boyutta aç ↗": "Abrir a tamaño completo ↗",
+    "Sonraki ekran": "Pantalla siguiente"
   },
   "it": {
     "Alış Faturası": "Fatture di acquisto",
@@ -238,7 +266,14 @@
     "Dolum kaydı": "Registrazione delle ricariche",
     "Merak edilenler": "Domande frequenti",
     "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA bu sitede çalışır; lisans gerekebilir. Mac paketleri notarize değildir.": "Contattaci per l’installazione su Mac/Linux. L’app iPhone/PWA funziona su questo sito e potrebbe richiedere una licenza. I pacchetti Mac non sono notarizzati.",
-    "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.": "Contattaci per l’installazione su Mac/Linux. L’app iPhone/PWA funziona su questo sito e potrebbe richiedere una licenza. I pacchetti Mac non sono notarizzati."
+    "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.": "Contattaci per l’installazione su Mac/Linux. L’app iPhone/PWA funziona su questo sito e potrebbe richiedere una licenza. I pacchetti Mac non sono notarizzati.",
+    "Gerçek uygulama ekranı; örnek verilerle gösterilmiştir. Görseller Türkçe arayüze aittir.": "Schermata reale dell’applicazione con dati di esempio. Le immagini mostrano l’interfaccia in turco.",
+    "Görseli büyüt ↗": "Ingrandisci schermata ↗",
+    "Program ekranı": "Schermata dell’applicazione",
+    "Kapat ×": "Chiudi ×",
+    "Önceki ekran": "Schermata precedente",
+    "Tam boyutta aç ↗": "Apri a dimensione intera ↗",
+    "Sonraki ekran": "Schermata successiva"
   },
   "pt": {
     "Alış Faturası": "Faturas de compra",
@@ -276,7 +311,14 @@
     "Dolum kaydı": "Registro de recargas",
     "Merak edilenler": "Perguntas frequentes",
     "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA bu sitede çalışır; lisans gerekebilir. Mac paketleri notarize değildir.": "Entre em contato para instalar no Mac/Linux. O app iPhone/PWA funciona neste site e pode exigir licença. Os pacotes Mac não são notarizados.",
-    "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.": "Entre em contato para instalar no Mac/Linux. O app iPhone/PWA funciona neste site e pode exigir licença. Os pacotes Mac não são notarizados."
+    "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.": "Entre em contato para instalar no Mac/Linux. O app iPhone/PWA funciona neste site e pode exigir licença. Os pacotes Mac não são notarizados.",
+    "Gerçek uygulama ekranı; örnek verilerle gösterilmiştir. Görseller Türkçe arayüze aittir.": "Tela real do aplicativo com dados de exemplo. As capturas mostram a interface em turco.",
+    "Görseli büyüt ↗": "Ampliar captura ↗",
+    "Program ekranı": "Tela do aplicativo",
+    "Kapat ×": "Fechar ×",
+    "Önceki ekran": "Tela anterior",
+    "Tam boyutta aç ↗": "Abrir em tamanho real ↗",
+    "Sonraki ekran": "Próxima tela"
   },
   "nl": {
     "Alış Faturası": "Inkoopfacturen",
@@ -311,7 +353,14 @@
     "Dolum kaydı": "Opwaarderingen registreren",
     "Merak edilenler": "Veelgestelde vragen",
     "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA bu sitede çalışır; lisans gerekebilir. Mac paketleri notarize değildir.": "Neem contact op voor installatie op Mac/Linux. De iPhone/PWA-app werkt op deze website en vereist mogelijk een licentie. Mac-pakketten zijn niet genotariseerd.",
-    "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.": "Neem contact op voor installatie op Mac/Linux. De iPhone/PWA-app werkt op deze website en vereist mogelijk een licentie. Mac-pakketten zijn niet genotariseerd."
+    "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.": "Neem contact op voor installatie op Mac/Linux. De iPhone/PWA-app werkt op deze website en vereist mogelijk een licentie. Mac-pakketten zijn niet genotariseerd.",
+    "Gerçek uygulama ekranı; örnek verilerle gösterilmiştir. Görseller Türkçe arayüze aittir.": "Werkelijk applicatiescherm met voorbeeldgegevens. De schermafbeeldingen tonen de Turkse interface.",
+    "Görseli büyüt ↗": "Schermafbeelding vergroten ↗",
+    "Program ekranı": "Applicatiescherm",
+    "Kapat ×": "Sluiten ×",
+    "Önceki ekran": "Vorig scherm",
+    "Tam boyutta aç ↗": "Op volledig formaat openen ↗",
+    "Sonraki ekran": "Volgend scherm"
   },
   "pl": {
     "Alış Faturası": "Faktury zakupu",
@@ -355,7 +404,14 @@
     "Dolum kaydı": "Rejestr doładowań",
     "Merak edilenler": "Najczęstsze pytania",
     "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA bu sitede çalışır; lisans gerekebilir. Mac paketleri notarize değildir.": "Skontaktuj się z nami w sprawie instalacji na Mac/Linux. Aplikacja iPhone/PWA działa w tej witrynie i może wymagać licencji. Pakiety Mac nie są notaryzowane.",
-    "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.": "Skontaktuj się z nami w sprawie instalacji na Mac/Linux. Aplikacja iPhone/PWA działa w tej witrynie i może wymagać licencji. Pakiety Mac nie są notaryzowane."
+    "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.": "Skontaktuj się z nami w sprawie instalacji na Mac/Linux. Aplikacja iPhone/PWA działa w tej witrynie i może wymagać licencji. Pakiety Mac nie są notaryzowane.",
+    "Gerçek uygulama ekranı; örnek verilerle gösterilmiştir. Görseller Türkçe arayüze aittir.": "Rzeczywisty ekran aplikacji z przykładowymi danymi. Zrzuty przedstawiają interfejs w języku tureckim.",
+    "Görseli büyüt ↗": "Powiększ zrzut ↗",
+    "Program ekranı": "Ekran aplikacji",
+    "Kapat ×": "Zamknij ×",
+    "Önceki ekran": "Poprzedni ekran",
+    "Tam boyutta aç ↗": "Otwórz w pełnym rozmiarze ↗",
+    "Sonraki ekran": "Następny ekran"
   },
   "ro": {
     "Alış Faturası": "Facturi de achiziție",
@@ -392,7 +448,14 @@
     "Dolum kaydı": "Înregistrarea reîncărcărilor",
     "Merak edilenler": "Întrebări frecvente",
     "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA bu sitede çalışır; lisans gerekebilir. Mac paketleri notarize değildir.": "Contactați-ne pentru instalarea pe Mac/Linux. Aplicația iPhone/PWA rulează pe acest site și poate necesita licență. Pachetele Mac nu sunt notarizate.",
-    "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.": "Contactați-ne pentru instalarea pe Mac/Linux. Aplicația iPhone/PWA rulează pe acest site și poate necesita licență. Pachetele Mac nu sunt notarizate."
+    "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.": "Contactați-ne pentru instalarea pe Mac/Linux. Aplicația iPhone/PWA rulează pe acest site și poate necesita licență. Pachetele Mac nu sunt notarizate.",
+    "Gerçek uygulama ekranı; örnek verilerle gösterilmiştir. Görseller Türkçe arayüze aittir.": "Ecran real al aplicației cu date demonstrative. Capturile prezintă interfața în limba turcă.",
+    "Görseli büyüt ↗": "Mărește captura ↗",
+    "Program ekranı": "Ecranul aplicației",
+    "Kapat ×": "Închide ×",
+    "Önceki ekran": "Ecranul anterior",
+    "Tam boyutta aç ↗": "Deschide la dimensiune completă ↗",
+    "Sonraki ekran": "Ecranul următor"
   },
   "el": {
     "Alış Faturası": "Τιμολόγια αγορών",
@@ -429,7 +492,14 @@
     "Dolum kaydı": "Καταγραφή ανανεώσεων υπολοίπου",
     "Merak edilenler": "Συχνές ερωτήσεις",
     "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA bu sitede çalışır; lisans gerekebilir. Mac paketleri notarize değildir.": "Επικοινωνήστε μαζί μας για εγκατάσταση σε Mac/Linux. Η εφαρμογή iPhone/PWA λειτουργεί σε αυτόν τον ιστότοπο και ενδέχεται να απαιτεί άδεια. Τα πακέτα Mac δεν είναι συμβολαιογραφικά επικυρωμένα από την Apple.",
-    "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.": "Επικοινωνήστε μαζί μας για εγκατάσταση σε Mac/Linux. Η εφαρμογή iPhone/PWA λειτουργεί σε αυτόν τον ιστότοπο και ενδέχεται να απαιτεί άδεια. Τα πακέτα Mac δεν είναι συμβολαιογραφικά επικυρωμένα από την Apple."
+    "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.": "Επικοινωνήστε μαζί μας για εγκατάσταση σε Mac/Linux. Η εφαρμογή iPhone/PWA λειτουργεί σε αυτόν τον ιστότοπο και ενδέχεται να απαιτεί άδεια. Τα πακέτα Mac δεν είναι συμβολαιογραφικά επικυρωμένα από την Apple.",
+    "Gerçek uygulama ekranı; örnek verilerle gösterilmiştir. Görseller Türkçe arayüze aittir.": "Πραγματική οθόνη της εφαρμογής με ενδεικτικά δεδομένα. Τα στιγμιότυπα δείχνουν το περιβάλλον στα τουρκικά.",
+    "Görseli büyüt ↗": "Μεγέθυνση εικόνας ↗",
+    "Program ekranı": "Οθόνη εφαρμογής",
+    "Kapat ×": "Κλείσιμο ×",
+    "Önceki ekran": "Προηγούμενη οθόνη",
+    "Tam boyutta aç ↗": "Άνοιγμα σε πλήρες μέγεθος ↗",
+    "Sonraki ekran": "Επόμενη οθόνη"
   },
   "ru": {
     "Alış Faturası": "Закупочные накладные",
@@ -469,7 +539,14 @@
     "Dolum kaydı": "Учёт пополнений",
     "Merak edilenler": "Частые вопросы",
     "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA bu sitede çalışır; lisans gerekebilir. Mac paketleri notarize değildir.": "Свяжитесь с нами для установки на Mac/Linux. Приложение iPhone/PWA работает на этом сайте; может потребоваться лицензия. Пакеты Mac не прошли нотариальную проверку Apple.",
-    "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.": "Свяжитесь с нами для установки на Mac/Linux. Приложение iPhone/PWA работает на этом сайте; может потребоваться лицензия. Пакеты Mac не прошли нотариальную проверку Apple."
+    "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.": "Свяжитесь с нами для установки на Mac/Linux. Приложение iPhone/PWA работает на этом сайте; может потребоваться лицензия. Пакеты Mac не прошли нотариальную проверку Apple.",
+    "Gerçek uygulama ekranı; örnek verilerle gösterilmiştir. Görseller Türkçe arayüze aittir.": "Настоящий экран приложения с примерными данными. На снимках показан интерфейс на турецком языке.",
+    "Görseli büyüt ↗": "Увеличить снимок ↗",
+    "Program ekranı": "Экран приложения",
+    "Kapat ×": "Закрыть ×",
+    "Önceki ekran": "Предыдущий экран",
+    "Tam boyutta aç ↗": "Открыть в полном размере ↗",
+    "Sonraki ekran": "Следующий экран"
   },
   "ar": {
     "Alış Faturası": "فواتير الشراء",
@@ -507,7 +584,14 @@
     "Dolum kaydı": "تسجيل عمليات شحن الرصيد",
     "Merak edilenler": "الأسئلة الشائعة",
     "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA bu sitede çalışır; lisans gerekebilir. Mac paketleri notarize değildir.": "تواصل معنا لتثبيت إصدار Mac/Linux. يعمل تطبيق iPhone/PWA على هذا الموقع وقد يتطلب ترخيصًا. حزم Mac غير موثّقة لدى Apple.",
-    "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.": "تواصل معنا لتثبيت إصدار Mac/Linux. يعمل تطبيق iPhone/PWA على هذا الموقع وقد يتطلب ترخيصًا. حزم Mac غير موثّقة لدى Apple."
+    "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.": "تواصل معنا لتثبيت إصدار Mac/Linux. يعمل تطبيق iPhone/PWA على هذا الموقع وقد يتطلب ترخيصًا. حزم Mac غير موثّقة لدى Apple.",
+    "Gerçek uygulama ekranı; örnek verilerle gösterilmiştir. Görseller Türkçe arayüze aittir.": "شاشة فعلية للتطبيق ببيانات توضيحية. تعرض الصور واجهة التطبيق باللغة التركية.",
+    "Görseli büyüt ↗": "تكبير الصورة ↗",
+    "Program ekranı": "شاشة التطبيق",
+    "Kapat ×": "إغلاق ×",
+    "Önceki ekran": "الشاشة السابقة",
+    "Tam boyutta aç ↗": "فتح بالحجم الكامل ↗",
+    "Sonraki ekran": "الشاشة التالية"
   },
   "zh": {
     "MOS BARCODE / ALIŞ FATURASI": "MOS BARCODE / 采购发票",
@@ -545,7 +629,14 @@
     "Dolum kaydı": "充值记录",
     "Merak edilenler": "常见问题",
     "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA bu sitede çalışır; lisans gerekebilir. Mac paketleri notarize değildir.": "如需安装 Mac/Linux 版本，请联系我们。iPhone/PWA 在本网站运行，可能需要许可证。Mac 安装包未经 Apple 公证。",
-    "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.": "如需安装 Mac/Linux 版本，请联系我们。iPhone/PWA 在本网站运行，可能需要许可证。Mac 安装包未经 Apple 公证。"
+    "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.": "如需安装 Mac/Linux 版本，请联系我们。iPhone/PWA 在本网站运行，可能需要许可证。Mac 安装包未经 Apple 公证。",
+    "Gerçek uygulama ekranı; örnek verilerle gösterilmiştir. Görseller Türkçe arayüze aittir.": "使用示例数据的真实应用界面。截图展示土耳其语界面。",
+    "Görseli büyüt ↗": "放大截图 ↗",
+    "Program ekranı": "应用界面",
+    "Kapat ×": "关闭 ×",
+    "Önceki ekran": "上一屏",
+    "Tam boyutta aç ↗": "查看原图 ↗",
+    "Sonraki ekran": "下一屏"
   },
   "tr": {
     "Pzt": "Pzt",
@@ -561,6 +652,13 @@
     "Dolum kaydı": "Dolum kaydı",
     "Merak edilenler": "Merak edilenler",
     "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA bu sitede çalışır; lisans gerekebilir. Mac paketleri notarize değildir.": "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA bu sitede çalışır; lisans gerekebilir. Mac paketleri notarize değildir.",
-    "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.": "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA bu sitede çalışır; lisans gerekebilir. Mac paketleri notarize değildir."
+    "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.": "Mac/Linux kurulumları için iletişime geçin. iPhone/PWA bu sitede çalışır; lisans gerekebilir. Mac paketleri notarize değildir.",
+    "Gerçek uygulama ekranı; örnek verilerle gösterilmiştir. Görseller Türkçe arayüze aittir.": "Gerçek uygulama ekranı; örnek verilerle gösterilmiştir. Görseller Türkçe arayüze aittir.",
+    "Görseli büyüt ↗": "Görseli büyüt ↗",
+    "Program ekranı": "Program ekranı",
+    "Kapat ×": "Kapat ×",
+    "Önceki ekran": "Önceki ekran",
+    "Tam boyutta aç ↗": "Tam boyutta aç ↗",
+    "Sonraki ekran": "Sonraki ekran"
   }
 }

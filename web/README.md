@@ -65,3 +65,17 @@ Dil düzenlemesi: 14 dilde hafta günleri, satış/fiş/dolum terimleri, SSS ve 
 sloganlar; İngilizcede ek arayüz ve tanıtım metni düzeltmeleri. Kalıcı düzeltmeler
 `site-overrides.json` içinde tutulur. Tüm metinler profesyonel olarak onaylanmış
 çeviri değildir; bu güncelleme uygulama içi dil paketlerini değiştirmez.
+
+## Gerçek uygulama ekranları — 11 modül
+`assets/img/screens/` içindeki görseller MOS BARCODE 1.15.20'nin çalışan React
+arayüzünden, 1600×1050 boyutta alınmıştır; yapay görsel veya yeniden çizilmiş arayüz
+değildir. Yerel demo oturumunda örnek işletme/veriler kullanılmış; müşteri ve personel
+adları örnek adlarla değiştirilmiş, telefonları boş bırakılmıştır. POS yapılandırma
+modülü yalnız yerel çekim oturumunda etkinleştirilmiştir; ürünün lisans/ücret kuralları
+ve kaynak kodu değiştirilmemiştir. POS yıllık ücret notu korunur.
+
+Her bölüm kendi sekmesinin WebP ekranını ve 960 px önizlemesini içerir. Lazy loading,
+srcset, klavyeyle kullanılabilen dialog (Escape, ok tuşları, odak geri dönüşü), önceki/
+sonraki ekran ve tam boyut bağlantısı vardır. JavaScript yoksa orijinal görsel açılır.
+Açıklamalar ve kontroller 14 dilde; görüntülerin arayüz dili Türkçedir. Bu durum
+her görselin altında açıkça belirtilir. Yeni sürümde ekranlar değişirse yeniden çekilmelidir.
