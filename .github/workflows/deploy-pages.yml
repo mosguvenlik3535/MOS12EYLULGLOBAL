@@ -39,8 +39,12 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Verify website language packs
-        run: python3 web/scripts/check-locales.py
+      - name: Prepare complete website languages and asset revisions
+        run: |
+          python3 -m pip install beautifulsoup4==4.13.4
+          python3 web/scripts/translate-site.py
+          python3 web/scripts/refresh-assets.py
+          python3 web/scripts/check-locales.py
 
       - name: Install dependencies
         working-directory: mosbarkod

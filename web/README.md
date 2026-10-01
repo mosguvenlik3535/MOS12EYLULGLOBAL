@@ -66,16 +66,26 @@ sloganlar; İngilizcede ek arayüz ve tanıtım metni düzeltmeleri. Kalıcı d�
 `site-overrides.json` içinde tutulur. Tüm metinler profesyonel olarak onaylanmış
 çeviri değildir; bu güncelleme uygulama içi dil paketlerini değiştirmez.
 
-## Gerçek uygulama ekranları — 11 modül
-`assets/img/screens/` içindeki görseller MOS BARCODE 1.15.20'nin çalışan React
-arayüzünden, 1600×1050 boyutta alınmıştır; yapay görsel veya yeniden çizilmiş arayüz
-değildir. Yerel demo oturumunda örnek işletme/veriler kullanılmış; müşteri ve personel
-adları örnek adlarla değiştirilmiş, telefonları boş bırakılmıştır. POS yapılandırma
-modülü yalnız yerel çekim oturumunda etkinleştirilmiştir; ürünün lisans/ücret kuralları
-ve kaynak kodu değiştirilmemiştir. POS yıllık ücret notu korunur.
+## Tam sürüm ekranları ve ayrıntılı özellik rehberi
+`assets/img/screens-pro/` içindeki 11 ekran, MOS BARCODE 1.15.20 üretim derlemesinden
+(VITE_DEMO=0, VITE_PLAY=0) 1600×1050 CSS piksel ve 2× cihaz piksel oranıyla alınmıştır.
+Orijinal PNG dosyaları **3200×2100** boyutundadır. Görüntüden demo etiketi silinmemiş,
+arayüz yeniden çizilmemiştir. Yerel çekim oturumunda yetkili tam sürüm/POS durumu ve
+örnek kayıtlar kullanılmıştır; uygulama kaynak kodu veya dağıtılan lisans kuralları
+değiştirilmemiştir. Müşteri ve personel adları örnek adlar, telefonlar boştur.
 
-Her bölüm kendi sekmesinin WebP ekranını ve 960 px önizlemesini içerir. Lazy loading,
-srcset, klavyeyle kullanılabilen dialog (Escape, ok tuşları, odak geri dönüşü), önceki/
-sonraki ekran ve tam boyut bağlantısı vardır. JavaScript yoksa orijinal görsel açılır.
-Açıklamalar ve kontroller 14 dilde; görüntülerin arayüz dili Türkçedir. Bu durum
-her görselin altında açıkça belirtilir. Yeni sürümde ekranlar değişirse yeniden çekilmelidir.
+Orijinal kayıpsız PNG ve yüksek kaliteli 3200 px WebP yanında 1600 ve 960 px
+önizlemeler sunulur. Görseller yalnız yeniden boyutlandırılmış/sıkıştırılmıştır.
+PNG kaynakları büyük görüntüleyicide ayrı bağlantıyla açılır. Eski demo görselleri
+paketten çıkarılmış, önbellek karışmaması için yeni `screens-pro` yolları kullanılmıştır.
+
+Her ekranın altında bir koyu yeşil/mint özellik vurgusu ve numaralı işlev açıklamaları
+vardır: toplam 11 vurgu + 53 ayrıntılı bölüm. Büyük ekran görüntüleyicisi de aynı
+modülün açıklamalarını ve uyarılarını resmin altında gösterir. Önceki/sonraki, Escape,
+ok tuşları, odak geri dönüşü ve JavaScript kapalıyken orijinal WebP bağlantısı korunur.
+Türkçe/İngilizce yeni metinler elle hazırlanmıştır; diğer dillerin yeni metinleri
+build-time çeviri hattından geçer. Tam profesyonel çeviri onayı değildir.
+
+`refresh-assets.py` dil/CSS/JS önbellek anahtarlarını günceller. Yayın ve paketleme,
+eksik dil anahtarlarını tamamlamadan ve doğrulamadan devam etmez. POS yıllık ücret,
+donanım uyumu, PDF/OCR ve yedekleme sınırları açıklamalarda korunur.

@@ -13,11 +13,17 @@ if('IntersectionObserver' in window){
  const image=viewer.querySelector('#screen-viewer-image');
  const title=viewer.querySelector('#screen-viewer-title');
  const original=viewer.querySelector('#screen-viewer-original');
+ const details=viewer.querySelector('#screen-viewer-details');
  let index=0,opener=null;
  function render(){
   const link=links[index];
   const heading=link.closest('.module-detail').querySelector('h2').textContent;
-  image.src=link.href;image.alt=heading;title.textContent=heading;original.href=link.href;
+  image.src=link.href;image.alt=heading;title.textContent=heading;original.href=link.dataset.original||link.href;
+  details.replaceChildren();
+  for(const block of link.closest('.module-detail').querySelectorAll(':scope > .module-highlight,:scope > .module-breakdown,:scope > .module-note,:scope > .integration-fee')){
+   const copy=block.cloneNode(true);copy.removeAttribute('id');copy.querySelectorAll('[id]').forEach(el=>el.removeAttribute('id'));details.append(copy);
+  }
+  viewer.scrollTop=0;
  }
  function move(delta){index=(index+delta+links.length)%links.length;render();}
  for(const [i,link] of links.entries())link.addEventListener('click',event=>{

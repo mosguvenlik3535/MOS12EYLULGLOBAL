@@ -1,5 +1,5 @@
 """Check the small overlay ZIP without downloading or changing existing installers."""
-import hashlib,json,re,zipfile
+import hashlib,json,re,zipfile,struct
 from pathlib import Path
 archive=Path.home()/'.cache/mospos-hosting/MOSBARCODE-dil-PWA-guncelleme.zip'
 with zipfile.ZipFile(archive) as z:
@@ -15,10 +15,16 @@ with zipfile.ZipFile(archive) as z:
             assert hashlib.sha256(z.read(asset)).hexdigest().startswith(digest),asset
     features=z.read('ozellikler.html').decode()
     for module in ['sales','delivery','imkart','pos-integration','stock','purchase','credit','expense','staff','cash','settings']:
-        assert f'assets/img/screens/{module}.webp' in names
-        assert f'assets/img/screens/{module}-preview.webp' in names
-        assert f'href="assets/img/screens/{module}.webp"' in features
+        assert f'assets/img/screens-pro/{module}.webp' in names
+        assert f'assets/img/screens-pro/{module}-preview.webp' in names
+        assert f'href="assets/img/screens-pro/{module}.webp"' in features
+        png=f'assets/img/screens-pro/{module}.png'
+        assert png in names
+        assert struct.unpack('>II',z.read(png)[16:24])==(3200,2100),png
     assert features.count('class="module-screenshot"')==11
+    assert features.count('class="module-highlight"')==11
+    assert features.count('class="feature-explanation"')==53
+    assert 'id="screen-viewer-details"' in features
     assert 'id="screen-viewer"' in features
     assert 'POS entegrasyonu ayrıca yıllık ücrete tabidir.' in features
     manifest=json.loads(z.read('uygulama/manifest.webmanifest'))

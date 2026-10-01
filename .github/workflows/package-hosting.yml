@@ -30,6 +30,12 @@ jobs:
           VITE_DEMO: '0'
           VITE_PLAY: '0'
         run: npm ci --prefix mosbarkod && npm run build --prefix mosbarkod
+      - name: Prepare complete website languages and asset revisions
+        run: |
+          python3 -m pip install beautifulsoup4==4.13.4
+          python3 web/scripts/translate-site.py
+          python3 web/scripts/refresh-assets.py
+          python3 web/scripts/check-locales.py
       - name: Assemble website and verify demo installers
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
