@@ -359,7 +359,7 @@ function LicenseCard() {
       <div className="mt-5 space-y-2 rounded-xl border border-white/70 bg-black/20 p-3 font-mono text-[9.5px]">
         <div className="flex justify-between gap-3"><span className="text-mut2">Yazılım Sahibi:</span><span className="font-bold text-txt">MOSBARKODYAZILIM</span></div>
         <div className="flex justify-between gap-3"><span className="text-mut2">Sürüm:</span><span className="font-bold text-txt">{appVersionLabel()}</span></div>
-        <div className="flex justify-between gap-3"><span className="text-mut2">Lisans Tipi:</span><span className={cn('font-bold', IS_PLAY || IS_DEMO ? 'text-amber2' : 'text-mint')}>{IS_PLAY ? '★ AYLIK ABONELİK' : IS_DEMO ? '★ DENEME' : '✓ ÖMÜR BOYU'}</span></div>
+        <div className="flex justify-between gap-3"><span className="text-mut2">Lisans Tipi:</span><span className={cn('font-bold', IS_PLAY || IS_DEMO ? 'text-amber2' : 'text-mint')}>{IS_PLAY ? '★ 1.000 SATIŞ DEMO / PLAY PRO' : IS_DEMO ? '★ DENEME' : '✓ ÖMÜR BOYU'}</span></div>
         <div className="flex justify-between gap-3">
           <span className="text-mut2">Destek E-Posta:</span>
           <a href="mailto:m.ortayayla@gmail.com" className="font-bold text-amber2 hover:underline">

@@ -35,4 +35,9 @@ export const de: TranslationTable = {
   'poslock.title': 'MOS BARCODE',
   'poslock.subtitle': 'POS-Integration — Lizenzschlüssel erforderlich',
   'poslock.unlock': 'ENTSPERREN',
+  "playTrial.remaining": "DEMO · {count} VERKÄUFE ÜBRIG",
+  "playTrial.expired": "Die Demo mit 1.000 Verkäufen ist beendet. Für neue Verkäufe ist Play Pro erforderlich.",
+  "playTrial.summary": "Die ersten 1.000 abgeschlossenen Verkäufe sind kostenlos, ohne Produktlimit oder zusätzliche Pro-Funktionssperren. Danach können Sie mit einem Google-Play-Pro-Abonnement weiterverkaufen.",
+  "playTrial.records": "Ihre Daten bleiben erhalten; Berichte und Sicherungen bleiben zugänglich. Anforderungen an Hardware und externe Dienste gelten weiterhin.",
+  "playTrial.storage": "Der Demozähler konnte nicht gespeichert werden. Prüfen Sie Speicherzugriff und freien Speicherplatz.",
 };

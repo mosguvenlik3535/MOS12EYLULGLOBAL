@@ -28,4 +28,9 @@ export const pt: TranslationTable = {
   'settings.language': 'Idioma',
   'poslock.subtitle': 'Integração POS — Chave de licença necessária',
   'poslock.unlock': 'DESBLOQUEAR',
+  "playTrial.remaining": "DEMO · RESTAM {count} VENDAS",
+  "playTrial.expired": "A demo de 1.000 vendas terminou. Novas vendas exigem Play Pro.",
+  "playTrial.summary": "As primeiras 1.000 vendas concluídas são gratuitas, sem limite de produtos nem bloqueios extras de funções Pro. Depois, continue com uma assinatura Pro do Google Play.",
+  "playTrial.records": "Seus registros são preservados; relatórios e backups continuam disponíveis. Os requisitos de hardware e serviços externos continuam válidos.",
+  "playTrial.storage": "Não foi possível salvar o contador. Verifique o acesso e o espaço de armazenamento.",
 };

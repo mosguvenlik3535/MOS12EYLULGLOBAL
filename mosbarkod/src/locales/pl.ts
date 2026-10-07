@@ -28,4 +28,9 @@ export const pl: TranslationTable = {
   'settings.language': 'Język',
   'poslock.subtitle': 'Integracja POS — wymagany klucz licencyjny',
   'poslock.unlock': 'ODBLOKUJ',
+  "playTrial.remaining": "DEMO · POZOSTAŁO {count} SPRZEDAŻY",
+  "playTrial.expired": "Demo 1 000 sprzedaży zakończyło się. Nowa sprzedaż wymaga Play Pro.",
+  "playTrial.summary": "Pierwsze 1 000 zakończonych sprzedaży jest bezpłatne, bez limitu produktów i dodatkowych blokad funkcji Pro. Potem kontynuuj z subskrypcją Pro w Google Play.",
+  "playTrial.records": "Dane pozostają zachowane; raporty i kopie zapasowe są nadal dostępne. Wymagania sprzętowe i usług zewnętrznych nadal obowiązują.",
+  "playTrial.storage": "Nie udało się zapisać licznika. Sprawdź uprawnienia i wolne miejsce.",
 };

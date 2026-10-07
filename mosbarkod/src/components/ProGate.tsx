@@ -7,7 +7,7 @@ import { PRO_PRICE } from '../lib/buildMode';
    ------------------------------------------------------------------
    Ücretsiz sürümde kilitli özelliklerin yerine gösterilen paneller.
    Kilit mantığı App.tsx'te tek yerden hesaplanır:
-     proLocked = IS_PLAY && !licensed && !pro
+     proLocked = false (1.000 satış modeli; kısıtlama satış tamamlamada uygulanır)
    (yalnızca Play derlemesinin ücretsiz katmanında true olur;
    masaüstü, demove lisanslı APK'lar etkilenmez.)
    ================================================================== */

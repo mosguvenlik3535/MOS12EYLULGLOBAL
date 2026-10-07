@@ -1,12 +1,12 @@
 /**
- * Derleme modu — demo ve Play Store (freemium) bayrakları.
+ * Derleme modu — demo ve Play Store (satış kotası) bayrakları.
  *
  * CI'da demo EXE/APK üretilirken `VITE_DEMO=1` ortam değişkeniyle derlenir.
  * Demo sürümde lisans kapısı açık başlar, görünür "DEMO SÜRÜM" rozeti gösterilir
  * ve belirli satış sayısından sonra tam sürüm lisansı istenir.
  *
  * Play Store sürümü (AAB) `VITE_PLAY=1` ile derlenir: çevrimdışı lisans kapısı
- * yerine ücretsiz başlangıç katmanı + Play Billing PRO aboneliği kullanılır.
+ * yerine 1.000 satışlık demo + Play Billing PRO aboneliği kullanılır.
  */
 
 import { version as PKG_VERSION } from '../../package.json';
@@ -19,9 +19,6 @@ export const IS_PLAY = (import.meta.env.VITE_PLAY ?? '') === '1';
 export const DEMO_MAX_SALES = 1000;
 
 export const DEMO_LABEL = 'DEMO SÜRÜM';
-
-/** Play ücretsiz katmanında izin verilen azami ürün sayısı. */
-export const FREE_MAX_PRODUCTS = 100;
 
 /** PRO abonelik fiyatları (Play Console'da tanımlı ürünlerle aynı olmalı). */
 export const PRO_PRICE = '299 TL/ay';
@@ -40,5 +37,5 @@ export function appVersionLabel(demo = false): string {
   return `v${APP_VERSION}${suffix}`;
 }
 
-/** Remaining completed sales in the direct-download demo (not Play freemium). */
+/** Remaining completed sales in the direct-download demo (not Play satış kotası). */
 export const demoSalesRemaining = (sales:number, baseline:number) => Math.max(0,DEMO_MAX_SALES-Math.max(0,sales-baseline));

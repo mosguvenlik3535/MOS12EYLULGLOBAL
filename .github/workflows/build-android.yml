@@ -2,6 +2,11 @@ name: Build Android APK
 
 on:
   workflow_dispatch:
+    inputs:
+      publish_release:
+        description: 'Publish Android artifacts to the package version release'
+        type: boolean
+        default: false
   push:
     tags:
       - 'v*'
@@ -70,18 +75,19 @@ jobs:
           if-no-files-found: error
 
       - name: Attach full APK to release
-        if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/') || inputs.publish_release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "${{ github.ref_name }}" \
-            --title "MOSBARKODYAZILIM ${{ github.ref_name }}" \
+          gh release create "v${{ steps.version.outputs.VERSION }}" \
+            --target "${{ github.sha }}" \
+            --title "MOSBARKODYAZILIM v${{ steps.version.outputs.VERSION }}" \
             --notes "Barkod Satış Programı — Windows (.exe + DEMO), Linux (AppImage) ve Android (APK + DEMO) sürümleri." \
             mosbarkod/android/app/build/outputs/apk/debug/app-debug.apk 2>/dev/null || \
-          gh release upload "${{ github.ref_name }}" mosbarkod/android/app/build/outputs/apk/debug/app-debug.apk --clobber
+          gh release upload "v${{ steps.version.outputs.VERSION }}" mosbarkod/android/app/build/outputs/apk/debug/app-debug.apk --clobber
 
-      # ---- PLAY STORE AAB (imzalı release, freemium) ----
-      - name: Build Play web app (freemium)
+      # ---- PLAY STORE AAB (imzalı release, 1.000 satışlık demo) ----
+      - name: Build Play web app (1.000 satışlık demo)
         working-directory: mosbarkod
         run: VITE_PLAY=1 npm run build
 
@@ -100,8 +106,8 @@ jobs:
           MOS_KEY_PASSWORD: ${{ secrets.MOS_KEY_PASSWORD }}
         run: |
           if [ -z "$MOS_KEYSTORE_BASE64" ]; then
-            echo "::warning::MOS_KEYSTORE_BASE64 secret'i yok — imzalı AAB üretilmedi. Keystore secret'larını ekleyin."
-            exit 0
+            echo "::error::MOS_KEYSTORE_BASE64 secret'i yok — imzalı AAB üretilmedi. Keystore secret'larını ekleyin."
+            exit 1
           fi
           mkdir -p app/keystore
           echo "$MOS_KEYSTORE_BASE64" | base64 -d > app/mos-release.jks
@@ -113,16 +119,16 @@ jobs:
         with:
           name: MOSBARKODYAZILIM-Android-AAB
           path: mosbarkod/android/app/build/outputs/bundle/release/app-release.aab
-          if-no-files-found: ignore
+          if-no-files-found: error
 
       - name: Attach AAB to release
-        if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/') || inputs.publish_release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           AAB=mosbarkod/android/app/build/outputs/bundle/release/app-release.aab
           if [ -f "$AAB" ]; then
-            gh release upload "${{ github.ref_name }}" "$AAB" --clobber
+            gh release upload "v${{ steps.version.outputs.VERSION }}" "$AAB" --clobber
           else
             echo "::warning::AAB bulunamadı (imzalama secret'ları eksik olabilir)."
           fi
@@ -156,7 +162,7 @@ jobs:
           if-no-files-found: error
 
       - name: Attach demo APK to release
-        if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/') || inputs.publish_release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload "${{ github.ref_name }}" mosbarkod/android/app/build/outputs/apk/debug/app-debug-demo.apk --clobber
+        run: gh release upload "v${{ steps.version.outputs.VERSION }}" mosbarkod/android/app/build/outputs/apk/debug/app-debug-demo.apk --clobber

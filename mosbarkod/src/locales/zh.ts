@@ -28,4 +28,9 @@ export const zh: TranslationTable = {
   'settings.language': '语言',
   'poslock.subtitle': 'POS 集成 — 需要许可证密钥',
   'poslock.unlock': '解锁',
+  "playTrial.remaining": "试用 · 剩余 {count} 笔销售",
+  "playTrial.expired": "1,000 笔销售试用已结束。新增销售需要 Play Pro。",
+  "playTrial.summary": "前 1,000 笔已完成销售免费，无商品数量限制或额外 Pro 功能锁定。之后可通过 Google Play Pro 订阅继续销售。",
+  "playTrial.records": "您的记录会保留，报表和备份仍可访问。硬件和外部服务要求仍然适用。",
+  "playTrial.storage": "无法保存试用计数。请检查存储权限和可用空间。",
 };

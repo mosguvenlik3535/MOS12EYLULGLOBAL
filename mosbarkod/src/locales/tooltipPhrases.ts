@@ -153,6 +153,22 @@ export const TIP_PHRASES: Record<string, TipTranslations> = {
     el: 'Συνεχής σάρωση: η κάμερα παραμένει ανοιχτή, κάθε σάρωση προσθέτει το προϊόν στο καλάθι',
     nl: 'Continu scannen: camera blijft open, elke scan voegt het product toe aan de winkelwagen',
   },
+  'MOS BARCODE PRO': {
+    en: 'MOS BARCODE PRO',
+    ar: 'MOS BARCODE PRO',
+    ru: 'MOS BARCODE PRO',
+    es: 'MOS BARCODE PRO',
+    de: 'MOS BARCODE PRO',
+    fr: 'MOS BARCODE PRO',
+    it: 'MOS BARCODE PRO',
+    pt: 'MOS BARCODE PRO',
+    zh: 'MOS BARCODE PRO',
+    pl: 'MOS BARCODE PRO',
+    ro: 'MOS BARCODE PRO',
+    el: 'MOS BARCODE PRO',
+    nl: 'MOS BARCODE PRO',
+  },
+
   'MOSBARKOD PRO': {
     en: 'MOSBARKOD PRO',
     ar: 'MOSBARKOD PRO',

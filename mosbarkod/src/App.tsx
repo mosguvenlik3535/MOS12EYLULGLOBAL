@@ -29,8 +29,9 @@ import {
   type SyncStatus,
 } from './lib/sync';
 import LicenseGate, { getStoredLicense, getStoredLicenseAsync } from './components/LicenseGate';
-import { IS_DEMO, IS_PLAY, demoSalesRemaining, FREE_MAX_PRODUCTS } from './lib/buildMode';
+import { IS_DEMO, IS_PLAY, demoSalesRemaining } from './lib/buildMode';
 import { initPlayBilling, isPlayBillingAvailable, isProActive } from './lib/playBilling';
+import { readPlayTrialUsage, playTrialRemaining, consumePlayTrialSale } from './lib/playTrial';
 import ProUpsellModal from './components/ProUpsellModal';
 import LoginGate from './components/LoginGate';
 import { useWakeLock } from './lib/wakeLock';
@@ -175,14 +176,18 @@ export default function App() {
   }, []);
   const [sync, setSync] = useState<SyncStatus>({ role: 'off', code: '', connected: false });
   const [joinCode, setJoinCode] = useState('');
-  const [licensed, setLicensed] = useState(() => IS_DEMO || Boolean(getStoredLicense()));
+  const [licensed, setLicensed] = useState(() => !IS_PLAY && (IS_DEMO || Boolean(getStoredLicense())));
   const [pro, setPro] = useState(false);
   const [proOpen, setProOpen] = useState(false);
   const [proBannerOff, setProBannerOff] = useState(() => {
     try { return localStorage.getItem('mos_pro_banner_off') === '1'; } catch { return false; }
   });
-  // Play ücretsiz katman kilidi: yalnızca Play derlemesinde, lisanssız ve PRO'suzken true.
-  const proLocked = IS_PLAY && !licensed && !pro;
+  // Sales quota replaces feature locks; records and backups remain accessible at expiry.
+  const proLocked = false;
+  const [playUsed, setPlayUsed] = useState(() => IS_PLAY ? readPlayTrialUsage() : 0);
+  const paymentCommitted = useRef(false);
+  const completedDeliveries = useRef(new Set<string>());
+  const playRemaining = playTrialRemaining(playUsed);
   const requirePro = () => setProOpen(true);
   const [demo, setDemo] = useState(IS_DEMO);
   const [demoBaseline, setDemoBaseline] = useState(0);
@@ -234,7 +239,7 @@ export default function App() {
 
   // Electron'da lisansı userData dosyasından da doğrula (her açılışta tekrarlamasın)
   useEffect(() => {
-    if (!licensed) {
+    if (!IS_PLAY && !licensed) {
       void getStoredLicenseAsync().then((v) => {
         if (v) setLicensed(true);
       });
@@ -258,7 +263,7 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Play Store (freemium) sürümü: PRO aboneliği başlat ve sahiplik değişimini dinle.
+  // Play Store (1.000 satışlık demo) sürümü: PRO aboneliği başlat ve sahiplik değişimini dinle.
   // CdvPurchase native köprü kurulana kadar kısa süre beklenir (plugin WebView'e sonradan yüklenebilir).
   useEffect(() => {
     if (!IS_PLAY) return;
@@ -841,7 +846,22 @@ export default function App() {
 
   /* ---------- payment ---------- */
 
+  const allowPlaySale = () => {
+    if (!IS_PLAY || pro) return true;
+    const used=readPlayTrialUsage();setPlayUsed(used);
+    if(playTrialRemaining(used)>0) return true;
+    setProOpen(true);toast(computedTr('playTrial.expired'),'err');return false;
+  };
+  const recordPlaySale = () => {
+    if (!IS_PLAY || pro) return true;
+    const result=consumePlayTrialSale();setPlayUsed(result.used);
+    if(result.allowed) return true;
+    if(result.reason==='limit')setProOpen(true);
+    toast(computedTr(result.reason==='storage'?'playTrial.storage':'playTrial.expired'),'err');return false;
+  };
   const openPay = () => {
+    if(!allowPlaySale()) return;
+    paymentCommitted.current=false;
     if (cart.length === 0) {
       toast('Sepet boş', 'err');
       return;
@@ -850,6 +870,7 @@ export default function App() {
   };
 
   const confirmPayment = (p: PayPayload) => {
+    if(!allowPlaySale()) return;
     // TAM ENTEGRE MOD: kart/POS tutarı varsa provizyon onayı beklenir.
     if (needsPosAuth(state.settings.pos.enabled, p.pos)) {
       setPayOpen(false);
@@ -860,6 +881,9 @@ export default function App() {
   };
 
   const finalizeSale = (p: PayPayload, posAuth?: string) => {
+    if(cart.length===0 || paymentCommitted.current) return;
+    if(!recordPlaySale()) return;
+    paymentCommitted.current=true;
     const cashier = USERS.find((u) => u.id === user)!;
     const now = new Date().toISOString();
     /* Müşteri adı / açıklama: ödeme ekranına yazılan ad, yoksa veresiye müşterisi */
@@ -914,11 +938,6 @@ export default function App() {
 
   const saveProduct = (p: Product) => {
     const exists = state.products.some((x) => x.id === p.id);
-    if (!exists && IS_PLAY && !licensed && !pro && state.products.length >= FREE_MAX_PRODUCTS) {
-      toast(`Ücretsiz sürümde en fazla ${FREE_MAX_PRODUCTS} ürün — PRO'ya yükseltin`, 'err');
-      setProOpen(true);
-      return;
-    }
     setState((s) => ({
       ...s,
       products: exists ? s.products.map((x) => (x.id === p.id ? p : x)) : [...s.products, p],
@@ -929,11 +948,6 @@ export default function App() {
     setState((s) => ({ ...s, products: s.products.filter((x) => x.id !== id) }));
 
   const bulkUpdateProducts = (list: Product[]) => {
-    if (IS_PLAY && !licensed && !pro && list.length > FREE_MAX_PRODUCTS) {
-      toast(`Ücretsiz sürümde en fazla ${FREE_MAX_PRODUCTS} ürün — PRO'ya yükseltin`, 'err');
-      setProOpen(true);
-      return;
-    }
     setState((s) => ({ ...s, products: list }));
   };
 
@@ -1136,6 +1150,10 @@ export default function App() {
     }));
 
   const finalizeDelivery = (id: string) => {
+    const pendingOrder=stateRef.current.deliveries.find(d=>d.id===id);
+    if(!pendingOrder || pendingOrder.saleId || pendingOrder.status==='iptal' || completedDeliveries.current.has(id)) return;
+    if(!recordPlaySale()) return;
+    completedDeliveries.current.add(id);
     const now = new Date().toISOString();
     const cashier = USERS.find((u) => u.id === user)!;
     setState((s) => {
@@ -1272,7 +1290,7 @@ export default function App() {
     );
   }
 
-  if ((!licensed && !pro && !IS_PLAY) || (demo && demoExpired)) {
+  if (!IS_PLAY && ((!licensed && !pro) || (demo && demoExpired))) {
     return (
       <LicenseGate
         demo={demo}
@@ -1580,12 +1598,17 @@ export default function App() {
         ))}
       </div>
 
-      {demo && !demoExpired && (
+      {IS_PLAY && !pro && (
+        <button onClick={()=>setProOpen(true)} className="fixed left-1/2 top-[70px] z-[80] max-w-[94vw] -translate-x-1/2 rounded-full border border-amber/50 bg-amber px-3 py-1 font-mono text-[10px] font-black text-black shadow-lg">
+          {computedTr(playRemaining>0?'playTrial.remaining':'playTrial.expired',{count:playRemaining})}
+        </button>
+      )}
+      {!IS_PLAY && demo && !demoExpired && (
         <div className="pointer-events-none fixed left-1/2 top-[70px] z-[80] -translate-x-1/2 rounded-full border border-amber/50 bg-amber/90 px-3 py-1 font-mono text-[10px] font-black tracking-[0.2em] text-black shadow-lg">
           DEMO SÜRÜM · {demoSalesRemaining(state.sales.length, demoBaseline)} SATIŞ KALDI
         </div>
       )}
-      {IS_PLAY && !licensed && !pro && !proBannerOff && (
+      {IS_PLAY && !pro && !proBannerOff && (
         <div className="fixed bottom-[76px] left-1/2 z-[80] flex max-w-[94vw] -translate-x-1/2 items-center gap-1 rounded-full border border-mint/70 bg-mint py-1 pl-3 pr-1 shadow-lg">
           <button
             onClick={() => setProOpen(true)}

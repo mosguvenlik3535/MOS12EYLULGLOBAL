@@ -28,4 +28,9 @@ export const ro: TranslationTable = {
   'settings.language': 'Limbă',
   'poslock.subtitle': 'Integrare POS — cheie de licență necesară',
   'poslock.unlock': 'DEBLOCARE',
+  "playTrial.remaining": "DEMO · {count} VÂNZĂRI RĂMASE",
+  "playTrial.expired": "Demo-ul de 1.000 de vânzări s-a încheiat. Noile vânzări necesită Play Pro.",
+  "playTrial.summary": "Primele 1.000 de vânzări finalizate sunt gratuite, fără limită de produse sau blocări suplimentare ale funcțiilor Pro. Apoi continuați cu un abonament Pro Google Play.",
+  "playTrial.records": "Datele sunt păstrate; rapoartele și copiile de siguranță rămân accesibile. Cerințele hardware și ale serviciilor externe rămân valabile.",
+  "playTrial.storage": "Contorul nu a putut fi salvat. Verificați accesul și spațiul de stocare.",
 };

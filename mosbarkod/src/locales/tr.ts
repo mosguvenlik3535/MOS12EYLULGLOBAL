@@ -344,4 +344,9 @@ export const tr: TranslationTable = {
   'common.help': 'Yardım',
   'common.languageSwitcher': 'Dil',
   'common.TheyFindResults': 'bulunamadı',
+  "playTrial.remaining": "DEMO · {count} SATIŞ KALDI",
+  "playTrial.expired": "1.000 satışlık demo tamamlandı. Yeni satış için Play Pro gerekir.",
+  "playTrial.summary": "İlk 1.000 tamamlanmış satış ücretsizdir. Ürün sınırı ve ek Pro özellik kilidi yoktur. Sonrasında Google Play Pro aboneliğiyle satışa devam edebilirsiniz.",
+  "playTrial.records": "Kayıtlarınız korunur; rapor ve yedekleme erişiminiz devam eder. Donanım ve harici servis gereksinimleri geçerlidir.",
+  "playTrial.storage": "Demo sayacı kaydedilemedi. Depolama iznini ve boş alanı kontrol edin.",
 };

@@ -28,4 +28,9 @@ export const nl: TranslationTable = {
   'settings.language': 'Taal',
   'poslock.subtitle': 'POS-integratie — licentiesleutel vereist',
   'poslock.unlock': 'ONTGRENDELEN',
+  "playTrial.remaining": "DEMO · {count} VERKOPEN OVER",
+  "playTrial.expired": "De demo van 1.000 verkopen is afgelopen. Voor nieuwe verkopen is Play Pro vereist.",
+  "playTrial.summary": "De eerste 1.000 afgeronde verkopen zijn gratis, zonder productlimiet of extra Pro-functieblokkades. Ga daarna verder met een Google Play Pro-abonnement.",
+  "playTrial.records": "Uw gegevens blijven bewaard; rapporten en back-ups blijven toegankelijk. Hardware- en externe-servicevereisten blijven gelden.",
+  "playTrial.storage": "De demoteller kon niet worden opgeslagen. Controleer toegang en vrije opslagruimte.",
 };

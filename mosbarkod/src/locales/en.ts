@@ -344,4 +344,9 @@ export const en: TranslationTable = {
   'common.help': 'Help',
   'common.languageSwitcher': 'Language',
   'common.TheyFindResults': 'not found',
+  "playTrial.remaining": "DEMO · {count} SALES LEFT",
+  "playTrial.expired": "Your 1,000-sale demo has ended. Play Pro is required for new sales.",
+  "playTrial.summary": "Your first 1,000 completed sales are free, without a product limit or extra Pro feature locks. Continue selling with a Google Play Pro subscription afterwards.",
+  "playTrial.records": "Your records are preserved; reports and backups remain accessible. Hardware and external-service requirements still apply.",
+  "playTrial.storage": "The trial counter could not be saved. Check storage access and free space.",
 };
