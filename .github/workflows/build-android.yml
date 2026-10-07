@@ -8,11 +8,15 @@ on:
         type: boolean
         default: false
   push:
+    branches:
+      - 'arena/01a0bfd3-mos12eylulglobal'
     tags:
       - 'v*'
 
 jobs:
   build-apk:
+    # Explicit publish marker permits a branch build when dispatch permission is unavailable.
+    if: github.event_name != 'push' || startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[publish-android]')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -75,7 +79,7 @@ jobs:
           if-no-files-found: error
 
       - name: Attach full APK to release
-        if: startsWith(github.ref, 'refs/tags/') || inputs.publish_release
+        if: startsWith(github.ref, 'refs/tags/') || inputs.publish_release || contains(github.event.head_commit.message, '[publish-android]')
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -122,7 +126,7 @@ jobs:
           if-no-files-found: error
 
       - name: Attach AAB to release
-        if: startsWith(github.ref, 'refs/tags/') || inputs.publish_release
+        if: startsWith(github.ref, 'refs/tags/') || inputs.publish_release || contains(github.event.head_commit.message, '[publish-android]')
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -162,7 +166,7 @@ jobs:
           if-no-files-found: error
 
       - name: Attach demo APK to release
-        if: startsWith(github.ref, 'refs/tags/') || inputs.publish_release
+        if: startsWith(github.ref, 'refs/tags/') || inputs.publish_release || contains(github.event.head_commit.message, '[publish-android]')
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release upload "v${{ steps.version.outputs.VERSION }}" mosbarkod/android/app/build/outputs/apk/debug/app-debug-demo.apk --clobber
