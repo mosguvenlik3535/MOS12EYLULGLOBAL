@@ -15,6 +15,7 @@ with zipfile.ZipFile(archive) as z:
     for page in ['index.html','ozellikler.html']:
         for asset,digest in re.findall(r'(assets/(?:css|js)/[^"?]+)\?v=([a-f0-9]+)',z.read(page).decode()):
             assert hashlib.sha256(z.read(asset)).hexdigest().startswith(digest),asset
+    assert '1.499 TL' in home and '>4.999 TL</del>' in home and '%70 İNDİRİM' in home
     assert 'id="global-coverage-title"' in home
     assert '14 dilde kullanım. 14 ülke için vergi hesaplama.' in home
     features=z.read('ozellikler.html').decode()

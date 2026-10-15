@@ -40,6 +40,15 @@ for path in (root/'assets/css').glob('*.css'):
         if target.startswith(('data:','http','#')):continue
         assert (path.parent/target).is_file(),('missing CSS asset',target)
 assert (root/'gizlilik-politikasi.html').read_bytes()==(root.parent/'mosbarkod/public/gizlilik-politikasi.html').read_bytes()
-assert '4.999 TL' in pages['index.html'].get_text()
+home=pages['index.html']
+assert home.select_one('.previous-price del').get_text(strip=True)=='4.999 TL'
+assert home.select_one('.pro-price [data-no-translate]').get_text(strip=True)=='1.499 TL'
+assert home.select_one('.discount-badge').get_text(strip=True)=='%70 İNDİRİM'
+assert home.select_one('.pro-price .vat-label').get_text(strip=True)=='+ KDV'
+message=unquote(home.select_one('.purchase-link')['href'])
+assert '1.499 TL + KDV' in message and '4.999' not in message
+assert '4.999' not in home.select_one('.faq-list').get_text()
+assert '4.999' not in pages['ozellikler.html'].get_text()
+assert '1.499 TL' in pages['ozellikler.html'].get_text()
 assert '0000' in pages['index.html'].get_text()
 print('PASS: local links/anchors, unique headings/IDs, 14-language pickers, platform download manifest, local fonts and privacy page')

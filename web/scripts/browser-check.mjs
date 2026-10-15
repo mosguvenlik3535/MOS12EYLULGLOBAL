@@ -31,7 +31,7 @@ try{
   for(const width of [320,375,768,1024,1440]){
    await page.setViewportSize({width,height:900});
    const layout=await page.evaluate(()=>{
-    const selectors='.hero-copy h1,.hero-copy>p,.hero-buttons>a,.features-heading h1,.features-hero-copy>p,.nav-row .brand,.nav-row select,.nav-row .menu-toggle';
+    const selectors='.hero-copy h1,.hero-copy>p,.hero-buttons>a,.features-heading h1,.features-hero-copy>p,.nav-row .brand,.nav-row select,.nav-row .menu-toggle,.campaign-announcement,.campaign-heading,.previous-price,.pro-price,.pro-card .purchase-link';
     const clipped=[...document.querySelectorAll(selectors)].filter(e=>{
      const box=e.getBoundingClientRect();if(!box.width||!box.height)return false;
      const range=document.createRange();range.selectNodeContents(e);
@@ -44,6 +44,11 @@ try{
  }
  for(const lang of langs){
   await page.setViewportSize({width:375,height:850});await visit('index.html',lang);
+  assert.equal((await page.locator('.previous-price del').innerText()).trim(),'4.999 TL');
+  assert.equal((await page.locator('.pro-price [data-no-translate]').innerText()).trim(),'1.499 TL');
+  assert.ok((await page.locator('.discount-badge').innerText()).includes('70'));
+  assert.ok((await page.locator('.previous-price del').evaluate(e=>getComputedStyle(e).textDecorationLine)).includes('line-through'));
+  assert.ok(decodeURIComponent(await page.locator('.purchase-link').getAttribute('href')).includes('1.499 TL + KDV'));
   const menu=page.locator('.menu-toggle');
   await menu.click();assert.equal(await menu.getAttribute('aria-expanded'),'true');
   await page.locator('#navigation a').first().focus();await page.keyboard.press('Escape');

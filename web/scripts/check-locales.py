@@ -11,6 +11,7 @@ for lang in ['tr','en','de','fr','es','it','pt','nl','pl','ro','el','ru','ar','z
   if 'MOS BARCODE' in original: assert 'MOS BARCODE' in translated,(lang,'brand changed')
   if '0000' in original: assert '0000' in translated,(lang,'PIN changed')
   normalized=re.sub(r'(?<=\d)[.,\s](?=\d)','',translated)
-  if '4.999' in original: assert '4999' in normalized,(lang,'price changed')
+  if '1.499' in original: assert '1499' in normalized,(lang,'sale price changed')
+  if '%70' in original: assert '70' in normalized,(lang,'discount changed')
   if '1.000' in original: assert '1000' in normalized,(lang,'demo limit changed')
 print('PASS: 14 complete language packs,',len(source),'keys each')
