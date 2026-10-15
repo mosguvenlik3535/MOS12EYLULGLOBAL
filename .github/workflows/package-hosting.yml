@@ -36,15 +36,16 @@ jobs:
           python3 web/scripts/translate-site.py
           python3 web/scripts/refresh-assets.py
           python3 web/scripts/check-locales.py
+          python3 web/scripts/check-site.py
       - name: Assemble website and verify demo installers
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python3 web/scripts/package-hosting.py
-      - name: Verify update ZIP
+      - name: Verify complete hosting ZIP
         run: python3 web/scripts/check-hosting.py
       - name: Publish ready-to-upload hosting ZIP
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION=$(python3 -c "import json; print(json.load(open('mosbarkod/package.json'))['version'])")
-          gh release upload "v${VERSION}" "$HOME/.cache/mospos-hosting/MOSBARKOD-public_html.zip" "$HOME/.cache/mospos-hosting/MOSBARCODE-dil-PWA-guncelleme.zip" --clobber
+          gh release upload "v${VERSION}" "$HOME/.cache/mospos-hosting/MOSBARKOD-public_html.zip" --clobber

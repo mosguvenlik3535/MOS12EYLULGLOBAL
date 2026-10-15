@@ -1,0 +1,5 @@
+{
+  "windows": {"version": "1.15.20", "file": "MOSBARKODYAZILIM-Demo-Setup-1.15.20.exe"},
+  "portable": {"version": "1.15.20", "file": "MOSBARKODYAZILIM-Demo-Portable-1.15.20.exe"},
+  "android": {"version": "1.15.22", "file": "app-debug-demo.apk"}
+}

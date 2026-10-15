@@ -12,8 +12,6 @@ LANGS=['tr','en','de','fr','es','it','pt','nl','pl','ro','el','ru','ar','zh']
 EXTRA=['Menüyü aç','Menüyü kapat','Mobil hızlı satış ekranı','Ürün ve stok yönetimi ekranı','Gün sonu raporu ekranı']
 def catalog():
  keys=set(EXTRA)
- version=json.loads((ROOT/'mosbarkod/package.json').read_text())['version']
- keys.update([f'Doğrudan sitemizden indirilen demo paketleri: v{version}', 'macOS & Linux için bize yazın', 'Mac/Linux kurulumları için iletişime geçin. iPhone/PWA harici uygulama adresinde açılır; demo paketi değildir ve lisans gerekebilir. Mac paketleri notarize değildir.'])
  for name in ['index.html','ozellikler.html']:
   soup=BeautifulSoup((ROOT/'web'/name).read_text(),'html.parser')
   for node in soup.find_all(string=True):

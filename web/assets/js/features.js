@@ -27,7 +27,7 @@ if('IntersectionObserver' in window){
  }
  function move(delta){index=(index+delta+links.length)%links.length;render();}
  for(const [i,link] of links.entries())link.addEventListener('click',event=>{
-  if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
+  if(event.button!==0||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
   event.preventDefault();index=i;opener=link;render();viewer.showModal();document.documentElement.classList.add('screen-viewer-open');
  });
  viewer.querySelector('.screen-viewer-close').addEventListener('click',()=>viewer.close());

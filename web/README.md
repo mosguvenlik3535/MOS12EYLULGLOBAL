@@ -96,3 +96,16 @@ ayrıntı notu bulunur. Sayılar uygulamanın locales/i18n ve countryVat.ts prof
 eşleşir. Ülke profili mevcut uygulamada dil seçimine bağlıdır; ülkeye ait kayıtlı
 oranlar ve girilen veriler kullanılır. Otomatik mevzuat güncellemesi veya resmî mali
 uyumluluk garantisi verilmez. Yeni tanıtım metinleri 14 dil paketine dahildir.
+
+## Genel site kontrolü — Ekim 2026
+
+- Mobil ana başlıkta `overflow:hidden` arkasında kalan metin sorunu giderildi; kontrol artık yalnızca sayfa kaydırma genişliğini değil gerçek metin sınırlarını da ölçer.
+- Yazı tipleri OFL lisanslarıyla `assets/fonts/` içinde yereldir; ziyaretçinin Google Fonts bağlantısı kurması gerekmez.
+- Mobil menü Escape / dışarı tıklama / odak ayrılma ile kapanır; Escape odağı menü düğmesine döndürür. RTL sekme yönleri, dokunma hedefleri ve azaltılmış hareket tercihi desteklenir.
+- Demo sürümleri `scripts/downloads.json` içinde platform başına sabitlenir. Android-only yayının sürümünden Windows dosya adı türetilmez. Bağlantılar değiştiğinde HTML ve manifest birlikte güncellenir; `check-site.py` tutarlılığı doğrular.
+- Tam hosting ZIP'i Windows v1.15.20 Setup + Portable ve Android v1.15.22 demo içerir. Play AAB dosyası siteye APK diye konmaz.
+- `gizlilik-politikasi.html` uygulamanın yayımlanmış gizlilik metninin aynısıdır. Değişirse iki kopya birlikte güncellenmelidir.
+- Yerel denetim: `python3 web/scripts/check-locales.py` ve BeautifulSoup kurulu Python ile `python3 web/scripts/check-site.py`.
+- Paket doğrulama: `python3 web/scripts/check-hosting.py` **tam** ZIP'i, kurulumları ve yerel fontları kontrol eder.
+
+Küçük kurulum içermeyen güncelleme ZIP'i artık üretilmez: yeni Android bağlantısını eski hosting kurulumunda eksik bırakmamak için dağıtım **tek tam paket** olarak yapılır.

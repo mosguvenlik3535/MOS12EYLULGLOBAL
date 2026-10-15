@@ -45,6 +45,7 @@ jobs:
           python3 web/scripts/translate-site.py
           python3 web/scripts/refresh-assets.py
           python3 web/scripts/check-locales.py
+          python3 web/scripts/check-site.py
 
       - name: Install dependencies
         working-directory: mosbarkod

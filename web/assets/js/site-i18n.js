@@ -13,11 +13,11 @@ document.querySelectorAll('[alt],[aria-label],[title],meta[name="description"],m
  ['alt','aria-label','title',...(el.tagName==='META'?['content']:[])].forEach(attr=>{const text=el.getAttribute(attr);if(text)attributes.push([el,attr,text]);});
 });
 const lookup=text=>dictionary[text.trim()]||text.trim();
-function decorateLinks(){document.querySelectorAll('a[href]').forEach(a=>{const raw=a.getAttribute('href');if(!raw||raw.startsWith('#')||/^(https?:|mailto:|tel:)/i.test(raw))return;const url=new URL(raw,location.href);if(url.origin===location.origin&&/\.(?:html)$/.test(url.pathname)){url.searchParams.set('lang',current);a.setAttribute('href',url.pathname.split('/').pop()+url.search+url.hash);}});}
+function decorateLinks(){document.querySelectorAll('a[href]').forEach(a=>{const raw=a.getAttribute('href');if(!raw||raw.startsWith('#')||/^(https?:|mailto:|tel:)/i.test(raw))return;const url=new URL(raw,location.href);if(url.origin===location.origin&&/\.(?:html)$/.test(url.pathname)){url.searchParams.set('lang',current);a.setAttribute('href',url.pathname+url.search+url.hash);}});}
 async function useLanguage(lang,remember=true){
  if(!supported.includes(lang))lang='tr';const ticket=++serial;picker.disabled=true;
  try{
-  let data={};if(lang!=='tr'){const res=await fetch('assets/locales/'+lang+'.json?v=bc30656082c8');if(!res.ok)throw Error('language unavailable');const pack=await res.json();if(pack.locale!==lang||!pack.texts)throw Error('invalid language pack');data=pack.texts;}
+  let data={};if(lang!=='tr'){const res=await fetch('assets/locales/'+lang+'.json?v=b87f4c9bbfe0');if(!res.ok)throw Error('language unavailable');const pack=await res.json();if(pack.locale!==lang||!pack.texts)throw Error('invalid language pack');data=pack.texts;}
   if(ticket!==serial)return;dictionary=data;current=lang;
   for(const [node,original] of texts){const trimmed=original.trim();node.data=original.replace(trimmed,()=>lookup(original));}
   for(const [el,attr,original] of attributes)el.setAttribute(attr,lookup(original));

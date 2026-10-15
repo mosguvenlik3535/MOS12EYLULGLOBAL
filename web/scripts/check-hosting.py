@@ -1,15 +1,17 @@
-"""Check the small overlay ZIP without downloading or changing existing installers."""
+"""Verify the complete public_html ZIP, including all linked platform installers."""
 import hashlib,json,re,zipfile,struct
 from pathlib import Path
-archive=Path.home()/'.cache/mospos-hosting/MOSBARCODE-dil-PWA-guncelleme.zip'
+DOWNLOADS=list(json.loads((Path(__file__).parent/'downloads.json').read_text()).values())
+HOSTED=[f"indir/v{d['version']}/{d['file']}" for d in DOWNLOADS]
+archive=Path.home()/'.cache/mospos-hosting/MOSBARKOD-public_html.zip'
 with zipfile.ZipFile(archive) as z:
     assert z.testzip() is None
     names=set(z.namelist())
     assert {'index.html','ozellikler.html','uygulama/index.html','uygulama/sw.js','uygulama/manifest.webmanifest','GUNCELLEME-OKU.txt'}<=names
-    assert not any(n.startswith('indir/') or n.endswith(('.exe','.apk','.map')) for n in names)
+    assert not any(n.endswith('.map') for n in names)
     home=z.read('index.html').decode()
     assert 'href="uygulama/"' in home and 'https://mosguvenlik3535.github.io/MOS12EYLULGLOBAL/"' not in home
-    assert len(re.findall(r'href="indir/v1.15.20/[^\"]+"',home))==3
+    assert all(f'href="{path}"' in home for path in HOSTED)
     for page in ['index.html','ozellikler.html']:
         for asset,digest in re.findall(r'(assets/(?:css|js)/[^"?]+)\?v=([a-f0-9]+)',z.read(page).decode()):
             assert hashlib.sha256(z.read(asset)).hexdigest().startswith(digest),asset
@@ -38,4 +40,10 @@ with zipfile.ZipFile(archive) as z:
     assert en['Sal']=='Tue' and en['Cum']=='Fri'
     assert en['Fiş ve çevre birimleri']=='Receipts and peripherals'
     assert en['Kasada güçlü. Mobilde pratik.']=='Powerful at checkout. Convenient on mobile.'
-print('PASS: small overlay ZIP, no installers, same-host PWA, scoped cache, asset revisions, translation regressions')
+    for path in HOSTED:
+        assert path in names,path
+        assert z.getinfo(path).file_size>1_000_000,path
+    assert 'TAM public_html PAKETİ' in z.read('GUNCELLEME-OKU.txt').decode()
+    assert 'gizlilik-politikasi.html' in names
+    assert any(name.endswith('.woff2') for name in names)
+print('PASS: FULL ZIP CRC, three linked demos, same-host PWA, scoped cache, assets, 14 languages, gallery, privacy and local fonts')
