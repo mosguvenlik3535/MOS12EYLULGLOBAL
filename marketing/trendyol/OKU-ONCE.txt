@@ -1,0 +1,20 @@
+MOS BARCODE — TRENDYOL LİSTELEME PAKETİ
+
+01–05 numaralı 5 JPG görseli ürün görsellerine sırasıyla yükleyin.
+Ölçü: 1200 × 1800 piksel, RGB JPEG, 96 dpi.
+
+Teklif: 1 bilgisayar için ömür boyu Masaüstü Full Pro + ilk uzaktan kurulum.
+Fiyat: 1.499 TL + KDV. %20 KDV doğrulanırsa toplam 1.798,80 TL.
+
+belgeler/01-URUN-BASLIGI.txt: kopyalanacak başlık
+belgeler/02-URUN-ACIKLAMASI.html ve .txt: ürün açıklaması
+belgeler/03-LISTELEME-VE-SATIS-PLANI.md ve .pdf: satıcıya özel kontrol listesi ve satış planı
+belgeler/04-PANEL-ALANLARI.csv: alan hazırlık tablosu, doğrudan yükleme şablonu DEĞİLDİR
+belgeler/05-OLCUM-SABLONU.csv: ilk reklam/satış testinin kayıt tablosu
+
+Henüz Trendyol'a ürün gönderilmedi. Marka/kategori, dijital teslimat yetkisi,
+gerçek teslim süresi, KDV ve lisans teslimi doğrulanmadan satış açmayın.
+API anahtarı, şifre veya müşteri verisi bu pakette yoktur.
+
+Başlık ve HTML/TXT açıklama müşteri içindir. Satış planı, CSV tabloları ve
+bu OKU-ONCE metni satıcı içindir; ürün açıklamasına topluca yapıştırmayın.

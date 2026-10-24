@@ -1,0 +1,32 @@
+name: Publish Trendyol listing assets
+on:
+  push:
+    branches: ['arena/01a0bfd3-mos12eylulglobal']
+    paths:
+      - 'marketing/trendyol/**'
+      - '.github/workflows/publish-trendyol.yml'
+permissions:
+  contents: write
+concurrency:
+  group: trendyol-listing-package
+  cancel-in-progress: false
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify product images and assemble listing kit
+        run: |
+          pip install pillow==11.3.0
+          python marketing/trendyol/build-package.py
+      - name: Publish downloadable files (not a Trendyol product submission)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload v1.15.22 \
+            "$HOME/.cache/mos-trendyol/MOS-BARCODE-Trendyol-Satis-Paketi.zip" \
+            marketing/trendyol/gorseller/*.jpg \
+            marketing/trendyol/belgeler/03-LISTELEME-VE-SATIS-PLANI.pdf --clobber

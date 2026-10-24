@@ -1,0 +1,20 @@
+Alan;Değer;Durum
+Marka;MOS BARCODE;Panelde marka kaydı/onayı doğrulanmalı
+Ürün adı;MOS BARCODE Barkodlu Satış ve Stok Takip Programı Full Pro Ömür Boyu Lisans 1 Bilgisayar;Hazır
+Önerilen iç model/stok kodu;MOS-FULLPRO-WIN-1PC;İç kod önerisi - kayıtlı barkod değildir
+Kategori;Ticari yazılım / uygun dijital yazılım kategorisi;Satıcı desteği ve panelden doğrulanmalı
+Barkod;;Kendi ürününüz için geçerli değer panelden doğrulanmalı
+Lisans kapsamı;1 bilgisayar;Kullanıcı onaylı
+Lisans süresi;Ömür boyu kullanım;Destek/güncelleme ömür boyu taahhüt edilmez
+Kurulum;İlk uzaktan kurulum dahil;Kullanıcı onaylı - randevu/süre netleştirilmeli
+Platform;Windows masaüstü;Hedef cihaz ve sürüm uyumu test edilmeli
+KDV hariç bedel;1499.00;Kullanıcı onaylı
+KDV oranı;20;Varsayım - muhasebeci ve kategori ile doğrula
+KDV dahil önerilen toplam;1798.80;Yalnız %20 KDV doğrulandığında
+Eski/liste fiyatı;;Gerçek fiyat geçmişi ve mevzuat doğrulanmadan girilmemeli
+Dijital teslimat;;Kategori yetkisi ve onaylı teslimat akışı doğrulanmalı
+Teslim süresi;;Gerçek operasyon kapasitesine göre doldur
+Stok;;Lisans ve kurulum kapasitesine göre doldur
+Donanım;Dahil değil;Açıklamada belirtilmiş
+Mobil lisans;Dahil değil;Açıklamada belirtilmiş
+POS entegrasyonu;Ayrıca yıllık ücretli;Açıklamada belirtilmiş
