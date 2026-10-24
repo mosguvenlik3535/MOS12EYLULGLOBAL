@@ -1,0 +1,32 @@
+MOS BARCODE — TRENDYOL GÖRSEL REVİZYONU R2
+
+Bu pakette sadece yeni 5 görsel ve bu açıklama bulunur.
+DOSYALARIN TAMAMI -R2.jpg İLE BİTER.
+
+1) Ürün medya galerisindeki eski 5 görseli kaldırın.
+2) Yeni dosyaları 01, 02, 03, 04, 05 sırasıyla yükleyin.
+3) Güncellemeden önce galeride eski dosya veya eski küçük resim kalmadığını kontrol edin.
+4) Ürünü yeniden değerlendirmeye gönderin. Nihai onay Trendyol'a aittir.
+
+Yapılanlar:
+- Eski satış ekranındaki sıralama/öneri şeridi yeni çekimde görünmüyor.
+- Ana görselde gerçek ödeme penceresi kullanılıyor.
+- Stok, rapor ve ayar ekranlarında ilgili bölüm görüntüleri kullanılıyor.
+- Rapordaki ret mesajıyla çakışabilecek maliyet satırı görsel dışında bırakıldı.
+- Ayarlar görselindeki iletişim bilgileri bölümü dışarıda bırakıldı.
+- Beş nihai JPG'nin Türkçe OCR taramasında ret mesajındaki kelimeler bulunmadı.
+  OCR olasılıksal bir kontroldür; platform onayının yerine geçmez.
+- Uygulamanın çalışan kodu değiştirilmedi; yalnızca pazaryeri görselleri yenilendi.
+
+Ölçü: 1200 × 1800 piksel, RGB JPEG, 96 DPI.
+Lisans/kurulum kapsamı ve fiyat değiştirilmedi.
+
+EK KONTROL:
+Paylaştığınız ekranda kategori Barkod Okuyucu görünüyordu. Satılan ürün cihaz
+olmadığı için uygun ticari yazılım/dijital lisans kategorisini Trendyol desteğiyle
+teyit edin. Uygun kategoriyi bilmeden rastgele kategori ID'si girmeyin.
+
+Başlık önerisi:
+MOS BARCODE Barkodlu Satış ve Stok Takip Programı Full Pro Ömür Boyu Lisans 1 Bilgisayar
+
+Bu revizyon Trendyol panelinize otomatik yüklenmedi.

@@ -1,0 +1,54 @@
+{
+  "revision": "R2",
+  "engine": "tesseract.js 7.0.0",
+  "terms": [
+    "en",
+    "çok",
+    "satılan",
+    "satan"
+  ],
+  "scope": "whole-word Unicode-aware matching; final JPEGs at delivered resolution",
+  "old_sales_source_matches": [
+    "en",
+    "çok",
+    "satan"
+  ],
+  "note": "OCR is probabilistic; not a guarantee of Trendyol approval. Visual inspection and source-content checks were also performed.",
+  "images": [
+    {
+      "file": "01-MOS-BARCODE-R2.jpg",
+      "sha256": "e569464a41b8e6dac43c718910bf09b5e9ec8ba4d6224f6334f89daa1e492cc1",
+      "ocr_language": "tur",
+      "matches": [],
+      "confidence": 75
+    },
+    {
+      "file": "02-MOS-BARCODE-R2.jpg",
+      "sha256": "bb660fd211f2ea88675979ef6d3933b501927f0a589ed4d17f19ebb28f2ea162",
+      "ocr_language": "tur",
+      "matches": [],
+      "confidence": 72
+    },
+    {
+      "file": "03-MOS-BARCODE-R2.jpg",
+      "sha256": "ce570abedab0530c03df45d7d5437fa9378ef61320632940e1aaa46365ba5836",
+      "ocr_language": "tur",
+      "matches": [],
+      "confidence": 71
+    },
+    {
+      "file": "04-MOS-BARCODE-R2.jpg",
+      "sha256": "c18b1b59b6fabf9c6634a5f59e173fa0de3773abc86605628c954091e909c206",
+      "ocr_language": "tur",
+      "matches": [],
+      "confidence": 89
+    },
+    {
+      "file": "05-MOS-BARCODE-R2.jpg",
+      "sha256": "bd793f43990e3b0aecd750c46e230efb49e5f5278006d8332db094300e4933f2",
+      "ocr_language": "tur",
+      "matches": [],
+      "confidence": 71
+    }
+  ]
+}

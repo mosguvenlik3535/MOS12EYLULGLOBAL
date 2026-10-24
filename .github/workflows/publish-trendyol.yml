@@ -28,5 +28,6 @@ jobs:
         run: |
           gh release upload v1.15.22 \
             "$HOME/.cache/mos-trendyol/MOS-BARCODE-Trendyol-Satis-Paketi.zip" \
-            marketing/trendyol/gorseller/*.jpg \
+            "$HOME/.cache/mos-trendyol/MOS-BARCODE-Trendyol-Gorseller-REVIZE-R2.zip" \
+            marketing/trendyol/gorseller/*-R2.jpg \
             marketing/trendyol/belgeler/03-LISTELEME-VE-SATIS-PLANI.pdf --clobber

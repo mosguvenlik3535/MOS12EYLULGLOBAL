@@ -1,6 +1,6 @@
 MOS BARCODE — TRENDYOL LİSTELEME PAKETİ
 
-01–05 numaralı 5 JPG görseli ürün görsellerine sırasıyla yükleyin.
+R2 revizyonundaki 01–05 numaralı 5 JPG görseli ürün görsellerine sırasıyla yükleyin.
 Ölçü: 1200 × 1800 piksel, RGB JPEG, 96 dpi.
 
 Teklif: 1 bilgisayar için ömür boyu Masaüstü Full Pro + ilk uzaktan kurulum.
@@ -18,3 +18,6 @@ API anahtarı, şifre veya müşteri verisi bu pakette yoktur.
 
 Başlık ve HTML/TXT açıklama müşteri içindir. Satış planı, CSV tabloları ve
 bu OKU-ONCE metni satıcı içindir; ürün açıklamasına topluca yapıştırmayın.
+
+Görseller R2 olarak yenilendi. Önceki görselleri galeriden kaldırın.
+Ayrıntılar: REVIZYON-R2-OKU.txt
