@@ -1,0 +1,31 @@
+name: Publish separate Trendyol NETUM bundle images
+on:
+  push:
+    branches: ['arena/01a0bfd3-mos12eylulglobal']
+    paths:
+      - 'marketing/trendyol-netum/**'
+      - '.github/workflows/publish-trendyol-netum.yml'
+permissions:
+  contents: write
+concurrency:
+  group: trendyol-netum-bundle
+  cancel-in-progress: false
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate the independent second product image set
+        run: |
+          pip install pillow==11.3.0
+          python marketing/trendyol-netum/build-package.py
+      - name: Publish files only; not a Trendyol listing submission
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload v1.15.22 \
+            "$HOME/.cache/mos-trendyol/MOS-BARCODE-NETUM-USB-Trendyol-Gorseller.zip" \
+            marketing/trendyol-netum/gorseller/*.jpg --clobber
